@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Invictus.Core\Invictus.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Administrativo\ColaboradorAggregate\Interfaces\" />
+    <Folder Include="Administrativo\UnidadeAggregate\Interfaces\" />
+  </ItemGroup>
+
+</Project>

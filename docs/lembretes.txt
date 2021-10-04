@@ -1,0 +1,418 @@
+DÚVIDAS???????????
+
+
+aluno: 75% de presença
+OBS: aluno q reprova e no outro semestre vai fazer apenas a materia q foi reprovada
+em outra turma
+
+
+----------------------------
+
+
+MÔDULOS:
+
+GERAL
+	- Em todos modais, tirar o cancel como botao e colocar o x no canto superior direito
+	- nas pesquisas, se nao localizar, retornar 404 (esse ou 200?) analisar!
+	- snakbar de sucesso (create colab linha 157) transformar em component a parte e ao chamar, enviar a msg que 
+	  deseja
+	- setar os status 409 nos casos de conflito
+    - paleta de cores e setar padrão pra todo sistema
+	- arquivos SCSS
+	- dropdowns vindo de sessions?
+	- passar usuarui e outros Id para GUID
+    - IMPORTANTE!!! colaboradores, alunos,turmas etc, NAO DELETAR REGISTROS, apenas desativar
+	- validar sempre formato de CPF EAMIL, TELEFONE pra nao salvar errado pois sao ("Ids"), salvar email tudo
+	  em minúsculo etc...
+	- depois tela login, pensar numa tela imadiata com info mais importantes do dia a dia
+	  tipo turmar em aberto, msg, alertas etc...
+	- colocar botao logout com nome da pessoa no canto superior direito
+	- IMPORTANTE!!! criar local para criar as unidade - apenas um ou dois responsáveis poderão fazer isso
+	  ,inicialmente, paenas os dev poderão fazer isso
+	- IMPORTANTE!!! LOGS - REVISAR
+	- refresh do JWT
+	- limpar string comentários!
+	- em todas as buscas de colaborador, aluno ou prof, botao para informar se quer trazer tb
+	  os destivados!
+	- redefiniar abas e icones da NAV
+	- IMPORTANTE!!! consertar a foto na matricula e em outros lugares...
+	- PENSAR IMPLEMENTAÇÃO quando o aluno fizer um curso em uma unidade e outro curso
+	  em outro
+1) LOGIN
+	- botao esqueceu senha 
+	- avisar qnd perfil estiver inativado ou que nao existe (melhor nao)
+	- cliar esquei senha e mudar senha
+	- depois da tela login, mostral modal com mural de mensagem!
+
+
+2) IDENTITY
+
+
+
+
+3) ADMINISTRATIVO
+	.cursos:
+	.colaboradores:
+		- informar na aba "status" (mudar a aba perfil) : usuário com acesso ao sistema/usuário sem acesso/acesso desativado
+	    - colocar barra ou similar, de load
+		- fazer o perfil que qnd salva prof, salva na sua localidade ou qnd edita, edita
+		  add localidade adicional (cria setor só de professores).
+		OK - salvar colaborador, antes ver se: ja existe cadastro com o msm CPF e/ou EMAIL
+		- ta table, trocar coluna perfil e perfil ativo para: possui acesso ao sistema e acesso ativo?
+		OK - no botao deletar, mostrar tela de confirmação e não deletar do banco, apenas desativar,
+		  ; criar coluna "ativo"
+		- ERRO: quando cliquei no mudar página, msm desativado, ele tentou mudar!
+		OK - botar numero index na table
+		OK - campo CPF está podendo digitar caracteres, não permitir edição do CPF nem EMAIL 
+		  por questões cadastrais e de validação
+		- tirar do dropdown cargos o "professor" - criar setor específico para este
+		- se mudar unidade, informar que ele será "transferido"
+		OK - ao salvar colaborador, verificar se está tornando email tudo em minusculo e eliminando
+		  "acentos"
+		OK - "revalidar" CPF ou formato do email?
+		- na busca, colocar padrão igual está no "pedag/matricula
+		OK - ao editar, msg editado com sucesso
+		- ao editar, ao voltar pra tela principal, atualizar a table
+		- ver no livro Pro angular a msg "deseja cancelar modificarçao"? ao cancelar editar
+		- revalir se spinner estão ok!
+	
+	.usuários
+	    OK - deixar tela padrão tela colaboradores
+		- analisar e reformar tela criar usuários
+		- ao buscar usuários para criar o acesso, passar a unidade do cadastrador para realizar a busca baseado nesse cadastro, 
+		  buscando colaborador apenas cadastrado na msm unidade
+		- logo na principal informar que é tela de cadastro de pessoas ao sistema
+		- informar que para dar acesso, tem q ser previamente cadastrado como processor ou
+		  colaborador
+		- trazer apenas quem tem acesso, ou seja, quem tem perfil
+		ok - buscar email, se ja tiver com esse email, informar 
+		  que ja existe esse perfil e se quiser alterar, va em editar!
+        - mostrar e popular só os que nao tiverem perfil para ele criar
+		  na tabela colaboradores colocar email unique para n ter perigo de duplicar
+		ok - criado, enviar email para o usuário com a senha (ver como gerar com os 
+		  caracteres exigidos pelo .net) - ver livro real time
+		- só pode das perfil para o usuário q está na msm unidade do cadastrador
+		- na tela de criar perfil, informar tb final do CPF (com bind) e nome completo 
+		  e a unidade
+		- só dar acesso se o colaborador estiver cadastrado na msm unidade de quem está atribuindo
+		  o perfil
+		ok - no criar, aparecer apenas o pesquisar escondendo os demais, pequisando
+		  se trazer user, mostrar os outros campos com nome, perfil drop pra escolher
+	      etc...
+	    - e se mudar o email? VER AO FINAL, POR ENQUANTO NAO PERMITIR MUDAR
+		- modal criar, deixar no padrão dos demais  
+	.cursos
+		- data abertura matrículas, data início do curso, mínimo de alunos,
+	      unidade da criação do curso (quem abre, abre para todos)
+		- implementar o botao de desconto
+		- criar quantidade de salas do curso
+		- ao criar turma, ver vagas baseado na quantidade de salas
+		- msg iniciar aula - melhorar e colocar para "próxima semana de aula"
+		- na table, Status, refatorar para salvar "Em andamento" e nao "EmAndamento"
+		- se EmAndamento, informar em qual trimestre se encontra
+		- ver melhor lógico de "setar" os trimestres
+		- na aba editar, melhorar layout e informações
+	.produtos
+		- implementar com o banco de dados
+		- usar como teste iniciar para financeiro
+		- implementar no padrão de modal, busca, table etc dos demais
+	.Modulos (CRIAR)
+		- setar quantidade de salar e capacidade
+		- ver modulos cadastrados e cadastrar mais
+	.Setup(criar)
+		- criar editar mensagem (ver criação de msg com layout igual era na petrobras)
+		- configurar msg aparecer conforme for prof, adm ou para TODOS
+	.Professores (CrIAR)
+	    - aba criar professor (igual colaborador)
+		- mostra table professor (igual colaborador)
+		- ta table professor, ver as tumas em que está vinculados, icone para verificar 
+		  calendarios de turmas q irá ministrar
+		
+		
+4) PEDAGÓGICO
+	.matrícula:
+	    ** ao matricular, eu na tabela Matriculados, entidade Matriculados e crio
+		  a entidade HistoricoEscolar e NotasDisciplinas e boletimEscolar (ver Draw.io)
+		- no icone de matricular aluno ja cadastrado, ao abrir, aparece para escolher turma
+		  que ele já está matriculado
+	    - no icone de mtricular aluno na turma, rever modal de confiramção da matricula
+		- no icone de mtricular aluno na turma, melhorar o layout
+		- criar o número de matrícula do aluno
+		- documentos para salvar (implementar) ver os docs exigidos
+		- ao matricular, gerar acesso ao sistema para o aluno ver apenas o que ele poder ver
+		- pedag: mostrar alunos com acesso ao sistema
+		- ao abrir modal matricula, buscar necessariamente por CPF, nome E EMAIL
+		- certificar de limpar caracteres na busca
+		- se nao achar nenhum cadastro, ao abrir a forma deixar o CPF digitado
+		- ao digitar email no form, automaticamente pesquisar informando se já existe ou não
+		- implementar anexo de documentos
+		- ver se enviar docs junto com form
+		- ao salvar, revalidar email e CPF
+		- se existente aluno, sem turma (query) informar que deve matricular ele pela table e 
+		  não por aqui
+		- criar número de matrícula já no cadastro inicial do aluno (criar coluna na table)
+		- matriculando, melhorar table de escolha das turmas, trazendo só turmas que estão no primeiro trimetre
+		  (query inicio + uma semana (caso do Em Andamento) e turmas Aguardando Inicio)
+		- matriculando, implementar o "indicação de aluno", salvando isso em alguma table
+		- implementar imprimir contrato
+		- implementar outras infos na table final de matricula
+		- implementar o desconto, informando campo "tem desconto?" salvando log quem deu desconto
+		- criar um campo em editar ou outro lugar com campo livre com observações
+		- criar na table icone ou tro lugar para ver docs ja juntados e se validados ou nao. Como quem
+		  só vê essa table é o usuário, ver e validar no msm lugar
+		- na table inicial, mostrar o icone de matricular o aluno apenas se ele nao estiver matriculado em uma
+		- na table inicial, se não localizar ninguem, avisar!
+	
+	.turmas:
+	    - crias "salas" professor DEVE ser programado para dar aula 15 dias ANTES do inico 
+		  da aula na SALA. colocar capacidade de aluno por sala
+		- estou criando agenda de provas na table com materias, porém com datas nulas,
+		  verificar
+    .tranferência
+	    - implementar internet
+		- iniciar trans externa
+		- na transf externa, copiar +ou - o fluxo matricula
+		- transf interna, na disciplinas faltantes, pegar tudo e eliminar conforme setado 
+		  APROVADO na tabe de notas dele
+		- na tranf interna, mostrar qual turma do trimestre e em que semana de aula do
+		  trimestre se encontra (ver dúvidas)
+		- buscar turma daquela unidade analisnaod o turno em q o aluno se encontra conforme
+		- a materia mais "avançada" em que ele esteja cursando
+		- na transf interna, mudar na table Aluno a UnidadeCadastrada, criar Tabela ligada
+		  a transferencia para criar histórico das transferências
+		- ver como mostrar a transferência no histórico/boletim escolar
+		- ao trans internamente, a turma antiga, eu tenho que tirar esse aluno dela, liberando
+	      uma vaga
+		- na trans f interna, eu vou trans um aluno que não esteja naquela unidade
+	.diário de classe
+        - pensar em setar o trimestre atual do aluno mostrando matérias em q ele estária 
+		  liberado para cursar, e liberando conforme domain event aprovado ou nao em certa
+		  matéria ou identificando notas de certas matérias q sabe q sao de certo trimestre
+		- verificar tamanho ta table, deixar ela com altura automática!
+		- nao pagina a table inicial
+		- no agendamento das provas, colocar as segundas chamadas
+		- no agendamento das provas, colocar a unidade
+		- no agendamento das provas, desabilitar datas já passadas, provas que já
+		  ocorreram
+		- IMPORTANTE lançar notas não está funcionado, botar pra funcionar!
+		- no lançar notas, colocar campo livre para observaçes (colocar isso no banco)
+		- analisar QUERY para o item 26/pedagogico no contrato.
+	.estágio:
+		- fluxo: se aluno estiver no 3 trimestre, mostrar possibilidade de inscrição
+		  senao, mostrar que ainda não está habilitado.
+		- habilitado, mostrar apenas inscrição
+		- enviado docs, mostrar que tem docs pendentes de análise OU mensagem informando se foi 
+	      aprovada ou não
+	    - atual aba estgio, tirar e criar nav aluno e colcoar la estágio
+		- onde está configurações, mudar para Estáfio
+		- "configuaraçãoes" mostrar lista de alunos que estão aguardando analise dos docs
+		  para estágio.
+		- mostrar table de alunos que estão em estagio (com docs ja aprovados)
+		- form para "criar" estágio
+		- editar o estágio (mudar data pex) informando para o aluno que a data modificar
+		- mostrar table com os estágios atuais cadastrados motrando infos etc
+	      com icone editar
+		- para as tablem acima pensar em dropdwon na nav "configurações"
+	
+5) COMERCIAL
+	.lead:
+		- pego o usuário que salvou e salvo cada linha da lead atribuindo a quem está logado!
+		- por excel: abri modal, esperar salvar, retorna do back end a quantidade de leads salvas
+	      entao aparecer botao para clicar em "ok" e fechar o modal
+	    - nao permitir salvar lead se faltar alguma coisa q identifique: ex tem email mas nao tem telefone,
+	      ai ok, mas nao tem nem um nem outro: nao permite salvar
+
+6) BACKGROUD
+
+
+7) FLUXO TESTE END TO END:
+
+---------FRONT--------
+
+
+
+
+----------------------------------------------------	
+			
+PERGUNTAS:
+p. ex: está cursando 3 matérias de certo trimestre, tem algum requisito para ele ir para o
+outro trimestre ou cursar alguma turma do outro? pex? só pode fazer enfermagem II se passar
+em enfermagem I? 
+R: ?
+P. Transferência interna ou externa? deixar livre para o usuário do sistema transferir o aluno mesmo
+que o trimestre esteja no fim ou fazer com que o sistema bloqueie em alguns casos?
+R: ?
+P. No cadastro de aluno, se eu salvar ele com resp financeiro pex, tiver já um colaborador OU
+aluno com o CPF de já um resp financeiro ou menor existente?
+R: ?
+P. Esclarecer item 34/Pedagogico (34.CONTROLE DE ESTAGIO (CHECKBOX OU NOTA) PARA MONITORAR QUAIS ESTÁGIOS FORAM FEITOS E QUAIS AINDA FALTAM SER FEITOS)?
+tem mais de um estagio? estágio tb tem nota?
+R: ?
+P. Estágio: tem a data de início. Tem data limite para inscrição? pex: inicia dia 10, pode se matricular depois dessa data?
+R: ?
+
+
+
+
+
+--------------------------
+REFAC
+- implementar command na criação de turma e matricula principalemnte, colocar UnitOfWork com este
+- analisar se acima seria melhor implementar em background
+- Unidade nao deve ser agregate junto com modulo pois posso criar unidade inicialmente sem modulo
+primeiro crio a unidade depois o modulo necessariamente com materias
+- na entidade Calendario nao preciso ter referencia da Unidade já q esta no agregado Turma
+- posso eliminar o TurmaPedag agregado e deixar só o livroMatricula om o LivroMatriculaAluno (mudar para
+Alunos ou algo similar)
+- Como fiz acima, msm posso fazer no MateriaPedag
+- na entidade Colaborador, mudar o campo string Entidade para int com referencia ao Id da unidade da tabela Unidade
+- ao matricular aluno (seja transf, novo, cadastrado) ** ao matricular, eu na tabela Matriculados, entidade Matriculados e crio
+  a entidade HistoricoEscolar e NotasDisciplinas e boletimEscolar (ver Draw.io) - Refatorar
+  na entidade, tem uma entidade listaPresença que nao inicializo, entao tirar
+- tirar propriedade Materia do ProvasAgenda
+- quando inicio a turma, eu crio a agenda (pq nao criar qnd se CRIA turma e nao qnd se
+inicia?
+- transformar verificardor se é menor de idade ou nao em serviço
+- criar table especifica para prof
+- hoje tenho o ProfessorNew q tem o Id e o "profId" q é o id do colaborador e ai tenho nele
+uma lista de materiasdoProd. refac: tirar esse professorNew, deixar só a entidade MateriasDoProf (renomear)
+e ai qnd addo prof, pegar o Id dele e pronto.
+- MATAR item acima e deixar (vide draw.io) apenas o MateriaPedag
+- materias-professor/{turmaId}")] está MOCKADO! REFAZER
+------------------------------
+
+* resp financ + RG + CPF - histórico.. cert conclusao... ou decl matrícula
+cert nascimento casado... foto 3x4... conp res... título el...
+
+se for transferência = escola origem - informar no cadastro c/ matérias cursadas
+
+--------------------------------
+CLAIMS e ROLES
+Claims:
+	IsActive
+	Unidade
+Roles:
+	SuperAdm
+	Administrador
+	Professor
+	Aluno (OBS: REVER)
+	MasterAdm (ou dev?)
+	obs: um pra dev: pode tudo: outro pra MasterAdm para os sócios (nao pode exatamente tudo)
+	
+
+	
+
+-------------------------
+OUTROS: 
+cep teste: 22753033   23045830   22790701
+
+alvaro.junior	d3kcmvohblpteyw
+https://cp.thor.hostazul.com.br	alvaro.junior	d3kcmvohblpteyw
+
+Script-Migration -context invictusdbcontext
+
+Script-Migration -From initial -To update1 -context invictusdbcontext
+
+add-migration update3 -context invictusdbcontext
+
+update-database -context invictusdbcontext
+
+
+
+
+Seu e-mail é: marylopesrj@hotmail.comcopiar
+Seu token é: CEE21E12643840A7B152946E37F69A4E
+
+https://localhost:44370/api/document/pdf
+
+www.api.invictustemp.com.thor.hostazul.com.br/api/document/pdf
+
+
+186_invictusDev
+
+Abc*123456
+
+Server=bd.thor.hostazul.com.br,3533;Database=186_invictusdb;User Id=186_invictusDev;Password=Abc*123456;
+
+http://invictustemp.com.thor.hostazul.com.br/login
+
+https://localhost:44370/api/identity/registrar
+
+
+{
+    "Nome":"Invictus",
+"Email":"invictus@teste.com",
+"Senha":"Abc*123456",
+"SenhaConfirmação":"Abc*123456"
+}
+
+-----------------------------------------
+PJBANK
+
+Você14:35
+alvaroximenesrj@gmail.com
+Marcelo Henrique Amaro Valerio14:39
+API Introdução: https://docs.pjbank.com.br/?version=latest#intro
+Marcelo Henrique Amaro Valerio14:40
+API Sandbox - é mesma API
+ https://docs.pjbank.com.br/?version=latest#1584681a-06b7-4f3a-9543-02925bf2e187
+Para colocar na sandbox e realizar o teste tem que usar as urls que estão na doc começando com https://sandbox.pjbank.com.br ao invés de https://api.pjbank.com.br
+Por exemplo: pra credenciar uma conta de boletos na produção é https://api.pjbank.com.br/recebimentos para credenciar na sandbox é https://sandbox.pjbank.com.br/recebimentos
+
+
+https://docs.pjbank.com.br/?version=latest#intro
+
+10.9.0.98
+
+
+emitir boleto, se emitir boleto nomamante - mudar pedido_numero
+
+credenciamento boleto:
+{
+    "status": "201",
+    "msg": "Sucesso ao credenciar",
+    "credencial": "27f8b64b8168ee9d9775d3b529e985fd8e3698aa",
+    "chave": "dfa2e967b520a7ee78770d9454a74f26306d2bbd",
+    "chave_webhook": "ebb64b6f6de2c293ece5cd0970a7e0248253362c",
+    "conta_virtual": "229777",
+    "agencia_virtual": ""
+}
+
+
+---------------------------
+TODO TEMP
+Financeiro
+VERIFICARAO DE EMAIL EXISTE E CPF FAZER QND APRTAR BOTAO SALVAR,
+VERIFICAR ANTES, SE OK, PASSA E SALVA
+- CAIXINHA PARA INFORMAR PAGAMENTO NOS LUGARES
+XX - pedag/matricula dropbox meio pagamento/parcelas / codigo com a senha desconto, ficará uma mensagem informando
+	que a liberação ficará condicionada à confirmação o pagamento.
+	* caso de parcelado, ficará liberado após confirmação do valor de entrada.
+	* melhor uma tela de confirmação pra não cometer erros.
+	* cada matricula em um curso, geral outro numero de matricula
+	RESP: Qual data para o pagamento da entrada? E se o curso já estiver em curso?
+1.1 - qnd buscar por aluno, ver se ja pagou primeira parcela, se nao pago, não mostra como aluno
+	pode suspender caso nao haja pagamento
+1.2 QUERY (viabilizado depois de implementar recebimento...)
+1.3 fazer na aba aluno como ja iniciado...
+1.4 PDV
+1.5. moqar algo
+2.1  fazer moq background
+5. fazzer aba separada apenas para visualizar e extrair relatórios (pesquisar visual)
+5.a um moq em backgroud (um bota na tela, apertou, email enviado com a msg e o boleto)
+5.b implementar nas telas de matricula. A senha será HASH no banco, diferente da senha de login,
+	terá um botão que o responsável por conceder a senha enviara a senha por email para 
+	a pessoa q irá aplicar (gerada ficará no banco com as info, a senha em si, data de geração e por quem,
+	horário de expiração, se já foi utilizada ou não e quem poderá utilizar)
+6. fazer tela no menu do financeiro
+15. PESQUISAR - deixar o resultado da pesquisa salvo ja e enviar pro cliente.
+16. moqar e pegar excel na internet de exmplo, fazer o excel moqado
+20. criar na tabela aluno (ou aluno matriculado) um tabela para salvar o PDF original e PDF assinado.
+22. pode criar tabela de busca, e botao para clicar "vender" ver exemplos em lojas virtuais
+24. na venda de produtos, pesquisar o nome do aluno no sistema.
+26. pesquisar o máximo possível
+27. já está.
+28. melhorar e refazer a tela inicial
+
+
+
