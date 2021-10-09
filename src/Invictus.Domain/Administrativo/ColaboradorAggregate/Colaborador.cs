@@ -83,5 +83,10 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate
             Perfil = perfil;
             PerfilAtivo = perfilAtivo;
         }
+
+        public void SetUnidadeId(int unidadeId)
+        {
+            UnidadeId = unidadeId;
+        }
     }
 }

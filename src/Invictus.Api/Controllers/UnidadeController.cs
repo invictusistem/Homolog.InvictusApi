@@ -3,6 +3,7 @@ using Dapper;
 using Invictus.Application.Dtos;
 using Invictus.Application.Dtos.Administrativo;
 using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.ContratosAggregate;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
@@ -326,9 +327,10 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveUnidade([FromBody] UnidadeDto newUnidade)
+        public IActionResult SaveUnidade([FromBody] CreateUnidadeCommand command)
         {
-            var unidade = _mapper.Map<Unidade>(newUnidade);
+            return Ok();
+            var unidade = _mapper.Map<Unidade>(command.unidade);
 
             var qntSalas = _context.Salas.Count();
 
@@ -340,6 +342,14 @@ namespace Invictus.Api.Controllers
             }
 
             _context.Unidades.Add(unidade);
+
+            _context.SaveChanges();
+
+            var colaborador = _mapper.Map<Colaborador>(command.colaborador);
+            colaborador.SetUnidadeId(unidade.Id);
+            colaborador.AtivarPerfil(true);
+
+            _context.Colaboradores.Add(colaborador);
 
             _context.SaveChanges();
 

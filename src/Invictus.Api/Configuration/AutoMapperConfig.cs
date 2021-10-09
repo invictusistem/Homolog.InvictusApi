@@ -71,6 +71,7 @@ namespace Invictus.Api.Configuration
             CreateMap<PlanoPagamentoDto, PlanoPagamento>();
             CreateMap<AlunoExcelDto, Aluno>();
             CreateMap<CargoDto, Cargo>();
+            CreateMap<DocumentacaoExigidaDto, DocumentacaoExigencia>();
             //.ForMember(dest => dest.MeioPagamento, opt => opt.MapFrom<CustomResolver>());
 
 
