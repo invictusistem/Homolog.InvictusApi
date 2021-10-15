@@ -68,7 +68,7 @@ namespace Invictus.Api.Controllers
 
             var pessoas = await _matriculaQueries.BuscaAlunos(itemsPerPage, currentPage, parametros, unidadeId);
 
-           // BindCPF(alunos: ref pessoas.Data);
+            //BindCPF(alunos: ref pessoas.Data);
 
             return Ok(pessoas);
         }

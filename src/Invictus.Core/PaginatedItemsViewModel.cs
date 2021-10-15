@@ -15,9 +15,9 @@ namespace Invictus.Core
             Data = data;
         }
 
-        public int CurrentPage { get; private set; }
-        public int ItemsPerPage { get; private set; }
-        public long TotalItemsInDatabase { get; private set; }
-        public List<TEntity> Data { get; private set; }
+        public int CurrentPage { get; set; }
+        public int ItemsPerPage { get; set; }
+        public long TotalItemsInDatabase { get; set; }
+        public List<TEntity> Data { get; set; }
     }
 }

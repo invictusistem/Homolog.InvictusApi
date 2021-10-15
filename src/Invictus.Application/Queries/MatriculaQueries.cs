@@ -103,14 +103,27 @@ namespace Invictus.Application.Queries
 
                 var results = await connection.QueryAsync<AlunoDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
+                results = BindCPF(results.ToList());
+
                 var paginatedItems = new PaginatedItemsViewModel<AlunoDto>(currentPage, itemsPerPage, countItems, results.ToList());
 
                 connection.Close();
 
                 return paginatedItems;
             }
+        }
 
+        public List<AlunoDto> BindCPF(List<AlunoDto> alunos)
+        {
+            
+            foreach (var item in alunos)
+            {
 
+                string substr = item.cpf.Substring(6, 3);
+                item.cpf = "******." + substr + "-**";
+            }
+
+            return alunos;
 
         }
 

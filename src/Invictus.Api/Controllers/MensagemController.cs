@@ -28,7 +28,6 @@ namespace Invictus.Api.Controllers
             return Ok();
         }
 
-
         [HttpGet]
         public IActionResult GetMessage()
         {
