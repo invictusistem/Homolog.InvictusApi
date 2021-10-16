@@ -219,7 +219,7 @@ namespace Invictus.Api
             var context = new CustomAssemblyLoadContext();
             context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
 
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton(typeof(IConverter));
             RegisterServices(services);
 
         }
