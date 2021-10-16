@@ -54,7 +54,7 @@ namespace Invictus.Api
         {
             var conn = Configuration.GetConnectionString("InvictusConnection");
             #region Identity
-            services.AddDbContext<ApplicationDbContext>(options => 
+            services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("InvictusConnection"),
             providerOptions =>
                 providerOptions.EnableRetryOnFailure()));
@@ -64,12 +64,12 @@ namespace Invictus.Api
 
             services.AddDbContext<InvictusDbContext>(
                 options => options.UseSqlServer(conn,
-                providerOptions => 
+                providerOptions =>
                 providerOptions.EnableRetryOnFailure()));
 
             services.AddSingleton(typeof(IConverter),
             new SynchronizedConverter(new PdfTools()));
-            
+
 
             services.AddControllers().AddNewtonsoftJson(options =>
                   options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -112,14 +112,14 @@ namespace Invictus.Api
 
             #endregion
 
-            
+
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
             var appSettings = appSettingsSection.Get<AppSettings>();
 
-            
+
 
             services.AddAutoMapperConfiguration();
 
@@ -176,14 +176,14 @@ namespace Invictus.Api
 
             #endregion
 
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+           // services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             //services.Configure<FormOptions>(o => {
             //    o.ValueLengthLimit = int.MaxValue;
             //    o.MultipartBodyLengthLimit = int.MaxValue;
             //    o.MemoryBufferThreshold = int.MaxValue;
             //});
 
-            
+
 
             #region JWT
             var Key = Encoding.ASCII.GetBytes(appSettings.Secret);
@@ -208,7 +208,7 @@ namespace Invictus.Api
                     IssuerSigningKey = new SymmetricSecurityKey(Key)
                 };
 
-                
+
             }
 
             );
@@ -216,7 +216,10 @@ namespace Invictus.Api
             #endregion
 
             //services.AddWkhtmltopdf("wkhtmltopdf");
+            var context = new CustomAssemblyLoadContext();
+            context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
 
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             RegisterServices(services);
 
         }
@@ -240,7 +243,7 @@ namespace Invictus.Api
 
             app.UseAuthentication();
 
-            
+
 
 
 
@@ -274,21 +277,21 @@ namespace Invictus.Api
                 //SeedData.EnsurePopulated(app, Configuration);
             }
             //SeedData.EnsurePopulated(app, Configuration);
-            //var wkHtmlToPdfPath = "";
+           // var wkHtmlToPdfPath = "";
             //if (env.IsDevelopment())
             //{
-            //  wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox");
-            //SeedData.EnsurePopulated(app, Configuration);
+           // wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox");
+            // SeedData.EnsurePopulated(app, Configuration);
             //}
             //else
             //{
-            //    wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
-            //}
+            // wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
+
             //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
             //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox.dll");
             //var wkHtmlToPdfPath = $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox";
-           // var wkHtmlToPdfPath = $"C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\wkhtmltox\\v0.12.4\\libwkhtmltox";
-           /// CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
+            //var wkHtmlToPdfPath = $"C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\wkhtmltox\\v0.12.4\\libwkhtmltox";
+          // CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
             //context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
 
             // Process.Start("C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\Worker\\WorkerService1.exe");
