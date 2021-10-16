@@ -13,14 +13,14 @@
 	
 	<ItemGroup>
 		<None Remove="assets\styles.css" />
-		<None Remove="wkhtmltox\v0.12.4\libwkhtmltox.dll" />
+		<None Remove="wkhtmltox\v0.12.4\libwkhtmltox.so" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="assets\styles.css">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="wkhtmltox\v0.12.4\libwkhtmltox.dll">
+		<Content Include="wkhtmltox\v0.12.4\libwkhtmltox.so">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

@@ -217,7 +217,7 @@ namespace Invictus.Api
 
             //services.AddWkhtmltopdf("wkhtmltopdf");
             var context = new CustomAssemblyLoadContext();
-            context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
+            context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.so"));
 
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             RegisterServices(services);
