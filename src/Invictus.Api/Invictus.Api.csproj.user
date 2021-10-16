@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ActiveDebugProfile>Invictus.Api - Homol</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Projetos\INVICTUS\back\Invictus\src\Invictus.Api\Properties\PublishProfiles\FolderProfile.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Projetos\INVICTUS\ApiHomolog\src\Invictus.Api\Properties\PublishProfiles\FolderProfile1.pubxml</NameOfLastUsedPublishProfile>
     <ShowAllFiles>false</ShowAllFiles>
     <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
