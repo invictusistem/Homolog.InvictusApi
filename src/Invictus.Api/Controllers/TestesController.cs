@@ -31,7 +31,7 @@ using ExcelDataReader;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Microsoft.AspNetCore.Http;
 using AutoMapper;
-using Wkhtmltopdf.NetCore;
+//using Wkhtmltopdf.NetCore;
 using Invictus.Application.AuthApplication.Interface;
 //using iTextSharp.text;
 //using iTextSharp.text.pdf;
@@ -41,8 +41,7 @@ using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Application.Dtos.Administrativo;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Pedagogico.EstagioAggregate;
-using DinkToPdf;
-using DinkToPdf.Contracts;
+
 
 namespace Invictus.Api.Controllers
 {
@@ -50,7 +49,7 @@ namespace Invictus.Api.Controllers
     [Route("api/testando")]
     public class TestesController : ControllerBase
     {
-        private IConverter _converter;
+       // private IConverter _converter;
      
         private IConfiguration _config { get; }
         public UserManager<IdentityUser> UserManager { get; set; }
@@ -69,8 +68,8 @@ namespace Invictus.Api.Controllers
                                 InvictusDbContext db,
                                 IMapper mapper,
                                 IAdmApplication admApp,
-                                IHttpContextAccessor userHttpContext,
-                                IConverter converter
+                                IHttpContextAccessor userHttpContext
+                               // IConverter converter
                                 // IGeneratePdf generatePdf
                                 )
         {
@@ -83,7 +82,7 @@ namespace Invictus.Api.Controllers
             _admApp = admApp;
             _userHttpContext = userHttpContext;
             unidade = "CGI";// _userHttpContext.HttpContext.User.FindFirst("Unidade").Value;
-            _converter = converter;
+            //_converter = converter;
         }
         //public static MemoryStream Pdf(string html)
         //{
@@ -118,33 +117,74 @@ namespace Invictus.Api.Controllers
         //    return stream;
         //}
 
-        [HttpGet]
-        [Route("export-dk-pdf")]
-        public IActionResult ExportPDF()
+        //[HttpGet]
+        //[Route("export-dk-pdf")]
+        //public IActionResult ExportPDF()
+        //{
+        //    var globalSettings = new GlobalSettings
+        //    {
+        //        ColorMode = ColorMode.Color,
+        //        Orientation = Orientation.Portrait,
+        //        PaperSize = PaperKind.A4,
+        //        Margins = new MarginSettings { Top = 10 },
+        //        DocumentTitle = "PDF Report"
+        //    };
+        //    var objectSettings = new ObjectSettings
+        //    {
+        //        PagesCount = true,
+        //        HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
+        //        WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+        //        HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+        //        FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+        //    };
+        //    var pdf = new HtmlToPdfDocument()
+        //    {
+        //        GlobalSettings = globalSettings,
+        //        Objects = { objectSettings }
+        //    };
+        //    var file = _converter.Convert(pdf);
+        //    return File(file, "application/pdf");
+        //}
+
+        public string Convert(string s, int numRows)
         {
-            var globalSettings = new GlobalSettings
+            var rows = new List<string>(numRows);
+
+            int actualPosition = 0;
+            int prevLine = 0;
+
+            var count = 0;
+            bool down = true;
+
+            for (int i = 0; i < s.Length; i++)
             {
-                ColorMode = ColorMode.Color,
-                Orientation = Orientation.Portrait,
-                PaperSize = PaperKind.A4,
-                Margins = new MarginSettings { Top = 10 },
-                DocumentTitle = "PDF Report"
-            };
-            var objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
-                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
-            };
-            var pdf = new HtmlToPdfDocument()
-            {
-                GlobalSettings = globalSettings,
-                Objects = { objectSettings }
-            };
-            var file = _converter.Convert(pdf);
-            return File(file, "application/pdf");
+                if (down)
+                {
+                    rows[0] = s.Substring(1, 1);
+                }
+                else
+                {
+
+                }
+
+
+                
+
+
+                /*
+                 0          0
+                1      1
+                2   2
+                3
+
+                 
+                 */
+
+
+            }
+
+            return "1";
+
         }
 
         [HttpGet]
@@ -586,10 +626,10 @@ namespace Invictus.Api.Controllers
                         alunosDto.Add(new AlunoExcelDto()
                         {
                             nome = reader.GetValue(1).ToString(),
-                            dataCadastro = Convert.ToDateTime(reader.GetValue(2).ToString()),
+                            dataCadastro = System.Convert.ToDateTime(reader.GetValue(2).ToString()),
                             rg = reader.GetValue(4).ToString(),
                             cpf = reader.GetValue(5).ToString(),
-                            nascimento = Convert.ToDateTime(reader.GetValue(6).ToString()),
+                            nascimento = System.Convert.ToDateTime(reader.GetValue(6).ToString()),
                             logradouro = reader.GetValue(7).ToString(),
                             bairro = reader.GetValue(8).ToString(),
                             cidade = reader.GetValue(9).ToString(),
@@ -649,7 +689,7 @@ namespace Invictus.Api.Controllers
 
             var fileExtension = Path.GetExtension(fileName);
 
-            var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
+            var newFileName = String.Concat(System.Convert.ToString(Guid.NewGuid()), fileExtension);
 
 
             // var aluno = _db.Alunos.OrderBy(c => c.Id).LastOrDefault();
@@ -665,16 +705,13 @@ namespace Invictus.Api.Controllers
             }
 
             var tamanho = file.Length / 1024;
-            document.AddDocumento(arquivo,fileName,fileExtension,file.ContentType, Convert.ToInt32(tamanho));
+            document.AddDocumento(arquivo,fileName,fileExtension,file.ContentType, System.Convert.ToInt32(tamanho));
             document.SetDataCriacao();
             // document.
             //  documento.AddDataByte(arquivo);
 
             _db.DocumentosAlunos.Update(document);
             _db.SaveChanges();
-
-
-
 
             return Ok();
         }

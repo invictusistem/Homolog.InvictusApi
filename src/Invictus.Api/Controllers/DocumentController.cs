@@ -1,6 +1,4 @@
-﻿using DinkToPdf;
-using DinkToPdf.Contracts;
-using Invictus.Data.Context;
+﻿using Invictus.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,13 +20,13 @@ namespace Invictus.Api.Controllers
     [Route("api/document")]
     public class DocumentController : ControllerBase
     {
-        private IConverter _converter;
+       // private IConverter _converter;
         private InvictusDbContext _context;
         private readonly IAlunoQueries _alunoQueries;
 
-        public DocumentController(IConverter converter, InvictusDbContext context, IAlunoQueries alunoQueries)
+        public DocumentController(/*IConverter converter,*/ InvictusDbContext context, IAlunoQueries alunoQueries)
         {
-            _converter = converter;
+            //_converter = converter;
             _context = context;
             _alunoQueries = alunoQueries;
         }
@@ -232,40 +230,40 @@ namespace Invictus.Api.Controllers
         //    return stream;
         //}
 
-        public Task<byte[]> ExportFile()
-        {
-            var globalSettings = new GlobalSettings
-            {
-                ColorMode = ColorMode.Color,
-                Orientation = Orientation.Landscape,
-                PaperSize = PaperKind.A4,
-                Margins = new MarginSettings { Top = 10 },
-                DocumentTitle = ""
-            };
+        //public Task<byte[]> ExportFile()
+        //{
+        //    var globalSettings = new GlobalSettings
+        //    {
+        //        ColorMode = ColorMode.Color,
+        //        Orientation = Orientation.Landscape,
+        //        PaperSize = PaperKind.A4,
+        //        Margins = new MarginSettings { Top = 10 },
+        //        DocumentTitle = ""
+        //    };
 
-            var objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = Conteudo(),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
-                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "" }
-            };
+        //    var objectSettings = new ObjectSettings
+        //    {
+        //        PagesCount = true,
+        //        HtmlContent = Conteudo(),
+        //        WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+        //        HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+        //        FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "" }
+        //    };
 
-            var pdf = new HtmlToPdfDocument()
-            {
-                GlobalSettings = globalSettings,
-                Objects = { objectSettings }
-            };
+        //    var pdf = new HtmlToPdfDocument()
+        //    {
+        //        GlobalSettings = globalSettings,
+        //        Objects = { objectSettings }
+        //    };
 
-            var filePdf = _converter.Convert(pdf);
-
-
+        //    var filePdf = _converter.Convert(pdf);
 
 
 
-            return Task.FromResult(filePdf);
-        }
+
+
+        //    return Task.FromResult(filePdf);
+        //}
 
         public string Conteudo()
         {

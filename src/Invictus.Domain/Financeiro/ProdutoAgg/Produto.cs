@@ -11,6 +11,7 @@ namespace Invictus.Domain.Financeiro.NewFolder
                         string nome,
                         string descricao,
                         decimal preco,
+                        decimal precoCusto,
                         int quantidade,
                         int nivelMinimo,
                         int unidadeId,
@@ -23,6 +24,7 @@ namespace Invictus.Domain.Financeiro.NewFolder
             Nome = nome;
             Descricao = descricao;
             Preco = preco;
+            PrecoCusto = precoCusto;
             Quantidade = quantidade;
             NivelMinimo = nivelMinimo;
             UnidadeId = unidadeId;
@@ -35,6 +37,7 @@ namespace Invictus.Domain.Financeiro.NewFolder
         public string Nome { get; private set; }
         public string Descricao { get; private set; }
         public decimal Preco { get; private set; }
+        public decimal PrecoCusto { get; private set; }
         public int Quantidade { get; private set; }
         public int NivelMinimo { get; private set; }
         public int UnidadeId { get; private set; }

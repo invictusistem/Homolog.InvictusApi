@@ -1,5 +1,5 @@
-using DinkToPdf;
-using DinkToPdf.Contracts;
+//using DinkToPdf;
+//using DinkToPdf.Contracts;
 using Invictus.Api.Configuration;
 using Invictus.Api.Data;
 using Invictus.Api.Model;
@@ -25,7 +25,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IO;
 using System.Text;
-using Wkhtmltopdf.NetCore;
+//using Wkhtmltopdf.NetCore;
 
 namespace Invictus.Api
 {
@@ -67,8 +67,8 @@ namespace Invictus.Api
                 providerOptions =>
                 providerOptions.EnableRetryOnFailure()));
 
-            services.AddSingleton(typeof(IConverter),
-            new SynchronizedConverter(new PdfTools()));
+            //services.AddSingleton(typeof(IConverter),
+            //new SynchronizedConverter(new PdfTools()));
 
 
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -216,10 +216,10 @@ namespace Invictus.Api
             #endregion
 
             //services.AddWkhtmltopdf("wkhtmltopdf");
-            var context = new CustomAssemblyLoadContext();
-            context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
+            //var context = new CustomAssemblyLoadContext();
+            //context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
 
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             RegisterServices(services);
 
         }

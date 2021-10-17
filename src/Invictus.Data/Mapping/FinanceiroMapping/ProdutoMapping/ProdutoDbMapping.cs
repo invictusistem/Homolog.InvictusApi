@@ -19,6 +19,7 @@ namespace Invictus.Data.Mapping.FinanceiroMapping.ProdutoMapping
             //    .HasColumnType("nvarchar(50)");
 
             builder.Property(d => d.Preco).HasPrecision(11, 2);
+            builder.Property(d => d.PrecoCusto).HasPrecision(11, 2);
 
             //builder.Property(d => d.ValorTitulo).HasPrecision(11, 2);
             ////.HasPrecision(11, 6);
