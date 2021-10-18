@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
 {
-    
+
     [ApiController]
     [Route("api/estagios")]
     public class EstagioController : ControllerBase
@@ -75,7 +75,7 @@ namespace Invictus.Api.Controllers
 
                     var findRecusados = validados.Contains(false);
 
-                    if(findRecusados) return Ok(new { documentacaoEnviada = true, documentosAnalisados = false, message = "O(s) seguinte(s) documento(s) foi/foram rejeitado(s), favor reenviar:" });
+                    if (findRecusados) return Ok(new { documentacaoEnviada = true, documentosAnalisados = false, message = "O(s) seguinte(s) documento(s) foi/foram rejeitado(s), favor reenviar:" });
 
                     var estagios = await _pedagModelQueries.GetListEstagios();
                     return Ok(new { documentacaoEnviada = true, documentosValidados = true, data = estagios });
@@ -95,6 +95,16 @@ namespace Invictus.Api.Controllers
             //var estagios = await _pedagModelQueries.GetListEstagios();
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("{estagioId}")]
+        public async Task<ActionResult> GetEstagio(int estagioId)
+        {
+            var estagio = await _db.Estagios.FindAsync(estagioId);
+
+
+            return Ok(new { estagio = estagio });
         }
 
         [HttpGet]
@@ -277,7 +287,17 @@ namespace Invictus.Api.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        [Route("editar")]
+        public async Task<IActionResult> EstagioEdit([FromBody] EstagioDto estagioEdit)
+        {
+            var estagio = _mapper.Map<Estagio>(estagioEdit);
 
+            await _db.Estagios.SingleUpdateAsync(estagio);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
 
         private int GetUserId()
         {
@@ -289,7 +309,7 @@ namespace Invictus.Api.Controllers
             //var aluno = _db.Alunos.Where(t => t.Email == email).SingleOrDefault();
             var userEmail = _userHttpContext.HttpContext.User.FindFirst(ClaimTypes.Email).Value;
             var alunoId = _db.Alunos.Where(a => a.Email == userEmail).Select(a => a.Id).FirstOrDefault();
-           
+
 
             return alunoId;// alunoId.Id;
 
