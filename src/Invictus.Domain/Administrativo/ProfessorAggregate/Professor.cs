@@ -27,7 +27,7 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate
                             string cidade,
                             string uf)
         {
-            Id = Id = Guid.NewGuid();
+           // Id = Id = Guid.NewGuid();
             Nome = nome;
             Email = email;
             CPF = cpf;
@@ -45,7 +45,7 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate
             UF = uf;
 
         }
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
         public string Nome { get; private set; }
         public string Email { get; private set; }
         public string CPF { get; private set; }

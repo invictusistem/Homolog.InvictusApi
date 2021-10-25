@@ -88,14 +88,16 @@ namespace Invictus.Data.Context
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<Conteudo> Conteudos { get; set; }
         // Professores
+        public DbSet<Domain.Administrativo.ProfessorAggregate.Professor> Professores { get; set; }
         public DbSet<MateriasHabilitadas> MateriasHabilitadas { get; set; }
+
 
         #endregion
 
         #region Pedagogico
         // TurmaPedagAggregate
         public DbSet<TurmaPedagogico> TurmaPedag { get; set; }
-        public DbSet<Domain.Pedagogico.TurmaAggregate.Professor> Professores { get; set; }
+        //public DbSet<Domain.Pedagogico.TurmaAggregate.Professor> Professores { get; set; }
         public DbSet<MateriaPedag> ProfMaterias { get; set; }
         public DbSet<LivroMatriculaAlunos> LivroMatriculaAlunos { get; set; }
         public DbSet<LivroMatricula> LivroMatricula { get; set; }
@@ -198,6 +200,7 @@ namespace Invictus.Data.Context
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());
             // Professores
+            modelBuilder.ApplyConfiguration(new ProfessoresDbMapping());
             modelBuilder.ApplyConfiguration(new MateriasHabilitadasDbMapping());
 
             #endregion
@@ -205,7 +208,7 @@ namespace Invictus.Data.Context
             #region Pedagogico
             // TurmaPedagAggregate
             modelBuilder.ApplyConfiguration(new TurmaPedagDbMapping());
-            modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
+            //modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
             modelBuilder.ApplyConfiguration(new Mapping.PedagogicoMapping.TurmaMapping.MateriaPedagDbMapping());
             modelBuilder.ApplyConfiguration(new LivroMatriculaDbMapping());
             modelBuilder.ApplyConfiguration(new LivroMatriculaAlunosDbMapping());

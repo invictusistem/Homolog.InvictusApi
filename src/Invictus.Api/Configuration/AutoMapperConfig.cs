@@ -8,6 +8,7 @@ using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
+using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Comercial.Leads;
@@ -72,6 +73,7 @@ namespace Invictus.Api.Configuration
             CreateMap<AlunoExcelDto, Aluno>();
             CreateMap<CargoDto, Cargo>();
             CreateMap<DocumentacaoExigidaDto, DocumentacaoExigencia>();
+            CreateMap<ProfessorDto, Professor>();
             //.ForMember(dest => dest.MeioPagamento, opt => opt.MapFrom<CustomResolver>());
 
 
