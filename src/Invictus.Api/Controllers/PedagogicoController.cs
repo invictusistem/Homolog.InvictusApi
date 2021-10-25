@@ -283,7 +283,7 @@ namespace Invictus.Api.Controllers
 
             var matriculadoEmAlguma = await _context.Matriculados.Where(m => m.AlunoId == aluno.Id).SingleOrDefaultAsync();
 
-            if (matriculadoEmAlguma == null) { return Ok(new { message = "Aluno matriculado em nenhuma turma." }); }
+            if (matriculadoEmAlguma == null) { return Ok(new { message = "Aluno não matriculado em nenhuma turma." }); }
 
             var turmaDaunidade = await _context.Turmas.Where(t => t.Id == matriculadoEmAlguma.TurmaId & t.UnidadeId == unidadeAtual.Id).SingleOrDefaultAsync();
 

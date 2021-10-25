@@ -16,7 +16,8 @@ namespace Invictus.Domain.Administrativo.Models
                             string parcelamento,
                             bool materialGratuito,
                             decimal bonusMensalidade,
-                            int contratoId
+                            int contratoId,
+                            bool ativo
                             )
         {
             PacoteId = pacoteId;
@@ -27,6 +28,7 @@ namespace Invictus.Domain.Administrativo.Models
             MaterialGratuito = materialGratuito;
             BonusMensalidade = bonusMensalidade;
             ContratoId = contratoId;
+            Ativo = ativo;
 
         }
 
@@ -40,5 +42,6 @@ namespace Invictus.Domain.Administrativo.Models
         public decimal BonusMensalidade { get; private set; }
         public int UnidadeId { get; private set; }
         public int ContratoId { get; private set; }
+        public bool Ativo { get; private set; }
     }
 }

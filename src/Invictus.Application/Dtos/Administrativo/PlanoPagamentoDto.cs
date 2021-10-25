@@ -13,6 +13,7 @@ namespace Invictus.Application.Dtos.Administrativo
         public bool materialGratuito { get; set; }
         public decimal bonusMensalidade { get; set; }
         public int contratoId { get; set; }
+        public bool ativo { get; set; }
 
     }
 }

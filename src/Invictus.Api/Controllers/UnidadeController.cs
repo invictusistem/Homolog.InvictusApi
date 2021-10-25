@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
 {
-    
+
     [Route("api/unidade")]
     public class UnidadeController : BaseController
     {
@@ -83,7 +83,7 @@ namespace Invictus.Api.Controllers
             }
 
 
-           // return Ok(contratos);
+            // return Ok(contratos);
         }
 
         [HttpGet]
@@ -184,6 +184,28 @@ namespace Invictus.Api.Controllers
             return Ok(salas);
         }
 
+
+        [HttpGet]
+        [Route("unidade-salas/{unidadeId}")]
+        public IActionResult GetUnidadeSalas(int unidadeId)
+        {
+            //Console.WriteLine(unidade);
+            //var unidadeId = _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
+            var salas = _context.Salas.Where(s => s.UnidadeId == unidadeId).ToList();
+            //var modulos = await _moduloQueries.GetModulos(unidadeCode);
+            //var msg = "Ok"
+            return Ok(new { salas = salas });
+        }
+
+        [HttpGet]
+        [Route("sala/{salaId}")]
+        public async Task<IActionResult> GetSala(int salaId)
+        {
+            var sala = await _context.Salas.FindAsync(salaId);
+
+            return Ok(new { sala = sala });
+        }
+
         [HttpGet]
         [Route("modulos")]
         public async Task<ActionResult> GetModulos()
@@ -204,6 +226,17 @@ namespace Invictus.Api.Controllers
             var materias = await _context.Materias.Where(m => m.ModuloId == moduloId).ToListAsync();
 
             return Ok(materias);
+        }
+
+        [HttpGet]
+        [Route("produto/{produtoId}")]
+        public async Task<ActionResult> GetProduto(int produtoId)
+        {
+            var produto = await _context.Produtos.FindAsync(produtoId);
+
+            //var unidades = await _context.Unidades
+            //var msg = "Ok"
+            return Ok(new { produto = produto });
         }
 
 
@@ -235,7 +268,7 @@ namespace Invictus.Api.Controllers
         public IActionResult SaveContrato([FromBody] ContratoDto newContrato)
         {
             var totalContratos = _context.Contratos.Count();
-            var contrato = new Contrato(totalContratos, newContrato.pacoteId, newContrato.titulo,newContrato.ativo, newContrato.observacao);
+            var contrato = new Contrato(totalContratos, newContrato.pacoteId, newContrato.titulo, newContrato.ativo, newContrato.observacao);
             contrato.AddConteudos(newContrato.conteudo);
             contrato.SetDataCriacao();
             /*
@@ -455,7 +488,7 @@ namespace Invictus.Api.Controllers
         public IActionResult UpdatePlano([FromBody] PlanoPagamentoDto editedPlano)
         {
             var plano = _mapper.Map<PlanoPagamento>(editedPlano);
-            
+
             _context.Planos.Update(plano);
             _context.SaveChanges();
 

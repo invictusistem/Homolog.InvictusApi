@@ -7,13 +7,14 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate
     {
         public MateriasHabilitadas() { }
 
-        public MateriasHabilitadas(int materiaId)
+        public MateriasHabilitadas(int materiaId, int professorId)
         {
             MateriaId = materiaId;
+            ProfessorId = professorId;
         }
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
         public int MateriaId { get; private set; }
-        public Guid ProfessorId { get; private set; }
-        public virtual Professor Professor { get; private set; }
+        public int ProfessorId { get; private set; }
+       // public virtual Professor Professor { get; private set; }
     }
 }

@@ -5,6 +5,7 @@ using Invictus.Data.Mapping.AdministrativoMappings.ContratoMapping;
 using Invictus.Data.Mapping.AdministrativoMappings.ModelsMapping;
 using Invictus.Data.Mapping.AdministrativoMappings.ModuloMapping;
 using Invictus.Data.Mapping.AdministrativoMappings.ParametrosMapping;
+using Invictus.Data.Mapping.AdministrativoMappings.ProfessorMapping;
 using Invictus.Data.Mapping.AdministrativoMappings.TurmaMappings;
 using Invictus.Data.Mapping.AdministrativoMappings.UnidadeMapping;
 using Invictus.Data.Mapping.ComercialMapping.Leads;
@@ -25,6 +26,7 @@ using Invictus.Domain.Administrativo.ContratosAggregate;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.Parametros;
+using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Comercial.Leads;
@@ -85,13 +87,15 @@ namespace Invictus.Data.Context
 
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<Conteudo> Conteudos { get; set; }
-        
+        // Professores
+        public DbSet<MateriasHabilitadas> MateriasHabilitadas { get; set; }
+
         #endregion
 
         #region Pedagogico
         // TurmaPedagAggregate
         public DbSet<TurmaPedagogico> TurmaPedag { get; set; }
-        public DbSet<Professor> Professores { get; set; }
+        public DbSet<Domain.Pedagogico.TurmaAggregate.Professor> Professores { get; set; }
         public DbSet<MateriaPedag> ProfMaterias { get; set; }
         public DbSet<LivroMatriculaAlunos> LivroMatriculaAlunos { get; set; }
         public DbSet<LivroMatricula> LivroMatricula { get; set; }
@@ -193,6 +197,8 @@ namespace Invictus.Data.Context
             // Contratos Ag
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());
+            // Professores
+            modelBuilder.ApplyConfiguration(new MateriasHabilitadasDbMapping());
 
             #endregion
 

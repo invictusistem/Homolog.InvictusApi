@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Application.Dtos;
+using Invictus.Application.Dtos.Administrativo;
 using Invictus.Application.Queries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
@@ -43,6 +44,30 @@ namespace Invictus.Application.Queries
                 var materias = await connection.QueryAsync<MateriaDto>(query, new { moduloId = moduloId });
 
                 return materias.ToList();
+            }
+        }
+
+        public async Task<IEnumerable<ProdutoViewModel>> GetProdutosViewModel()
+        {
+            var query = @"select 
+                        produto.Id, 
+                        produto.Nome,
+                        produto.preco,
+                        produto.quantidade,
+                        produto.NivelMinimo,
+                        unidade.sigla as unidade 
+                        from Produto 
+                        inner join unidade on 
+                        Produto.UnidadeId = Unidade.Id";
+            /* select * from agendaprovas where turmaId = 1070*/
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var produtos = await connection.QueryAsync<ProdutoViewModel>(query);
+
+                return produtos;
             }
         }
     }

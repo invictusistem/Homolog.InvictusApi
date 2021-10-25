@@ -28,6 +28,7 @@ namespace Invictus.Api.Controllers
     public class FinanceiroController : Controller
     {
         private readonly IFinanceiroQueries _financeiroQueries;
+        private readonly IUnidadeQueries _unidadeQueries;
         private IFinanceiroApp _financApplication;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _userHttpContext;
@@ -35,7 +36,7 @@ namespace Invictus.Api.Controllers
         private InvictusDbContext _db;
         private readonly string unidade;
         public FinanceiroController(IFinanceiroQueries financeiroQueries, InvictusDbContext db, IMapper mapper, IHttpContextAccessor userHttpContext,
-            IFinanceiroApp financApplication, UserManager<IdentityUser> userManager)
+            IFinanceiroApp financApplication, UserManager<IdentityUser> userManager, IUnidadeQueries unidadeQueries)
         {
             _financeiroQueries = financeiroQueries;
             _mapper = mapper;
@@ -44,6 +45,7 @@ namespace Invictus.Api.Controllers
             unidade = _userHttpContext.HttpContext.User.FindFirst("Unidade").Value;
             _userManager = userManager;
             _financApplication = financApplication;
+            _unidadeQueries = unidadeQueries;
         }
 
         #region GET
@@ -141,9 +143,9 @@ namespace Invictus.Api.Controllers
         [Route("produtos")]
         public async Task<IActionResult> Produtos()
         {
-            var unidadeId = await _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefaultAsync();
+            //var unidadeId = await _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefaultAsync();
 
-            var produtos = await _db.Produtos.Where(p => p.UnidadeId == unidadeId).ToListAsync();
+            var produtos = await _unidadeQueries.GetProdutosViewModel();//  _db.Produtos.ToListAsync();
 
             return Ok(produtos);
         }

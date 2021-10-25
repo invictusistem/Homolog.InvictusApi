@@ -213,7 +213,7 @@ namespace Invictus.Api.Controllers
 
             _admApp.ReadAndSaveExcelAlunosSJM();
 
-            var planPag = new PlanoPagamento(typePacote1.Id, "Pacote Educa Mais Brasil", 4290, 0, "Mensal", true, 45, Convert.ToInt32(contrato.Id));
+            var planPag = new PlanoPagamento(typePacote1.Id, "Pacote Educa Mais Brasil", 4290, 0, "Mensal", true, 45, Convert.ToInt32(contrato.Id), true);
 
             return Ok();
 

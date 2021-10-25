@@ -114,7 +114,7 @@ namespace Invictus.Api.Controllers
             var result = await _signInManager.PasswordSignInAsync(usuario, user.Senha, false, true);
             var aluno = await _db.Alunos.Where(a => a.Email == user.Email).FirstOrDefaultAsync();
 
-            if(aluno != null) return CustomResponse(await GerarJwtAluno(usuario, aluno));
+            if (aluno != null) return CustomResponse(await GerarJwtAluno(usuario, aluno));
 
             if (result.Succeeded) return CustomResponse(await GerarJwt(usuario));
 
@@ -135,38 +135,38 @@ namespace Invictus.Api.Controllers
             var claims = await _userManager.GetClaimsAsync(user);
             var userRoles = await _userManager.GetRolesAsync(user);
             var colaborador = new Colaborador();
-            if (user.Email.ToLower() != "invictus@master.com")
-            {
-                colaborador = await _db.Colaboradores.Where(c => c.Email == user.Email).FirstOrDefaultAsync();
-            }
+            //if (user.Email.ToLower() != "invictus@master.com")
+            //{
+            colaborador = await _db.Colaboradores.Where(c => c.Email == user.Email).FirstOrDefaultAsync();
+            //}
             //var userId = _db.Colaboradores.Wh
 
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
             claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
-            
-            
-            if (user.Email.ToLower() != "invictus@master.com")
-            {
-                var trimName = colaborador.Nome.Split(' ');
-                claims.Add(new Claim("Name", trimName[0]));
-            }
-            else
-            {
-                claims.Add(new Claim("Name", "Desenvolvedor"));
-            }
+
+
+            //if (user.Email.ToLower() != "invictus@master.com")
+            //{
+            var trimName = colaborador.Nome.Split(' ');
+            claims.Add(new Claim("Name", trimName[0]));
+            //}
+            //else
+            //{
+            //    claims.Add(new Claim("Name", "Desenvolvedor"));
+            //}
 
 
 
 
-            if (user.Email.ToLower() != "invictus@master.com")
-            {
+            //if (user.Email.ToLower() != "invictus@master.com")
+            //{
 
-                claims.Add(new Claim("ColaboradorId", Convert.ToString(colaborador.Id)));
-            }
-            else
-            {
-                claims.Add(new Claim("ColaboradorId", Convert.ToString(1)));
-            }
+            claims.Add(new Claim("ColaboradorId", Convert.ToString(colaborador.Id)));
+            //}
+            //else
+            //{
+            //    claims.Add(new Claim("ColaboradorId", Convert.ToString(1)));
+            //}
             //claims.Add(new Claim("Unidade", "Campo Grande"));
             //claims.Add(new Claim("Codigo", "CGI"));
             //claims.Add(new Claim(ClaimTypes.Role, "SuperAdm"));
@@ -190,14 +190,14 @@ namespace Invictus.Api.Controllers
             //validar
             var claimUnidade = identityClaims.FindFirst("Unidade").Value;
             var unidadeBairro = "";
-            if (user.Email.ToLower() != "invictus@master.com")
-            {
-                unidadeBairro = await _db.Unidades.Where(u => u.Sigla == claimUnidade).Select(u => u.Bairro).FirstOrDefaultAsync();
-            }
-            else
-            {
-                unidadeBairro = "CGI";
-            }
+            //if (user.Email.ToLower() != "invictus@master.com")
+            //{
+            unidadeBairro = await _db.Unidades.Where(u => u.Sigla == claimUnidade).Select(u => u.Bairro).FirstOrDefaultAsync();
+            //}
+            //else
+            //{
+            //    unidadeBairro = "CGI";
+            //}
             claims.Add(new Claim("UnidadeBairro", unidadeBairro));
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -237,7 +237,7 @@ namespace Invictus.Api.Controllers
             //var user = await _userManager.FindByEmailAsync(email);
             var claims = await _userManager.GetClaimsAsync(user);
             var userRoles = await _userManager.GetRolesAsync(user);
-           // var aluno = new Aluno();
+            // var aluno = new Aluno();
             //if (user.Email.ToLower() != "invictus@master.com")
             //{
             //    colaborador = await _db.Colaboradores.Where(c => c.Email == user.Email).FirstOrDefaultAsync();
@@ -250,8 +250,8 @@ namespace Invictus.Api.Controllers
 
             //if (user.Email.ToLower() != "invictus@master.com")
             //{
-                var trimName = aluno.Nome.Split(' ');
-                claims.Add(new Claim("Name", trimName[0]));
+            var trimName = aluno.Nome.Split(' ');
+            claims.Add(new Claim("Name", trimName[0]));
             //}
             //else
             //{
@@ -264,7 +264,7 @@ namespace Invictus.Api.Controllers
             //if (user.Email.ToLower() != "invictus@master.com")
             //{
 
-                claims.Add(new Claim("ColaboradorId", Convert.ToString(aluno.Id)));
+            claims.Add(new Claim("ColaboradorId", Convert.ToString(aluno.Id)));
             //}
             //else
             //{
@@ -295,8 +295,8 @@ namespace Invictus.Api.Controllers
             var unidadeBairro = "";
             //if (user.Email.ToLower() != "invictus@master.com")
             //{
-                unidadeBairro = await _db.Unidades.Where(u => u.Sigla == claimUnidade).Select(u => u.Bairro).FirstOrDefaultAsync();
-           // }
+            unidadeBairro = await _db.Unidades.Where(u => u.Sigla == claimUnidade).Select(u => u.Bairro).FirstOrDefaultAsync();
+            // }
             //else
             //{
             //    unidadeBairro = "CGI";
