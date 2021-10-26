@@ -253,7 +253,8 @@ namespace Invictus.Api.Controllers
 
             if (turmas.Count() > 0)
             {
-                var turmaOld = await _turmaQueries.GetTurmasMatriculadosOutraUnidade(aluno.Id, aluno.UnidadeCadastrada);
+                //var turmaOld = await _turmaQueries.GetTurmasMatriculadosOutraUnidade(aluno.Id, aluno.UnidadeCadastrada); //unidadeAtual
+                var turmaOld = await _turmaQueries.GetTurmasMatriculadosOutraUnidade(aluno.Id, unidadeAtual.Id); //unidadeAtual
 
                 if (turmaOld.Count() == 0) return Conflict(new { message = "O Aluno está cadastrado em outra unidade, porém não matriculado." });
 

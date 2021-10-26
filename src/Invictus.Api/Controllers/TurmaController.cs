@@ -127,6 +127,18 @@ namespace Invictus.Api.Controllers
             return cursos;
         }
 
+        [HttpGet]
+        [Route("cursosUnidadev2")]
+        public async Task<IActionResult> GetCursosUnidadev2()
+        {// validar p ntrazer turma do msm tipo se ele ja estiver matriculado tipo nao trazer cursos de nefermagem!
+         //informar se nao tiver cursos em andamento
+         // implementar para trazer outros cursos
+
+            var pacote = await _context.TypePacotes.ToListAsync();// _queries.GetCursosUnidade(unidadeId);
+
+            return Ok(pacote);// cursos;
+        }
+
 
 
         [HttpGet]
@@ -183,6 +195,27 @@ namespace Invictus.Api.Controllers
             var idTurmasMatriculados = await _context.Turmas.Where(t => matriculas.Contains(t.Id)).ToListAsync();
 
             var results = await _queries.GetCursosAndamento(curso, idTurmasMatriculados.Select(t => t.PacoteId).ToArray(), unidadeId);
+            // var typeIdsMatriculados = await _context.TypePacotes
+            if (results.Count() == 0) return NotFound(new { message = "Não há turmas nesta unidade em que o aluno possa se matricular." });
+
+
+            return Ok(results);
+        }
+
+        [HttpGet]
+        [Route("pesquisav2/{typePacoteId}")]
+        public async Task<IActionResult> GetCursosAndamentov2(int typePacoteId)
+        {
+
+            //var results = new List<CursoDto>();
+            var unidadeId = await _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefaultAsync();
+            //var matriculas = await _context.Matriculados.Where(m => m.AlunoId == alunoId).Select(m => m.TurmaId).ToListAsync();
+
+            //var idTurmasMatriculados = await _context.Turmas.Where(t => matriculas.Contains(t.Id)).ToListAsync();
+            var pacotesId = await _context.TypePacotes.Where(t => t.Id != typePacoteId).Select(t => t.Id).ToListAsync();//  new List<int>();// [{ typePacoteId}]
+           // pacotesId.Add(typePacoteId);
+
+            var results = await _queries.GetCursosAndamento(null, pacotesId.ToArray(), unidadeId);
             // var typeIdsMatriculados = await _context.TypePacotes
             if (results.Count() == 0) return NotFound(new { message = "Não há turmas nesta unidade em que o aluno possa se matricular." });
 
