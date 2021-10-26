@@ -340,7 +340,7 @@ namespace Invictus.Application.Queries
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
-                
+
                 var results = await connection.QueryAsync<NotasDisciplinasDto>(query, new { materiaId = materiaId, turmaId = turmaId });
 
                 return results;
@@ -348,10 +348,10 @@ namespace Invictus.Application.Queries
             }
             //throw 
 
-           
+
         }
 
-        public async Task<ListaPresencaViewModel> GetInfoDiaPresencaLista(int materiaId, int turmaId,int  calendarioId)
+        public async Task<ListaPresencaViewModel> GetInfoDiaPresencaLista(int materiaId, int turmaId, int calendarioId)
         {
             var listaPresencaViewModel = new ListaPresencaViewModel();
 
@@ -377,7 +377,7 @@ namespace Invictus.Application.Queries
                             right join Aluno on LivroPresencas.AlunoId = Aluno.Id
                             inner join Matriculados on Aluno.Id = Matriculados.AlunoId
                             where Matriculados.TurmaId = @turmaId";
-            
+
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -422,6 +422,26 @@ where Documento_Aluno.Analisado = 'false'";
 
 
                 return alunos.Distinct();
+
+            }
+        }
+
+        public async Task<IEnumerable<DocumentoAlunoDto>> GetDocPendenciasUnidade(int unidadeId)
+        {
+            var query = @"select * from documento_aluno 
+                        where documento_aluno.TurmaId IN (
+                        select turma.id from turma 
+                        where turma.UnidadeId = @unidadeId
+                        ) Or documento_aluno.TurmaId = 0";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var docs = await connection.QueryAsync<DocumentoAlunoDto>(query, new { unidadeId = unidadeId });
+
+                return docs;
 
             }
         }

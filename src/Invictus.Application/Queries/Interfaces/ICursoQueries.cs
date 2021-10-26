@@ -10,7 +10,7 @@ namespace Invictus.Application.Queries.Interfaces
         Task<IEnumerable<TurmaViewModel>> GetCursoById(int cursoId);
         Task<IEnumerable<TurmaViewModel>> GetCursosAndamento(string curso, int[] typePacoteIds,int unidadeId);
         Task<List<AlunoDto>> GetAlunosDaTurma(int turmaId);
-        Task<IEnumerable<TurmaViewModel>> GetCursosUnidade();
+        Task<IEnumerable<TurmaViewModel>> GetCursosUnidade(int unidadeId);
         Task<int> GetQuantidadeTurma(int unidadeId);
     }
 }

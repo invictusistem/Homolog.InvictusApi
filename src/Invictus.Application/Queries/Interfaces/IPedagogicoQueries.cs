@@ -17,6 +17,7 @@ namespace Invictus.Application.Queries.Interfaces
         Task<IEnumerable<NotasDisciplinasDto>> GetNotaByMateriaAndTurmaId(int materiaId, int turmaId);
         Task<ListaPresencaViewModel> GetInfoDiaPresencaLista(int materiaId, int turmaId, int calendarioId);
         Task<IEnumerable<AlunoDto>> GetDocsPendenciasLista();
+        Task<IEnumerable<DocumentoAlunoDto>> GetDocPendenciasUnidade(int unidadeId);
 
     }   
 

@@ -121,7 +121,8 @@ namespace Invictus.Api.Controllers
         {// validar p ntrazer turma do msm tipo se ele ja estiver matriculado tipo nao trazer cursos de nefermagem!
             //informar se nao tiver cursos em andamento
             // implementar para trazer outros cursos
-            var cursos = await _queries.GetCursosUnidade();
+            var unidadeId = await _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).SingleOrDefaultAsync();
+            var cursos = await _queries.GetCursosUnidade(unidadeId);
 
             return cursos;
         }

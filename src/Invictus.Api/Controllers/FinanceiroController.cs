@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
@@ -73,9 +74,26 @@ namespace Invictus.Api.Controllers
             var unidadeId = await _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefaultAsync();
             var pessoas = await _financeiroQueries.GetAlunoFin(itemsPerPage, currentPage, param, unidadeId);// _matriculaQueries.BuscaAlunos(param.email, param.cpf, param.nome);
             //  var pessoas = await _matriculaQueries.BuscaAlunos(itemsPerPage, currentPage, parametros, unidadeId);
-            //BindCPF(ref pessoas);
+            pessoas.Data = SetCPFBind(pessoas.Data);
             return Ok(pessoas);
             //return Ok(pessoas);
+        }
+
+        public List<AlunoDto> SetCPFBind(List<AlunoDto> datas)
+        {
+            foreach (var data in datas)
+            {   
+
+                var newValue = "***.***." + data.cpf.Substring(6, 3) + "-**";
+
+                data.cpf = newValue;
+
+            }
+            //var newValue = "***.***." + CPF.Substring(6, 3) + "-**";
+
+            //CPF = newValue;
+
+            return datas;
         }
 
         [HttpGet]
@@ -360,6 +378,136 @@ namespace Invictus.Api.Controllers
             _db.VendasProdutos.Add(vendaAggregate);
 
             _db.SaveChanges();
+
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("produto-venda-unidades/{unidadeCompradoraId}")]
+        public IActionResult VendaUnidades(int unidadeCompradoraId, [FromBody] ProdutoVendaCommand vendaProdutoCommand)
+        {
+            //TODO
+            // gerar a transação do cartao e salvar no banco com status
+            // fazer isso antes de tudo
+            // se der erro, informar na tela
+            //; ; MeioPagamento meio;
+
+
+            var meioPag = MeioPagamento.TryParse(vendaProdutoCommand.meioPagamento);
+            //var unidadeId = _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
+            var unidadeId = _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
+            //var usuario =  _userManager.FindByEmailAsync(user.Email);
+            var userId = _userHttpContext.HttpContext.User.FindFirst("ColaboradorId").Value;
+
+            //var userId = _db.Colaboradores.Where(c => c.Email == usuarioEmail).Select(c => c.Id).FirstOrDefault();
+            var totalParcelas = 1;
+            if (vendaProdutoCommand.meioPagamento == "dinheiro" ||
+               vendaProdutoCommand.meioPagamento == "debito" ||
+               vendaProdutoCommand.meioPagamento == "pix")
+            {
+                totalParcelas = 1;
+            }
+            else
+            {
+                if (vendaProdutoCommand.parcelas != "vista")
+                {
+                    totalParcelas = Convert.ToInt32(vendaProdutoCommand.parcelas);
+                }
+            }
+
+
+
+            var vendaAggregate = new VendaProdutoAggregate(0, DateTime.Now, vendaProdutoCommand.valorTotal, Convert.ToInt32(userId), unidadeId,
+                vendaProdutoCommand.cpf_comprador, 1, meioPag, " auto cartao ou deb", totalParcelas);
+
+            var produtos = new List<ProdutoVenda>();
+            foreach (var item in vendaProdutoCommand.produtos)
+            {
+                var valorTotal = item.quantidadeComprada * item.preco;
+                var produtoVenda = new ProdutoVenda(0, item.id, item.quantidadeComprada, item.preco,
+                    valorTotal);
+                produtos.Add(produtoVenda);
+
+                var produto = _db.Produtos.Find(item.id);
+                produto.RemoveProduto(item.quantidadeComprada);
+                _db.Produtos.Update(produto);
+
+            }
+
+            vendaAggregate.VendaEntreUnidadesInfo(unidadeCompradoraId);
+
+            vendaAggregate.ProdutosVenda.AddRange(produtos);
+
+            _db.VendasProdutos.Add(vendaAggregate);
+
+            _db.SaveChanges();
+
+
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("produto-doacao-unidades/{unidadeDonatariaId}")]
+        public IActionResult DoacaoUnidades(int unidadeDonatariaId, [FromBody] ProdutoVendaCommand vendaProdutoCommand)
+        {
+
+            // pegar o produto mudar apenas o IdUnidade
+            var produto = _db.Produtos.Find(vendaProdutoCommand.produtos[0].id);
+
+            produto.SetUnidadeId(unidadeDonatariaId);
+
+            _db.Produtos.Update(produto);
+
+            _db.SaveChanges();
+
+            //var meioPag = MeioPagamento.TryParse(vendaProdutoCommand.meioPagamento);
+           
+            //var unidadeId = _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
+            
+            //var userId = _userHttpContext.HttpContext.User.FindFirst("ColaboradorId").Value;
+
+           
+            //var totalParcelas = 1;
+            //if (vendaProdutoCommand.meioPagamento == "dinheiro" ||
+            //   vendaProdutoCommand.meioPagamento == "debito" ||
+            //   vendaProdutoCommand.meioPagamento == "pix")
+            //{
+            //    totalParcelas = 1;
+            //}
+            //else
+            //{
+            //    if (vendaProdutoCommand.parcelas != "vista")
+            //    {
+            //        totalParcelas = Convert.ToInt32(vendaProdutoCommand.parcelas);
+            //    }
+            //}
+
+            //var vendaAggregate = new VendaProdutoAggregate(0, DateTime.Now, vendaProdutoCommand.valorTotal, Convert.ToInt32(userId), unidadeId,
+            //    vendaProdutoCommand.cpf_comprador, 1, meioPag, " auto cartao ou deb", totalParcelas);
+
+            //var produtos = new List<ProdutoVenda>();
+            //foreach (var item in vendaProdutoCommand.produtos)
+            //{
+            //    var valorTotal = item.quantidadeComprada * item.preco;
+            //    var produtoVenda = new ProdutoVenda(0, item.id, item.quantidadeComprada, item.preco,
+            //        valorTotal);
+            //    produtos.Add(produtoVenda);
+
+            //    var produto = _db.Produtos.Find(item.id);
+            //    produto.RemoveProduto(item.quantidadeComprada);
+            //    _db.Produtos.Update(produto);
+
+            //}
+
+            //vendaAggregate.VendaEntreUnidadesInfo(unidadeCompradoraId);
+
+            //vendaAggregate.ProdutosVenda.AddRange(produtos);
+
+            //_db.VendasProdutos.Add(vendaAggregate);
+
+            //_db.SaveChanges();
 
 
             return Ok();

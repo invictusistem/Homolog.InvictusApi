@@ -14,6 +14,7 @@ namespace Invictus.Application.Queries
     public class CursoQueries : ICursoQueries
     {
         private readonly IConfiguration _config;
+        
         private readonly InvictusDbContext _context;
         public CursoQueries(IConfiguration config, InvictusDbContext context)
         {
@@ -226,9 +227,10 @@ namespace Invictus.Application.Queries
             }
         }
 
-        public async Task<IEnumerable<TurmaViewModel>> GetCursosUnidade()
+        public async Task<IEnumerable<TurmaViewModel>> GetCursosUnidade(int unidadeId)
         {
-            string query = "select Turma.Descricao from Turma";
+            string query = "select Turma.Descricao from Turma where Turma.unidadeId = @unidadeId";
+            // select Turma.Descricao from Turma where Turma.unidadeId = 1
             //select * from turma where Turma.Descricao like '%Enfermagem%'
 
             await using (var connection = new SqlConnection(
@@ -236,7 +238,7 @@ namespace Invictus.Application.Queries
             {
                 connection.Open();
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
-                var cursos = await connection.QueryAsync<TurmaViewModel>(query);
+                var cursos = await connection.QueryAsync<TurmaViewModel>(query, new { unidadeId  = unidadeId });
 
                 return cursos.DistinctBy(c => c.descricao);
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Invictus.Api.Controllers
 {
@@ -23,16 +24,16 @@ namespace Invictus.Api.Controllers
             _matriculaQueries = matriculaQueries;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> BuscarCadastro([FromQuery] string query)
-        //{
-        //    var param = JsonConvert.DeserializeObject<QueryDto>(query);
-        //    var pessoas = await _matriculaQueries.BuscaAlunos(param.email, param.cpf, param.nome);
+        [HttpGet]
+        public async Task<IActionResult> BuscarCadastro([FromQuery] string query)
+        {
+            var param = JsonConvert.DeserializeObject<QueryDto>(query);
+            var pessoas = await _context.Alunos.Where(a => a.CPF == param.cpf).ToListAsync();
 
-        //    if (pessoas.Count() > 0) return Conflict(new { message = "Foi localizado um aluno matriculado/cadastrado com este CPF." });
+            if (pessoas.Count() > 0) return Conflict(new { message = "Foi localizado um aluno matriculado/cadastrado com este CPF." });
 
-        //    return Ok();
-        //}
+            return Ok();
+        }
 
         //[Authorize(Roles = "MasterAdm,SuperAdm")]
         //[HttpPost]

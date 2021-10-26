@@ -173,6 +173,20 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("outras")]
+        public async Task<ActionResult> GetOutrasUnidades()
+        {
+            //Console.WriteLine(unidade);
+            var unidadeId = _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
+            //var salas = _context.Salas.Where(s => s.UnidadeId == unidadeId).ToList();
+            //var modulos = await _moduloQueries.GetModulos(unidadeCode);
+
+            var unidades = await _context.Unidades.Where(u => u.Id != unidadeId).ToListAsync();
+            //var msg = "Ok"
+            return Ok(new { unidades = unidades });
+        }
+
+        [HttpGet]
         [Route("salas")]
         public IActionResult GetSalas()
         {

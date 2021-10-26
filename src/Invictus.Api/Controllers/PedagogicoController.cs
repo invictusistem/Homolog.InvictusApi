@@ -72,6 +72,19 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("pendencias-docv2")]
+        public async Task<ActionResult<IEnumerable<TurmaViewModel>>> GetDocPendenciasV2()
+        {
+            //Thread.Sleep(3000); docEnviado analisado
+            var unidadeId = await _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).SingleOrDefaultAsync();
+            var docs = await _pedagogicoQuery.GetDocPendenciasUnidade(unidadeId);// _context.DocumentosAlunos.Where(d => d.Analisado == false).ToListAsync();
+
+            return Ok(new { qntDocs = docs.Count() });
+        }
+
+
+
+        [HttpGet]
         [Route("pendencias-lista")]
         public async Task<ActionResult<IEnumerable<TurmaViewModel>>> GetDocPendenciasLista()
         {
@@ -293,7 +306,10 @@ namespace Invictus.Api.Controllers
 
             if (turmaComVagasParaTRansferencia.Count == 0) { return Ok(new { message = "Sem turmas para transferência" }); }
 
-            return Ok(new { aluno = aluno, turmas = turmaComVagasParaTRansferencia, debitos = false, turmaAtualId = matriculadoEmAlguma.TurmaId });
+            var turmaAtual = await _context.Turmas.FindAsync(matriculadoEmAlguma.TurmaId);
+
+            return Ok(new { aluno = aluno, turmas = turmaComVagasParaTRansferencia, debitos = false, turmaAtualId = matriculadoEmAlguma.TurmaId, 
+            turma = turmaAtual});
         }
 
         [HttpGet]
@@ -301,7 +317,8 @@ namespace Invictus.Api.Controllers
         public async Task<ActionResult> GetPresencaLista(int turmaId)
         {
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 3, 0, 0);
-            var calendar = await _context.Calendarios.Where(c => c.DiaAula == hoje).SingleOrDefaultAsync();
+            //var calendar = await _context.Calendarios.Where(c => c.DiaAula == hoje).SingleOrDefaultAsync();
+            var calendar = await _context.Calendarios.Where(c => c.DiaAula == hoje).FirstOrDefaultAsync();
             if (calendar == null) return Ok();
             var notas = await _pedagogicoQuery.GetInfoDiaPresencaLista(calendar.MateriaId, turmaId, calendar.Id);
             // calendar.SetDataInicioAula();

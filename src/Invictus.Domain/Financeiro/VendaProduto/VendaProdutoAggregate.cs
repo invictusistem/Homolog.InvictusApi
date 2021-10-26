@@ -43,8 +43,15 @@ namespace Invictus.Domain.Financeiro.VendaProduto
         public string MeioPagamento { get; private set; }
         public string IdentificadorPagamento { get; private set; }
         public int Parcelas { get; private set; }
+        public bool EntreUnidades { get; private set; }
+        public int UnidadeCompradoraId { get; private set; }
         public List<ProdutoVenda> ProdutosVenda { get; private set; }
 
+        public void VendaEntreUnidadesInfo(int unidadeId)
+        {
+            EntreUnidades = true;
+            UnidadeCompradoraId = unidadeId;
+        }
        
     }
 }

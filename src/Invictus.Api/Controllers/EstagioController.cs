@@ -108,6 +108,16 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("alunos/{estagioId}")]
+        public async Task<ActionResult> GetAlunosEstagio(int estagioId)
+        {
+            var alunos = await _db.EstagioMatriculas.Where(e => e.EstagioId == estagioId).ToListAsync();
+
+
+            return Ok(new { alunos = alunos });
+        }
+
+        [HttpGet]
         [Route("documentos")]
         public async Task<ActionResult> GetDocs()
         {

@@ -178,9 +178,16 @@ namespace Invictus.Application.Queries
         public async Task<PaginatedItemsViewModel<ColaboradorDto>> GetUsuarios(QueryDto param, int itemsPerPage, int currentPage)
         {
 
-            var query = "SELECT Colaborador.id, Colaborador.nome, Colaborador.email, Colaborador.perfil, Colaborador.perfilAtivo from Colaborador " +
+            var query = "SELECT Colaborador.id, Colaborador.nome, Colaborador.email, Colaborador.perfilAtivo, "+
+                        "AspNetUserClaims.ClaimValue as ativo, "+
+                        "AspNetRoles.Name as perfil " +
+                        "from Colaborador " +
                         "inner join AspNetUsers on Colaborador.Email = AspNetUsers.Email " +
-                        "where LOWER(Colaborador.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
+                        "inner join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId " +
+                        "inner join AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId " +
+                        "inner join AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id " +
+                        "where AspNetUserClaims.ClaimType = 'IsActive' AND " +
+                        "LOWER(Colaborador.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
                         "LOWER(Colaborador.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
                         "LOWER(Colaborador.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI " +
                         "ORDER BY Colaborador.nome " +
@@ -190,16 +197,26 @@ namespace Invictus.Application.Queries
             //            Colaborador.Ativo = 'True' ORDER BY Colaborador.Nome   
             //            OFFSET(@currentPage - 1) * @itemsPerPage ROWS FETCH NEXT @itemsPerPage ROWS ONLY";
 
-            var queryCount = "select count(*) from Colaborador";
+            var queryCount = "select count(*) from Colaborador " +
+                             "inner join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId " +
+                             "inner join AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId " +
+                             "inner join AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id " +
+                             "where AspNetUserClaims.ClaimType = 'IsActive' AND " +
+                             "LOWER(Colaborador.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
+                             "LOWER(Colaborador.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
+                             "LOWER(Colaborador.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI " +
+                             "ORDER BY Colaborador.nome ";
+
+
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
-                var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
                 var results = await connection.QueryAsync<ColaboradorDto>(query, new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
-                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());
+                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, results.Count(), results.ToList());
 
                 return paginatedItems;
 

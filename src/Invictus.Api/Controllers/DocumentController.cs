@@ -196,6 +196,19 @@ namespace Invictus.Api.Controllers
 
         }
 
+        [HttpPost]
+        [Route("pendencia-criar/{alunoId}")]
+        public IActionResult CriarPendencia(int alunoId, [FromBody]CriarDocPendencia command)
+        {
+            var docsAluno = new DocumentoAluno(alunoId, command.descricao, command.comentario, false, false, false, 0);
+
+            _context.DocumentosAlunos.Add(docsAluno);
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
 
         //public static MemoryStream PdfConlusao(string html)
         //{
@@ -273,5 +286,11 @@ namespace Invictus.Api.Controllers
 
             return stringTemplate.ToString();
         }
+    }
+
+    public class CriarDocPendencia
+    {
+        public string descricao { get; set; }
+        public string comentario { get; set; }
     }
 }
