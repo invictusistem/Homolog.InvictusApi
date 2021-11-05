@@ -82,10 +82,11 @@ namespace Invictus.Data.Context
         public DbSet<Responsavel> Responsaveis { get; set; }
         //Colaborador Agg
         public DbSet<Colaborador> Colaboradores { get; set; }
+        public DbSet<DocumentacaoColaborador> DocumentacoesColaborador { get; set; }
 
-        //Contratos
+    //Contratos
 
-        public DbSet<Contrato> Contratos { get; set; }
+    public DbSet<Contrato> Contratos { get; set; }
         public DbSet<Conteudo> Conteudos { get; set; }
         // Professores
         public DbSet<Domain.Administrativo.ProfessorAggregate.Professor> Professores { get; set; }
@@ -196,6 +197,7 @@ namespace Invictus.Data.Context
             modelBuilder.ApplyConfiguration(new ResponsavelDbMapping());
             //Colaborador Agg
             modelBuilder.ApplyConfiguration(new ColaboradorDbMapping());
+            modelBuilder.ApplyConfiguration(new DocumentacaoColaboradorDbMapping());
             // Contratos Ag
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());

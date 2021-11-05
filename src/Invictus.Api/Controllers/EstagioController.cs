@@ -4,9 +4,11 @@ using Invictus.Application.Dtos;
 using Invictus.Application.Queries.Interfaces;
 using Invictus.Core;
 using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Pedagogico.EstagioAggregate;
 using Invictus.Domain.Pedagogico.Models;
 using Invictus.Domain.Pedagogico.Models.IPedagModelRepository;
+using Invictus.Domain.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,9 +32,11 @@ namespace Invictus.Api.Controllers
         private readonly IMapper _mapper;
         private readonly IEstagioQueries _estagioQuery;
         private readonly IHttpContextAccessor _userHttpContext;
+        private readonly IColaboradorRepository _colaboradorRepository;
         private readonly InvictusDbContext _db;
+        private readonly string unidade;
         public EstagioController(IPedagModelsRepository pedagModelRepo, IMapper mapper, IPedagModelsQueries pedagModelQueries,
-            InvictusDbContext db, IEstagioQueries estagioQuery, IHttpContextAccessor userHttpContext)
+            InvictusDbContext db, IEstagioQueries estagioQuery, IHttpContextAccessor userHttpContext, IColaboradorRepository colaboradorRepository)
         {
             _pedagModelRepo = pedagModelRepo;
             _mapper = mapper;
@@ -40,6 +44,8 @@ namespace Invictus.Api.Controllers
             _db = db;
             _estagioQuery = estagioQuery;
             _userHttpContext = userHttpContext;
+            unidade = _userHttpContext.HttpContext.User.FindFirst("Unidade").Value;
+            _colaboradorRepository = colaboradorRepository;
         }
 
         [HttpGet]
@@ -131,6 +137,18 @@ namespace Invictus.Api.Controllers
             var estagios = await _estagioQuery.GetEstagios();// await _db.Estagios.ToListAsync();
 
             return Ok(new { documentos = documentos, estagios = estagios });
+        }
+
+        [HttpGet]
+        [Route("supervisor/{estagioId}")]
+        public async Task<ActionResult> GetSupervisor(int estagioId)
+        {
+            var estagio = await _db.Estagios.FindAsync(estagioId);
+            var supervisor = await _db.Colaboradores.Where(c => c.Id == estagio.SupervisorId).FirstOrDefaultAsync();
+
+            var docs = await _db.DocumentacoesColaborador.Where(d => d.ColaboradorId == supervisor.Id).ToListAsync();
+
+            return Ok(new { supervisor = supervisor, docs = docs });
         }
 
 
@@ -293,6 +311,44 @@ namespace Invictus.Api.Controllers
             var newEstagioMatricula = new EstagioMatricula(alunoId, aluno.Nome, aluno.Email, aluno.CPF, estagioId);
             await _db.EstagioMatriculas.AddAsync(newEstagioMatricula);
             await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("supervisor/{estagioId}")]
+        public async Task<IActionResult> AddEstagioSupervisor(int estagioId, [FromBody] ColaboradorDto newColaborador)
+        {
+            var unidadeId = _db.Unidades.Where(u => u.Sigla == unidade).Select(s => s.Id).SingleOrDefault();
+            newColaborador.unidadeId = unidadeId;
+            //var cargoString = _context.Cargos.Where(c => c.Id == newColaborador.cargoId).Select(c => c.Nome).SingleOrDefault();
+           // newColaborador.cargo = cargoString;
+           
+                newColaborador.perfilAtivo = false;
+                newColaborador.ativo = true;
+                var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(newColaborador);
+                _colaboradorRepository.AddColaborador(colaborador);
+
+            var estagio = await _db.Estagios.FindAsync(estagioId);
+
+            var docs = new List<DocumentacaoColaborador>();
+            var documentacao = new DocumentacaoColaborador(colaborador.Id, "RG", "RG do supervisor", false, false, null, null, null, null);
+            docs.Add(documentacao);
+            var documentacao2 = new DocumentacaoColaborador(colaborador.Id, "CPF", "CPF do supervisor", false, false, null, null, null, null);
+            docs.Add(documentacao2);
+            var documentacao3 = new DocumentacaoColaborador(colaborador.Id, "Comp. Residência", "Comp. Residência do supervisor", false, false, null, null, null, null);
+            docs.Add(documentacao3);
+            var documentacao4 = new DocumentacaoColaborador(colaborador.Id, "COREN", "COREN", false, false, null, null, null, null);
+            docs.Add(documentacao4);
+            var documentacao5 = new DocumentacaoColaborador(colaborador.Id, "Diploma", "Diploma de Enfermagem", false, false, null, null, null, null);
+            docs.Add(documentacao5);
+
+            _db.DocumentacoesColaborador.AddRange(docs);
+            _db.SaveChanges();
+
+            estagio.SetSupervisorId(colaborador.Id);// setar id na table?
+            _db.Estagios.Update(estagio);
+            _db.SaveChanges();
 
             return Ok();
         }

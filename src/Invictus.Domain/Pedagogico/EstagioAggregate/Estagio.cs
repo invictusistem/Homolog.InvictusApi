@@ -47,6 +47,12 @@ namespace Invictus.Domain.Pedagogico.Models
         public string Cidade { get; private set; }
         public string UF { get; private set; }
         public string Bairro { get; private set; }
+        public int SupervisorId { get; private set; }
         public List<EstagioMatricula> Matriculados { get; private set; }
+
+        public void SetSupervisorId(int supervisorId)
+        {
+            SupervisorId = supervisorId;
+        }
     }
 }
