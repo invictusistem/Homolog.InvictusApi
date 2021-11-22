@@ -41,7 +41,8 @@ using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Application.Dtos.Administrativo;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Pedagogico.EstagioAggregate;
-
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 namespace Invictus.Api.Controllers
 {
@@ -49,7 +50,7 @@ namespace Invictus.Api.Controllers
     [Route("api/testando")]
     public class TestesController : ControllerBase
     {
-       // private IConverter _converter;
+        private IConverter _converter;
      
         private IConfiguration _config { get; }
         public UserManager<IdentityUser> UserManager { get; set; }
@@ -68,8 +69,8 @@ namespace Invictus.Api.Controllers
                                 InvictusDbContext db,
                                 IMapper mapper,
                                 IAdmApplication admApp,
-                                IHttpContextAccessor userHttpContext
-                               // IConverter converter
+                                IHttpContextAccessor userHttpContext,
+                                IConverter converter
                                 // IGeneratePdf generatePdf
                                 )
         {
@@ -82,7 +83,7 @@ namespace Invictus.Api.Controllers
             _admApp = admApp;
             _userHttpContext = userHttpContext;
             unidade = "CGI";// _userHttpContext.HttpContext.User.FindFirst("Unidade").Value;
-            //_converter = converter;
+            _converter = converter;
         }
         //public static MemoryStream Pdf(string html)
         //{
@@ -117,34 +118,34 @@ namespace Invictus.Api.Controllers
         //    return stream;
         //}
 
-        //[HttpGet]
-        //[Route("export-dk-pdf")]
-        //public IActionResult ExportPDF()
-        //{
-        //    var globalSettings = new GlobalSettings
-        //    {
-        //        ColorMode = ColorMode.Color,
-        //        Orientation = Orientation.Portrait,
-        //        PaperSize = PaperKind.A4,
-        //        Margins = new MarginSettings { Top = 10 },
-        //        DocumentTitle = "PDF Report"
-        //    };
-        //    var objectSettings = new ObjectSettings
-        //    {
-        //        PagesCount = true,
-        //        HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
-        //        WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
-        //        HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-        //        FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
-        //    };
-        //    var pdf = new HtmlToPdfDocument()
-        //    {
-        //        GlobalSettings = globalSettings,
-        //        Objects = { objectSettings }
-        //    };
-        //    var file = _converter.Convert(pdf);
-        //    return File(file, "application/pdf");
-        //}
+        [HttpGet]
+        [Route("export-dk-pdf")]
+        public IActionResult ExportPDF()
+        {
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PDF Report"
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+            };
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            var file = _converter.Convert(pdf);
+            return File(file, "application/pdf");
+        }
 
         public string Convert(string s, int numRows)
         {

@@ -1,5 +1,7 @@
 //using DinkToPdf;
 //using DinkToPdf.Contracts;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Invictus.Api.Configuration;
 using Invictus.Api.Data;
 using Invictus.Api.Model;
@@ -67,8 +69,8 @@ namespace Invictus.Api
                 providerOptions =>
                 providerOptions.EnableRetryOnFailure()));
 
-            //services.AddSingleton(typeof(IConverter),
-            //new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton(typeof(IConverter),
+            new SynchronizedConverter(new PdfTools()));
 
 
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -276,8 +278,9 @@ namespace Invictus.Api
             {
                 //SeedData.EnsurePopulated(app, Configuration);
             }
+
             //SeedData.EnsurePopulated(app, Configuration);
-            // var wkHtmlToPdfPath = "";
+            //var wkHtmlToPdfPath = "";
             //if (env.IsDevelopment())
             //{
             // wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox");
@@ -285,14 +288,14 @@ namespace Invictus.Api
             //}
             //else
             //{
-            // wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
+            //wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
 
             //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
-            //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox.dll");
+            var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox.dll");
             //var wkHtmlToPdfPath = $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox";
             //var wkHtmlToPdfPath = $"C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\wkhtmltox\\v0.12.4\\libwkhtmltox";
-            // CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
-            //context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
+            CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
+            context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
 
             // Process.Start("C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\Worker\\WorkerService1.exe");
         }

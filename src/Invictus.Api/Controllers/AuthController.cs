@@ -77,7 +77,7 @@ namespace Invictus.Api.Controllers
             {
                 // await _signInManager.SignInAsync(user, false);
                 // return Ok(await GerarJwt(newuser.Email));
-                var unidade = _db.Unidades.Where(u => u.Sigla == "CGI").FirstOrDefault();
+                var unidade = _db.Unidades.Where(u => u.Sigla == "ALC").FirstOrDefault();
                 await _userManager.AddToRoleAsync(user, newuser.Role);
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", newuser.IsActive.ToString()));
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Unidade", unidade.Sigla));

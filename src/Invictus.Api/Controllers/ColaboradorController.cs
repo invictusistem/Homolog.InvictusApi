@@ -256,10 +256,10 @@ namespace Invictus.Api.Controllers
             var colaborador = _context.Colaboradores.Find(id);
             colaborador.SetPerfil(perfil);
             colaborador.AtivarPerfil(perfilAtivo);
-
+            var nome = colaborador.Nome.Split(" ");
             var user = new IdentityUser
             {
-                UserName = colaborador.Email,
+                UserName = RemoveDiacritics(nome[0]),
                 Email = colaborador.Email,
                 EmailConfirmed = true
             };
