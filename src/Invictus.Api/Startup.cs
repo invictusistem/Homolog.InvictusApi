@@ -133,7 +133,7 @@ namespace Invictus.Api
                 {
                     Title = "Invictus",
                     Description = "Curso Invictus",
-                    Contact = new OpenApiContact() { Name = "Álvaro Carlos", Email = "alvaroximenesrj@gmail.com" },
+                    Contact = new OpenApiContact() { Name = "Álvaro Carlos", Email = "invictus.bdazure@gmail.com" },
 
                 });
 
