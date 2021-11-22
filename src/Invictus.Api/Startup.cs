@@ -1,7 +1,3 @@
-//using DinkToPdf;
-//using DinkToPdf.Contracts;
-using DinkToPdf;
-using DinkToPdf.Contracts;
 using Invictus.Api.Configuration;
 using Invictus.Api.Data;
 using Invictus.Api.Model;
