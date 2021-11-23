@@ -1,3 +1,5 @@
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Invictus.Api.Configuration;
 using Invictus.Api.Data;
 using Invictus.Api.Model;
@@ -68,7 +70,7 @@ namespace Invictus.Api
             //services.AddSingleton(typeof(IConverter),
             //new SynchronizedConverter(new PdfTools()));
 
-           // services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddControllers().AddNewtonsoftJson(options =>
                   options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
                );

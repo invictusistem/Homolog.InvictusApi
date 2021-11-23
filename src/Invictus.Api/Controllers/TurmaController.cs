@@ -614,7 +614,7 @@ namespace Invictus.Api.Controllers
             var diaSemanaUm = DiaDaSemana.TryParse(newTurma.prevInicio_1.DayOfWeek);
             var diaSemanaDois = DiaDaSemana.TryParse(newTurma.segundoDiaAula.DayOfWeek);
 
-            var feriados = _context.ParametrosValues.Where(p => p.ParametrosTypeId == 1).Select(p => p.Nome).ToList();
+            var feriados = new List<string>();// _context.ParametrosValues.Where(p => p.ParametrosTypeId == 1).Select(p => p.Nome).ToList();
 
             // n
             var datas = new List<DataFeriado>();
