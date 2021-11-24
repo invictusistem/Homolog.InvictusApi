@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Invictus.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,17 +7,31 @@ using System.Threading.Tasks;
 
 namespace Invictus.Domain.Administrativo.Parametros
 {
-    public class ParametrosValue
+    public class ParametrosValue : Entity
     {
-        public ParametrosValue(string nome)
+        public ParametrosValue(string value,
+                                string descricao,
+                                string comentario,
+                                Guid parametrosKeyId
+)
         {
-            Nome = nome;
-            //ParametrosValues = new List<ParametrosValue>();
+            Value = value;
+            Descricao = descricao;
+            Comentario = comentario;
+            ParametrosKeyId = parametrosKeyId;
         }
-        public int Id { get; private set; }
-        public string Nome { get; private set; }
+       // public int Id { get; private set; }
+        public string Value { get; private set; }
         public string Descricao { get; private set; }
-        public int ParametrosTypeId { get; private set; }
-        public virtual ParametrosType  ParametrosType { get; private set; }
+        public string Comentario { get; private set; }
+        
+
+
+        #region EF
+        public virtual ParametrosKey  ParametrosKey { get; private set; }
+        public Guid ParametrosKeyId { get; private set; }
+        public ParametrosValue() { }
+
+        #endregion
     }
 }

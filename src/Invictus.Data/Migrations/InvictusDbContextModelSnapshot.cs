@@ -21,39 +21,20 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.Aluno", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CienciaCurso")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Nascimento")
@@ -71,13 +52,13 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("NomeContatoReferencia")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NomeMae")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomePai")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NomeSocial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroMatricula")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RG")
@@ -95,308 +76,19 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("TelWhatsapp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TemRespFin")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("TemRespMenor")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeCadastrada")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Aluno");
+                    b.ToTable("Alunos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.Responsavel", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.AlunoDocumento", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Nascimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Naturalidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NaturalidadeUF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RG")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TelCelular")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TelResidencial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TelWhatsapp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlunoId");
-
-                    b.ToTable("Responsaveis");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.Colaborador", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cargo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CargoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Celular")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Numero")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Perfil")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PerfilAtivo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Colaborador");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.DocumentacaoColaborador", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Analisado")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ColaboradorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContentArquivo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("DataFile")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoArquivo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Validado")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DocumentacaoColaborador");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratosAggregate.Conteudo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ContratoId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContratoId");
-
-                    b.ToTable("ContratoConteudo");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratosAggregate.Contrato", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("CodigoContrato")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Observacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PacoteId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("PodeEditar")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Titulo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contratos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Cargo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cargo");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Destinatario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int?>("MensagemId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Perfil")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MensagemId");
-
-                    b.ToTable("Destinatario");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.DocumentoAluno", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Analisado")
                         .HasColumnType("bit");
@@ -419,8 +111,14 @@ namespace Invictus.Data.Migrations
                     b.Property<bool>("DocEnviado")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PrazoValidade")
+                        .HasColumnType("int");
 
                     b.Property<int>("Tamanho")
                         .HasColumnType("int");
@@ -428,116 +126,26 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("TipoArquivo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Validado")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Documento_Aluno");
+                    b.ToTable("AlunosDocumentos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.MateriasDaTurma", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.AlunoPlanoPagamento", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfessorId");
-
-                    b.ToTable("MateriasDaTurma");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Matriculados", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DiaMatricula")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroMatricula")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Matriculados");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Mensagem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Conteudo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Criador")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataExpiracao")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Mensagens");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.PlanoPagamento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("BonusMensalidade")
+                    b.Property<decimal>("BonusPontualidade")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
-
-                    b.Property<int>("ContratoId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
@@ -545,34 +153,107 @@ namespace Invictus.Data.Migrations
                     b.Property<bool>("MaterialGratuito")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PacoteId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Parcelamento")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Parcelas")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TaxaMatricula")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Valor")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<decimal>("ValorMaterial")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlanoPagamento");
+                    b.ToTable("AlunosPlanoPagamento");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.ProfessorNew", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Calendarios.Calendario", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AulaConcluida")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AulaIniciada")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DateAulaConcluida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateAulaIniciada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DiaAula")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DiaDaSemana")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoraFinal")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoraInicial")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MateriaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Observacoes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SalaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("TemReposicao")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiaAula");
+
+                    b.ToTable("Calendarios");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.Colaborador", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CPF")
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<Guid>("CargoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Celular")
+                        .HasColumnType("nvarchar(12)");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -580,51 +261,231 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProfId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TurmaId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Colaboradores");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratoAggregate.Conteudo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Order")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProfessorNew");
+                    b.HasIndex("ContratoId");
+
+                    b.ToTable("ConteudoContratos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.SenhaBolsas", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratosAggregate.Contrato", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CodigoContrato")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DataExpiracao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EmissorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PacoteId")
+                    b.Property<string>("Observacao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PercentualBolsa")
+                    b.Property<bool>("PodeEditar")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Titulo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contratos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate.DocumentacaoTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ValidadeDias")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nome");
+
+                    b.ToTable("DocumentacaoTemplate");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.AgendaTrimestre", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Fim")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AgendasTrimestre");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.MateriaTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CargaHoraria")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Modalidade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypePacoteId");
+
+                    b.ToTable("MateriasTemplate");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.PlanoPagamentoTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("BonusPontualidade")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<Guid>("ContratoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MaterialGratuito")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TaxaMatricula")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Valor")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<decimal>("ValorMaterial")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SenhaBolsa");
+                    b.ToTable("PlanoPagamentoTemplate");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Produto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodigoProduto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("NivelMinimo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Observacoes")
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<decimal>("Preco")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<decimal>("PrecoCusto")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Produtos");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Models.TypePacote", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
@@ -645,10 +506,9 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.DocumentacaoExigencia", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comentario")
                         .HasColumnType("nvarchar(max)");
@@ -656,69 +516,64 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ModuloId")
-                        .HasColumnType("int");
+                    b.Property<bool>("ObrigatorioParaMatricula")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PacoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Titular")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ValidadeDias")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ModuloId");
+                    b.HasIndex("PacoteId");
 
-                    b.ToTable("DocumentacaoExigencia");
+                    b.ToTable("PacotesDocumentacao");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Materia", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CargaHoraria")
                         .HasColumnType("int");
 
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("MateriaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Modalidade")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ModuloId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("PrimeiroDaLista")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PrimeiroDiaAula")
+                    b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QntAulas")
+                    b.Property<int>("Ordem")
                         .HasColumnType("int");
 
-                    b.Property<int>("QntProvas")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Semestre")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("TemRecuperacao")
-                        .HasColumnType("bit");
+                    b.Property<Guid>("PacoteId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModuloId");
+                    b.HasIndex("PacoteId");
 
-                    b.ToTable("Materias");
+                    b.ToTable("PacotesMaterias");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
@@ -726,248 +581,219 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DuracaoMeses")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Preco")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
                     b.Property<int>("TotalHoras")
                         .HasColumnType("int");
 
-                    b.Property<int>("TypePacoteId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Modulos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ParametrosType");
+                    b.ToTable("Pacotes");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosValue", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosKey", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ParametrosTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nome");
-
-                    b.HasIndex("ParametrosTypeId");
-
-                    b.ToTable("ParametrosValue");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.MateriasHabilitadas", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfessorId")
-                        .IsUnique();
-
-                    b.ToTable("MateriasHabilitadas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Bairro")
+                    b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CEP")
+                    b.Property<string>("Key")
                         .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParametrosKey");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comentario")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("ParametrosKeyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParametrosKeyId");
+
+                    b.ToTable("ParametrosValue");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.Disponibilidade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataAtualizacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Domingo")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PessoaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Quarta")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Quinta")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Sabado")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Segunda")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Sexta")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Terca")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProfessoresDisponibilidades");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.MateriaHabilitada", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PacoteMateriaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfessorId");
+
+                    b.ToTable("ProfessoresMaterias");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
 
                     b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cargo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Celular")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(12)");
 
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Perfil")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PerfilAtivo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.ToTable("Professores");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Calendario", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.RegistroMatricula.Matricula", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("AulaConcluida")
-                        .HasColumnType("bit");
+                    b.Property<Guid>("AlunoId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("AulaIniciada")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DateAulaConcluida")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateAulaIniciada")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DiaAula")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DiaDaSemana")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("HoraFinal")
+                    b.Property<string>("CPF")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HoraInicial")
+                    b.Property<DateTime>("DiaMatricula")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observacoes")
+                    b.Property<string>("NumeroMatricula")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SalaId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("TemReposicao")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DiaAula");
+                    b.ToTable("Matriculas");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Horario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DiaSemanada")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HorarioFim")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HorarioInicio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Calendarios");
+                    b.ToTable("TurmasHorarios");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.HorarioBase", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Previsoes", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("FinalHourOne")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FinalHourTwo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InitialHourOne")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InitialHourTwo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("WeekDayOne")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WeekDayTwo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TurmaId")
-                        .IsUnique();
-
-                    b.ToTable("Horarios");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Previsao", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("PrevisionEndingOne")
                         .HasColumnType("datetime2");
@@ -987,26 +813,19 @@ namespace Invictus.Data.Migrations
                     b.Property<DateTime>("PrevisionStartTwo")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TurmaId")
-                        .IsUnique();
-
-                    b.ToTable("Previsoes");
+                    b.ToTable("TurmasPrevisoes");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Turma", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
@@ -1014,56 +833,74 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Identificador")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Iniciada")
-                        .HasColumnType("bit");
-
                     b.Property<int>("MinimoAlunos")
                         .HasColumnType("int");
 
-                    b.Property<int>("ModuloId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PacoteId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("PacoteId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SalaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("PlanoPagamentoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Previsao")
+                    b.Property<string>("StatusAndamento")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PrevisaoAtual")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PrevisaoTerminoAtual")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SalaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SemetreAtual")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StatusDaTurma")
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("TotalAlunos")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Turma");
+                    b.ToTable("Turmas");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.TurmaMaterias", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CargaHoraria")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MateriaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Modalidade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TurmaId");
+
+                    b.ToTable("TurmasMaterias");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Sala", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
@@ -1072,907 +909,81 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comentarios")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Titulo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Descricao");
+
                     b.HasIndex("UnidadeId");
 
-                    b.ToTable("Salas");
+                    b.ToTable("UnidadesSalas");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Unidade", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CNPJ")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("nvarchar(14)");
 
                     b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("nvarchar(150)");
-
-                    b.Property<string>("Logradouro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Numero")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Sigla")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(3)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Unidade");
+                    b.HasIndex("Sigla");
+
+                    b.ToTable("Unidades");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Comercial.Leads.Lead", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAuth.Autorizacao", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ColaboradorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CursoPretendido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Data")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataInclusaoSistema")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResponsavelLead")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Unidade")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("Leads");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Aluno.Debito", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("BoletoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Competencia")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DataPagamento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataVencimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HistoricoDivida")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IdDebitoOriginal")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUnidadeResponsavel")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InfoFinancId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ParcelaNumero")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("TransacaoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorPago")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorTitulo")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InfoFinancId");
+                    b.HasIndex("UsuarioId");
 
-                    b.ToTable("Debito");
+                    b.ToTable("Autorizacoes");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Aluno.InformacaoFinanceiraAggregate", b =>
+            modelBuilder.Entity("Invictus.Domain.Padagogico.NotasTurmas.TurmaNotas", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataRegistro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("IdUnidadeCadastroInicial")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("MatConfirmada")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Parcelas")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorCurso")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("InfoFinanceira");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Configuracoes.CentroCusto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CentroCusto");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Configuracoes.SubConta", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SubConta");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Fornecedor.Fornecedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CNPJ_CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IE_RG")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeContato")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RazaoSocial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TelContato")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("WhatsApp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Fornecedores");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Fornecedor.FornecedorEntrada", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataVencimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DescricaoTransacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DiaPagamento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("FornecedorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StatusPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Valor")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorComDesconto")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorPago")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FornecedorEntrada");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Fornecedor.FornecedorSaida", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataVencimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DescricaoTransacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DiaPagamento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("FornecedorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StatusPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Valor")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorPago")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FornecedorSaida");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.NewFolder.Produto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("CodigoProduto")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NivelMinimo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Preco")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("PrecoCusto")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Produto");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.Boleto", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("banco_numero")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("credencial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("id_unico")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("id_unico_original")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("linhaDigitavel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("linkBoleto")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("linkGrupo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("msg")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("nossonumero")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("pedido_numero")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("token_facilitador")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Boleto");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoAggregate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("CodigoReferencia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodigoTransacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompradorEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompradorNome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompradorTelefone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataVencimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Taxas")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TotalLiquido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Valor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransacaoBoleto");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoEndereco", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Bairro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Endereco")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Estado")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Numero")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TransacaoBoletoId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TransacaoBoletoId1")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransacaoBoletoId")
-                        .IsUnique();
-
-                    b.HasIndex("TransacaoBoletoId1");
-
-                    b.ToTable("TransacaoBoletoEndereco");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.TransacaoCartaoAggregate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("AID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ARQC")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CV")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodigoTransacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodigoVenda")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NSU")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroSerie")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Taxas")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TotalLiquido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Valor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransacaoCartao");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaCurso.CursoVenda", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("ProdutoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorTotal")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorUnitario")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<int?>("VendaCursoAggregateId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VendaProdutoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VendaCursoAggregateId");
-
-                    b.ToTable("CursosVenda");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaCurso.VendaCursoAggregate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("CPF_Comprador")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataVenda")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IdentificadorPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MatriculaComprador")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Parcelas")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RespVendaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorTotalVenda")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VendaCurso");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaProduto.ProdutoVenda", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("ProdutoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorTotal")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<decimal>("ValorUnitario")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<int?>("VendaProdutoAggregateId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VendaProdutoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VendaProdutoAggregateId");
-
-                    b.ToTable("ProdutosVenda");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaProduto.VendaProdutoAggregate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("CPF_Comprador")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataVenda")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("EntreUnidades")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("IdentificadorPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MatriculaComprador")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MeioPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Parcelas")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RespVendaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnidadeCompradoraId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnidadeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ValorTotalVenda")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VendaProduto");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.EstagioAggregate.Documento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Analisado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ContentArquivo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("DataFile")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EstagioMatriculaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoArquivo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Validado")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EstagioMatriculaId");
-
-                    b.ToTable("DocumentosEstagio");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.EstagioAggregate.EstagioMatricula", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EstagioId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EstagioId");
-
-                    b.ToTable("EstagioMatricula");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.BoletimEscolar", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Disciplina")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("HistoricoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HistoricoId");
-
-                    b.ToTable("BoletinsEscolares");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.HistoricoEscolar", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Aluno")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("HistoricoEscolar");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.NotasDisciplinas", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AvaliacaoDois")
                         .HasColumnType("nvarchar(max)");
@@ -1986,8 +997,11 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("MateriaDescricao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MateriaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Resultado")
                         .HasColumnType("nvarchar(max)");
@@ -2001,258 +1015,183 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("SegundaChamadaAvaliacaoUm")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Trimestre")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotasDisciplinas");
+                    b.ToTable("TurmasNotas");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.Models.Estagio", b =>
+            modelBuilder.Entity("Invictus.Domain.Pedagogico.AlunoAggregate.AlunoAnotacao", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Bairro")
+                    b.Property<string>("Comentario")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Complemento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DataInicio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Logradouro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SupervisorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Trimestre")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Vagas")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Estagio");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.Models.LivroPresenca", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CalendarioId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPresent")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("IsPresentToString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LivroPresencas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.Models.ProvasAgenda", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime?>("AvaliacaoDois")
+                    b.Property<DateTime>("DataRegistro")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("AvaliacaoTres")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("AvaliacaoUm")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Materia")
+                    b.Property<string>("Titulo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("SegundaChamadaAvaliacaoDois")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("SegundaChamadaAvaliacaoTres")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("SegundaChamadaAvaliacaoUm")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProvasAgenda");
+                    b.ToTable("AlunosAnotacoes");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatricula", b =>
+            modelBuilder.Entity("Invictus.Domain.Pedagogico.Responsaveis.Responsavel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TurmaId")
-                        .IsUnique();
-
-                    b.ToTable("LivroMatriculas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatriculaAlunos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LivroMatriculaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LivroMatriculaId");
-
-                    b.ToTable("LivroMatriculasAlunos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.MateriaPedag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaPedagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TurmaPedagId");
-
-                    b.ToTable("MateriasTurmas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.Professor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                    b.Property<string>("CPF")
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MateriaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Nascimento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Naturalidade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NaturalidadeUF")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProfId")
-                        .HasColumnType("int");
+                    b.Property<string>("RG")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelCelular")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelResidencial")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelWhatsapp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TemRespFin")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Tipo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MateriaId");
-
-                    b.ToTable("Professor");
+                    b.ToTable("Responsaveis");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.TurmaPedagogico", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.Aluno", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                    b.OwnsOne("Invictus.Domain.Administrativo.AlunoAggregate.AlunoEndereco", "Endereco", b1 =>
+                        {
+                            b1.Property<Guid>("AlunoId")
+                                .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ModuloId")
-                        .HasColumnType("int");
+                            b1.Property<string>("Bairro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Bairro");
 
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                            b1.Property<string>("CEP")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("CEP");
 
-                    b.HasKey("Id");
+                            b1.Property<string>("Cidade")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cidade");
 
-                    b.ToTable("TurmaPedagogico");
+                            b1.Property<string>("Complemento")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Complemento");
+
+                            b1.Property<string>("Logradouro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Logradouro");
+
+                            b1.Property<string>("Numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Numero");
+
+                            b1.Property<string>("UF")
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("UF");
+
+                            b1.HasKey("AlunoId");
+
+                            b1.ToTable("Alunos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AlunoId");
+                        });
+
+                    b.Navigation("Endereco");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.TestandoEnum", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.Colaborador", b =>
                 {
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(450)");
+                    b.OwnsOne("Invictus.Domain.Administrativo.ColaboradorAggregate.ColaboradorEndereco", "Endereco", b1 =>
+                        {
+                            b1.Property<Guid>("ColaboradorId")
+                                .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Cardtype")
-                        .HasColumnType("nvarchar(100)");
+                            b1.Property<string>("Bairro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Bairro");
 
-                    b.HasKey("Descricao");
+                            b1.Property<string>("CEP")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("CEP");
 
-                    b.ToTable("Testando");
+                            b1.Property<string>("Cidade")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cidade");
+
+                            b1.Property<string>("Complemento")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Complemento");
+
+                            b1.Property<string>("Logradouro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Logradouro");
+
+                            b1.Property<string>("Numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Numero");
+
+                            b1.Property<string>("UF")
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("UF");
+
+                            b1.HasKey("ColaboradorId");
+
+                            b1.ToTable("Colaboradores");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ColaboradorId");
+                        });
+
+                    b.Navigation("Endereco");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.Responsavel", b =>
-                {
-                    b.HasOne("Invictus.Domain.Administrativo.AlunoAggregate.Aluno", "Aluno")
-                        .WithMany("Responsaveis")
-                        .HasForeignKey("AlunoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Aluno");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratosAggregate.Conteudo", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ContratoAggregate.Conteudo", b =>
                 {
                     b.HasOne("Invictus.Domain.Administrativo.ContratosAggregate.Contrato", "Contrato")
                         .WithMany("Conteudos")
@@ -2263,29 +1202,11 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Contrato");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Destinatario", b =>
-                {
-                    b.HasOne("Invictus.Domain.Administrativo.Models.Mensagem", null)
-                        .WithMany("Destinatarios")
-                        .HasForeignKey("MensagemId");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.MateriasDaTurma", b =>
-                {
-                    b.HasOne("Invictus.Domain.Administrativo.Models.ProfessorNew", "Professor")
-                        .WithMany("Materias")
-                        .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Professor");
-                });
-
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.DocumentacaoExigencia", b =>
                 {
                     b.HasOne("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", "Pacote")
-                        .WithMany("Documentos")
-                        .HasForeignKey("ModuloId")
+                        .WithMany("DocumentosExigidos")
+                        .HasForeignKey("PacoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2294,39 +1215,118 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Materia", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", "Modulo")
+                    b.HasOne("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", "Pacote")
                         .WithMany("Materias")
-                        .HasForeignKey("ModuloId")
+                        .HasForeignKey("PacoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Modulo");
+                    b.Navigation("Pacote");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosValue", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.Parametros.ParametrosType", "ParametrosType")
-                        .WithMany("ParametrosValues")
-                        .HasForeignKey("ParametrosTypeId")
+                    b.HasOne("Invictus.Domain.Administrativo.Parametros.ParametrosKey", "ParametrosKey")
+                        .WithMany("ParametrosValue")
+                        .HasForeignKey("ParametrosKeyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ParametrosType");
+                    b.Navigation("ParametrosKey");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.MateriasHabilitadas", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.MateriaHabilitada", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", null)
-                        .WithOne("materias")
-                        .HasForeignKey("Invictus.Domain.Administrativo.ProfessorAggregate.MateriasHabilitadas", "ProfessorId")
+                    b.HasOne("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", "Professor")
+                        .WithMany("Materias")
+                        .HasForeignKey("ProfessorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Professor");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Calendario", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", b =>
+                {
+                    b.OwnsOne("Invictus.Domain.Administrativo.ProfessorAggregate.DadosBancarios", "DadosBancarios", b1 =>
+                        {
+                            b1.Property<Guid>("ProfessorId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Agencia")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Agencia");
+
+                            b1.Property<string>("BancoNumero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("BancoNumero");
+
+                            b1.Property<string>("Conta")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Conta");
+
+                            b1.Property<string>("TipoConta")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("TipoConta");
+
+                            b1.HasKey("ProfessorId");
+
+                            b1.ToTable("Professores");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProfessorId");
+                        });
+
+                    b.OwnsOne("Invictus.Domain.Administrativo.ProfessorAggregate.ProfessorEndereco", "Endereco", b1 =>
+                        {
+                            b1.Property<Guid>("ProfessorId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Bairro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Bairro");
+
+                            b1.Property<string>("CEP")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("CEP");
+
+                            b1.Property<string>("Cidade")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cidade");
+
+                            b1.Property<string>("Complemento")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Complemento");
+
+                            b1.Property<string>("Logradouro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Logradouro");
+
+                            b1.Property<string>("Numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Numero");
+
+                            b1.Property<string>("UF")
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("UF");
+
+                            b1.HasKey("ProfessorId");
+
+                            b1.ToTable("Professores");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProfessorId");
+                        });
+
+                    b.Navigation("DadosBancarios");
+
+                    b.Navigation("Endereco");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Horario", b =>
                 {
                     b.HasOne("Invictus.Domain.Administrativo.TurmaAggregate.Turma", "Turma")
-                        .WithMany("Calendarios")
+                        .WithMany("Horarios")
                         .HasForeignKey("TurmaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2334,22 +1334,51 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Turma");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.HorarioBase", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Turma", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.TurmaAggregate.Turma", null)
-                        .WithOne("Horarios")
-                        .HasForeignKey("Invictus.Domain.Administrativo.TurmaAggregate.HorarioBase", "TurmaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("Invictus.Domain.Administrativo.TurmaAggregate.Previsao", "Previsao", b1 =>
+                        {
+                            b1.Property<Guid>("TurmaId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("DataCriacao")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("DataCriacao");
+
+                            b1.Property<DateTime>("PrevisaoAtual")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("PrevisaoAtual");
+
+                            b1.Property<string>("PrevisaoInfo")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("PrevisaoInfo");
+
+                            b1.Property<DateTime>("PrevisaoTerminoAtual")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("PrevisaoTerminoAtual");
+
+                            b1.HasKey("TurmaId");
+
+                            b1.ToTable("Turmas");
+
+                            b1.WithOwner("Turma")
+                                .HasForeignKey("TurmaId");
+
+                            b1.Navigation("Turma");
+                        });
+
+                    b.Navigation("Previsao");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Previsao", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.TurmaMaterias", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.TurmaAggregate.Turma", null)
-                        .WithOne("Previsoes")
-                        .HasForeignKey("Invictus.Domain.Administrativo.TurmaAggregate.Previsao", "TurmaId")
+                    b.HasOne("Invictus.Domain.Administrativo.TurmaAggregate.Turma", "Turma")
+                        .WithMany("Materias")
+                        .HasForeignKey("TurmaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Turma");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Sala", b =>
@@ -2363,126 +1392,96 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Unidade");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Aluno.Debito", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Unidade", b =>
                 {
-                    b.HasOne("Invictus.Domain.Financeiro.Aluno.InformacaoFinanceiraAggregate", "InformacaoFinanceiraAggregate")
-                        .WithMany("Debitos")
-                        .HasForeignKey("InfoFinancId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("Invictus.Domain.Administrativo.UnidadeAggregate.Endereco", "Endereco", b1 =>
+                        {
+                            b1.Property<Guid>("UnidadeId")
+                                .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("InformacaoFinanceiraAggregate");
+                            b1.Property<string>("Bairro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Bairro");
+
+                            b1.Property<string>("CEP")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("CEP");
+
+                            b1.Property<string>("Cidade")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cidade");
+
+                            b1.Property<string>("Complemento")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Complemento");
+
+                            b1.Property<string>("Logradouro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Logradouro");
+
+                            b1.Property<string>("Numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Numero");
+
+                            b1.Property<string>("UF")
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("UF");
+
+                            b1.HasKey("UnidadeId");
+
+                            b1.ToTable("Unidades");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UnidadeId");
+                        });
+
+                    b.Navigation("Endereco");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoEndereco", b =>
+            modelBuilder.Entity("Invictus.Domain.Pedagogico.Responsaveis.Responsavel", b =>
                 {
-                    b.HasOne("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoAggregate", null)
-                        .WithOne("Endereco")
-                        .HasForeignKey("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoEndereco", "TransacaoBoletoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("Invictus.Domain.Pedagogico.Responsaveis.ResponsavelEndereco", "Endereco", b1 =>
+                        {
+                            b1.Property<Guid>("ResponsavelId")
+                                .HasColumnType("uniqueidentifier");
 
-                    b.HasOne("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoAggregate", "TransacaoBoleto")
-                        .WithMany()
-                        .HasForeignKey("TransacaoBoletoId1");
+                            b1.Property<string>("Bairro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Bairro");
 
-                    b.Navigation("TransacaoBoleto");
-                });
+                            b1.Property<string>("CEP")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("CEP");
 
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaCurso.CursoVenda", b =>
-                {
-                    b.HasOne("Invictus.Domain.Financeiro.VendaCurso.VendaCursoAggregate", "VendaCursoAggregate")
-                        .WithMany("CursosVendas")
-                        .HasForeignKey("VendaCursoAggregateId");
+                            b1.Property<string>("Cidade")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Cidade");
 
-                    b.Navigation("VendaCursoAggregate");
-                });
+                            b1.Property<string>("Complemento")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Complemento");
 
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaProduto.ProdutoVenda", b =>
-                {
-                    b.HasOne("Invictus.Domain.Financeiro.VendaProduto.VendaProdutoAggregate", "VendaProdutoAggregate")
-                        .WithMany("ProdutosVenda")
-                        .HasForeignKey("VendaProdutoAggregateId");
+                            b1.Property<string>("Logradouro")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Logradouro");
 
-                    b.Navigation("VendaProdutoAggregate");
-                });
+                            b1.Property<string>("Numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Numero");
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.EstagioAggregate.Documento", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.EstagioAggregate.EstagioMatricula", null)
-                        .WithMany("Documentos")
-                        .HasForeignKey("EstagioMatriculaId");
-                });
+                            b1.Property<string>("UF")
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("UF");
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.EstagioAggregate.EstagioMatricula", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.Models.Estagio", "Estagio")
-                        .WithMany("Matriculados")
-                        .HasForeignKey("EstagioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.HasKey("ResponsavelId");
 
-                    b.Navigation("Estagio");
-                });
+                            b1.ToTable("Responsaveis");
 
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.BoletimEscolar", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.HistoricoEscolar", "HistoricoEscolar")
-                        .WithMany("BoletinsEscolares")
-                        .HasForeignKey("HistoricoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.WithOwner()
+                                .HasForeignKey("ResponsavelId");
+                        });
 
-                    b.Navigation("HistoricoEscolar");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatricula", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.TurmaAggregate.TurmaPedagogico", "Turma")
-                        .WithOne("LivroMatriculas")
-                        .HasForeignKey("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatricula", "TurmaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Turma");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatriculaAlunos", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatricula", "LivroMatricula")
-                        .WithMany("Alunos")
-                        .HasForeignKey("LivroMatriculaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LivroMatricula");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.MateriaPedag", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.TurmaAggregate.TurmaPedagogico", "TurmaPedag")
-                        .WithMany("Materias")
-                        .HasForeignKey("TurmaPedagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TurmaPedag");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.Professor", b =>
-                {
-                    b.HasOne("Invictus.Domain.Pedagogico.TurmaAggregate.MateriaPedag", "Materia")
-                        .WithMany("Professores")
-                        .HasForeignKey("MateriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Materia");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.AlunoAggregate.Aluno", b =>
-                {
-                    b.Navigation("Responsaveis");
+                    b.Navigation("Endereco");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.ContratosAggregate.Contrato", b =>
@@ -2490,97 +1489,33 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Conteudos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.Mensagem", b =>
-                {
-                    b.Navigation("Destinatarios");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.ProfessorNew", b =>
-                {
-                    b.Navigation("Materias");
-                });
-
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", b =>
                 {
-                    b.Navigation("Documentos");
+                    b.Navigation("DocumentosExigidos");
 
                     b.Navigation("Materias");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosType", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosKey", b =>
                 {
-                    b.Navigation("ParametrosValues");
+                    b.Navigation("ParametrosValue");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.ProfessorAggregate.Professor", b =>
                 {
-                    b.Navigation("materias");
+                    b.Navigation("Materias");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.Turma", b =>
                 {
-                    b.Navigation("Calendarios");
-
                     b.Navigation("Horarios");
 
-                    b.Navigation("Previsoes");
+                    b.Navigation("Materias");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Unidade", b =>
                 {
                     b.Navigation("Salas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Aluno.InformacaoFinanceiraAggregate", b =>
-                {
-                    b.Navigation("Debitos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Transacoes.TransacaoBoletoAggregate", b =>
-                {
-                    b.Navigation("Endereco");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaCurso.VendaCursoAggregate", b =>
-                {
-                    b.Navigation("CursosVendas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.VendaProduto.VendaProdutoAggregate", b =>
-                {
-                    b.Navigation("ProdutosVenda");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.EstagioAggregate.EstagioMatricula", b =>
-                {
-                    b.Navigation("Documentos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.HistoricoEscolar", b =>
-                {
-                    b.Navigation("BoletinsEscolares");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.Models.Estagio", b =>
-                {
-                    b.Navigation("Matriculados");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.LivroMatricula", b =>
-                {
-                    b.Navigation("Alunos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.MateriaPedag", b =>
-                {
-                    b.Navigation("Professores");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Pedagogico.TurmaAggregate.TurmaPedagogico", b =>
-                {
-                    b.Navigation("LivroMatriculas");
-
-                    b.Navigation("Materias");
                 });
 #pragma warning restore 612, 618
         }

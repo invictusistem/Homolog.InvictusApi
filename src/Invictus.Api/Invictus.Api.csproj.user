@@ -4,9 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Invictus.Api - Dev</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Projetos\INVICTUS\ApiHomolog\src\Invictus.Api\Properties\PublishProfiles\FolderProfile1.pubxml</NameOfLastUsedPublishProfile>
-    <ShowAllFiles>false</ShowAllFiles>
-    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <ActiveDebugProfile>Invictus.Api - Development</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

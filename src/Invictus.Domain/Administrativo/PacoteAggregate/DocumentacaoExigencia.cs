@@ -1,37 +1,41 @@
-﻿using Invictus.Core.Enums;
+﻿using Invictus.Core;
+using Invictus.Core.Enums;
+using System;
 
 namespace Invictus.Domain.Administrativo.PacoteAggregate
 {
-    public class DocumentacaoExigencia
+    public class DocumentacaoExigencia : Entity
     {
-        public DocumentacaoExigencia()
-        {
-
-        }
-        public DocumentacaoExigencia(//int id,
-                                    string descricao,
-                                    string comentario,
-                                    //TitularDoc titular,
-                                    int moduloId
+        
+        public DocumentacaoExigencia(//Guid documentoId,
+                                     string descricao,
+                                     string comentario,
+                                     TitularDoc titular,
+                                     int validadeDias,
+                                     bool obrigatorioParaMatricula
                                     )
         {
-           // Id = id;
+           // DocumentoId = documentoId;
             Descricao = descricao;
             Comentario = comentario;
-            //Titular = titular.DisplayName;
-            ModuloId = moduloId;
-
+            Titular = titular.DisplayName;
+            ValidadeDias = validadeDias;
+            ObrigatorioParaMatricula = obrigatorioParaMatricula;
         }
-        public int Id { get; private set; }
+        
+       // public Guid DocumentoId { get; private set; }
         public string Descricao { get; private set; }
         public string Comentario { get; private set; }
         public string Titular { get; private set; }
-        public int ModuloId { get; private set; }
-        public virtual Pacote Pacote { get; private set; }
+        public int ValidadeDias { get; private set; }
+        public bool ObrigatorioParaMatricula { get; private set; }
 
-        public void SetTitular(string titular)
-        {
-            Titular = TitularDoc.TryParse(titular).DisplayName;
-        }
+
+        #region EF
+
+        public DocumentacaoExigencia() { }
+        public Guid PacoteId { get; private set; }
+        public virtual Pacote Pacote { get; private set; }
+        #endregion
     }
 }

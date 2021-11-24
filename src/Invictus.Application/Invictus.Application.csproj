@@ -1,30 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
-		<PackageReference Include="ExcelDataReader" Version="3.7.0-develop00306" />
-		<PackageReference Include="ClosedXML" Version="0.95.3" />
-		<!--<PackageReference Include="itextsharp.xmlworker" Version="5.5.13.2" />-->
-		<!--<PackageReference Include="itextsharp.xmlworker" Version="5.5.13.2" />-->
-		<!--<PackageReference Include="iTextSharp" Version="5.5.13.2" />-->
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.8" />
 		<PackageReference Include="NETCore.MailKit" Version="2.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.8" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-		<PackageReference Include="morelinq" Version="3.3.2" />
-		<PackageReference Include="Dapper" Version="2.0.35" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-		<!--<PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.7.3" />-->
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
 	</ItemGroup>
-
 	<ItemGroup>
-		<ProjectReference Include="..\Invictus.Core\Invictus.Core.csproj" />
-		<ProjectReference Include="..\Invictus.Data\Invictus.Data.csproj" />
+		<ProjectReference Include="..\Invictus.Domain\Invictus.Domain.csproj" />
+		<ProjectReference Include="..\Invictus.Dtos\Invictus.Dtos.csproj" />
+		<ProjectReference Include="..\Invictus.QueryService\Invictus.QueryService.csproj" />
 	</ItemGroup>
-
 </Project>

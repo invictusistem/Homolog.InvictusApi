@@ -1,31 +1,31 @@
 using DinkToPdf;
 using DinkToPdf.Contracts;
-using Invictus.Api.Configuration;
-using Invictus.Api.Data;
-using Invictus.Api.Model;
-using Invictus.Application.Dtos;
-using Invictus.Cross;
+using Invictus.Api.Configurations;
+using Invictus.Api.Identity;
+using Invictus.Application.AutoMapper;
+using Invictus.Application.Ioc;
 using Invictus.Data.Context;
-using Invictus.Domain.Administrativo.AlunoAggregate.Interfaces;
-using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
-using Invictus.Domain.Pedagogico.HistoricoEscolarAggregate.Interfaces;
-using Invictus.Domain.Pedagogico.Models.IPedagModelRepository;
-using Invictus.Domain.Pedagogico.TurmaAggregate.Interfaces;
-using Invictus.Domain.Repository;
+using Invictus.Dtos;
+using Invictus.IoC;
+using Invictus.QueryService.IoC;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-//using Wkhtmltopdf.NetCore;
+using System.Threading.Tasks;
 
 namespace Invictus.Api
 {
@@ -46,14 +46,30 @@ namespace Invictus.Api
             Configuration = builder.Build();
             #endregion
         }
-
-
-        //readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         public void ConfigureServices(IServiceCollection services)
         {
+
+
+
+            #region SQLSERVER
             var conn = Configuration.GetConnectionString("InvictusConnection");
+            services.AddDbContext<InvictusDbContext>(
+                options => options.UseSqlServer(conn,
+                providerOptions =>
+                providerOptions.EnableRetryOnFailure()));
+
+            #endregion
+
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
+            #region Newtonsoft
+            services.AddControllers().AddNewtonsoftJson(options =>
+                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+               );
+            #endregion
+
             #region Identity
+
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("InvictusConnection"),
             providerOptions =>
@@ -61,19 +77,6 @@ namespace Invictus.Api
             //services.AddDbContext<InvictusDbContext>(options => options.UseSqlServer(Configuration
             //    .GetConnectionString("InvictusConnection", providerOptions => providerOptions.EnableRetryOnFailure())));
             // options.EnableRetryOnFailure())
-
-            services.AddDbContext<InvictusDbContext>(
-                options => options.UseSqlServer(conn,
-                providerOptions =>
-                providerOptions.EnableRetryOnFailure()));
-
-            //services.AddSingleton(typeof(IConverter),
-            //new SynchronizedConverter(new PdfTools()));
-
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            services.AddControllers().AddNewtonsoftJson(options =>
-                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-               );
 
             services.AddDefaultIdentity<IdentityUser>(opts =>
             {
@@ -112,16 +115,9 @@ namespace Invictus.Api
 
             #endregion
 
-
-
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-
-            var appSettings = appSettingsSection.Get<AppSettings>();
-
-
-
+            #region AutoMApper
             services.AddAutoMapperConfiguration();
+            #endregion
 
             #region Swagger
 
@@ -131,7 +127,7 @@ namespace Invictus.Api
                 {
                     Title = "Invictus",
                     Description = "Curso Invictus",
-                    Contact = new OpenApiContact() { Name = "Álvaro Carlos", Email = "invictus.bdazure@gmail.com" },
+                    Contact = new OpenApiContact() { Name = "Curso Invictus", Email = "invictus.bdazure@gmail.com" },
 
                 });
 
@@ -176,16 +172,10 @@ namespace Invictus.Api
 
             #endregion
 
-            
-            //services.Configure<FormOptions>(o => {
-            //    o.ValueLengthLimit = int.MaxValue;
-            //    o.MultipartBodyLengthLimit = int.MaxValue;
-            //    o.MemoryBufferThreshold = int.MaxValue;
-            //});
-
-
-
             #region JWT
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+            var appSettings = appSettingsSection.Get<AppSettings>();
             var Key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.AddAuthentication(opt =>
@@ -215,15 +205,10 @@ namespace Invictus.Api
 
             #endregion
 
-            //services.AddWkhtmltopdf("wkhtmltopdf");
-            //var context = new CustomAssemblyLoadContext();
-            //context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox\\v0.12.4\\libwkhtmltox.dll"));
-
-            //services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             RegisterServices(services);
-
         }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
@@ -243,26 +228,6 @@ namespace Invictus.Api
 
             app.UseAuthentication();
 
-
-
-
-
-            //app.UseCors(cors =>
-            //{
-            //    cors.AllowAnyHeader();
-            //    cors.AllowAnyMethod();
-            //    cors.AllowAnyOrigin();
-
-            //});
-
-            //app.UseStaticFiles();
-            //app.UseStaticFiles(new StaticFileOptions()
-            //{
-            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
-            //    RequestPath = new PathString("/Resources")
-            //});
-            //app.UseCors(MyAllowSpecificOrigins);
-
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
@@ -276,33 +241,16 @@ namespace Invictus.Api
             {
                 //SeedData.EnsurePopulated(app, Configuration);
             }
-
-
-
             //SeedData.EnsurePopulated(app, Configuration);
-            //var wkHtmlToPdfPath = "";
-            //if (env.IsDevelopment())
-            //{
-            // wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox");
-            // SeedData.EnsurePopulated(app, Configuration);
-            //}
-            //else
-            //{
-            //wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
 
-            //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox");
-            //var wkHtmlToPdfPath = Path.Combine(env.ContentRootPath, $"wkhtmltox\\v0.12.4\\libwkhtmltox.dll");
-            //var wkHtmlToPdfPath = $"C:\\Hosting\\alvaro.junior\\api.invictustemp.com\\wwwroot\\wkhtmltox\\v0.12.4\\libwkhtmltox";
-            //var wkHtmlToPdfPath = $"C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\wkhtmltox\\v0.12.4\\libwkhtmltox";
-            //CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
-            //context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
 
-            // Process.Start("C:\\Projetos\\INVICTUS\\back\\Invictus\\src\\Invictus.Api\\Worker\\WorkerService1.exe");
         }
 
         private static void RegisterServices(IServiceCollection services)
         {
             NativeInjectorBootStrapper.RegisterServices(services);
+            QueriesBootStrapper.RegisterServices(services);
+            ApplicationBootStrapper.RegisterServices(services);
         }
     }
 }
