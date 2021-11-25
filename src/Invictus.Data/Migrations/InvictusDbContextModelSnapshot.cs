@@ -535,7 +535,36 @@ namespace Invictus.Data.Migrations
                     b.ToTable("PacotesDocumentacao");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Materia", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalHoras")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pacotes");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.PacoteMateria", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -564,35 +593,6 @@ namespace Invictus.Data.Migrations
                     b.HasIndex("PacoteId");
 
                     b.ToTable("PacotesMaterias");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TotalHoras")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("TypePacoteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UnidadeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Pacotes");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Parametros.ParametrosKey", b =>
@@ -1213,7 +1213,7 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Pacote");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.Materia", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.PacoteMateria", b =>
                 {
                     b.HasOne("Invictus.Domain.Administrativo.PacoteAggregate.Pacote", "Pacote")
                         .WithMany("Materias")

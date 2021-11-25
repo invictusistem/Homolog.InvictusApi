@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Invictus.Api.Controllers.Pedagogico
 {
 
-    [Route("api/pedag/aluno")]
+    [Route("api/pedag/professor")]
     [Authorize]
     [ApiController]
     public class PedagProfessorController : ControllerBase

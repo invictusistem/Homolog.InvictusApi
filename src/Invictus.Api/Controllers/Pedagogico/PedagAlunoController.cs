@@ -58,6 +58,6 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             return Ok(new { aluno = aluno, });
         }
-        
+
     }
 }

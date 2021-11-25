@@ -33,39 +33,39 @@ namespace Invictus.Api.Controllers
         //    return Ok();
         //}
 
-        [HttpGet]
-        [Route("addrole")]
-        public async Task<ActionResult> AddRole()
-        {
-            //var email = "invictus@teste.com";
-            var role = "Aluno";
-            var role1 = "Administrador";
-            var role2 = "Professor";
-            var role3 = "SuperAdm";
-            var role4 = "MasterAdm";
-            //if (ModelState.IsValid)
-            //{
-            IdentityResult result = IdentityResult.Success;
-            //if (result.Process(ModelState))
-            //{
-            //IdentityUser user = await UserManager.FindByEmailAsync(email);
+        //[HttpGet]
+        //[Route("addrole")]
+        //public async Task<ActionResult> AddRole()
+        //{
+        //    //var email = "invictus@teste.com";
+        //    var role = "Aluno";
+        //    var role1 = "Administrador";
+        //    var role2 = "Professor";
+        //    var role3 = "SuperAdm";
+        //    var role4 = "MasterAdm";
+        //    //if (ModelState.IsValid)
+        //    //{
+        //    IdentityResult result = IdentityResult.Success;
+        //    //if (result.Process(ModelState))
+        //    //{
+        //    //IdentityUser user = await UserManager.FindByEmailAsync(email);
 
-            await RoleManager.CreateAsync(new IdentityRole(role));
-            await RoleManager.CreateAsync(new IdentityRole(role1));
-            //var role2 = "Professor";
-            await RoleManager.CreateAsync(new IdentityRole(role2));
-            //var role3 = "MasterAdm";
-            await RoleManager.CreateAsync(new IdentityRole(role3));
-            await RoleManager.CreateAsync(new IdentityRole(role4));
-            //if (!await UserManager.IsInRoleAsync(user, role))
-            //{
-            //    result = await UserManager.AddToRoleAsync(user, role);
-            //}
+        //    await RoleManager.CreateAsync(new IdentityRole(role));
+        //    await RoleManager.CreateAsync(new IdentityRole(role1));
+        //    //var role2 = "Professor";
+        //    await RoleManager.CreateAsync(new IdentityRole(role2));
+        //    //var role3 = "MasterAdm";
+        //    await RoleManager.CreateAsync(new IdentityRole(role3));
+        //    await RoleManager.CreateAsync(new IdentityRole(role4));
+        //    //if (!await UserManager.IsInRoleAsync(user, role))
+        //    //{
+        //    //    result = await UserManager.AddToRoleAsync(user, role);
+        //    //}
 
-            //}
-            //}
+        //    //}
+        //    //}
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
     }
 }
