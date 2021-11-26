@@ -10,5 +10,6 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
     public interface ITurmaPedagQueries
     {
         Task<IEnumerable<AlunoDto>> GetAlunosDaTurma(Guid turmaId);
+        Task<TurmaDto> GetTurmaByMatriculaId(Guid matriculaId);
     }
 }

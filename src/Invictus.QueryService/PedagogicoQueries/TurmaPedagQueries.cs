@@ -40,6 +40,30 @@ namespace Invictus.QueryService.PedagogicoQueries
                 return alunos;
 
             }
-        }        
+        }
+
+        public async Task<TurmaDto> GetTurmaByMatriculaId(Guid matriculaId)
+        {
+            var query = @"select 
+                            Turmas.identificador, 
+                            Turmas.descricao
+                            from turmas 
+                            where Turmas.id = (
+                            select Matriculas.TurmaId from Matriculas where 
+                            Matriculas.id = @matriculaId
+                            )";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var turma = await connection.QuerySingleAsync<TurmaDto>(query, new { matriculaId = matriculaId });
+
+                return turma;
+
+            }
+        }
     }
 }

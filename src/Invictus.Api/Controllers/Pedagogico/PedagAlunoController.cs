@@ -12,10 +12,12 @@ namespace Invictus.Api.Controllers.Pedagogico
     public class PedagAlunoController : ControllerBase
     {
         private readonly IPedagMatriculaQueries _pedagMatriculaQueries;
+        private readonly ITurmaPedagQueries _pedagTurmaQueries;
 
-        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries)
+        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries, ITurmaPedagQueries pedagTurmaQueries)
         {
             _pedagMatriculaQueries = pedagMatriculaQueries;
+            _pedagTurmaQueries = pedagTurmaQueries;
         }
 
         [HttpGet]
@@ -23,6 +25,8 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> GetInformacoesAlunoViewModel(Guid matriculaId)
         {
             // cadastro aluno baseado na matricula
+
+            var turma = await _pedagTurmaQueries.GetTurmaByMatriculaId(matriculaId);
 
             var aluno = await _pedagMatriculaQueries.GetAlunoByMatriculaId(matriculaId);
 
@@ -33,7 +37,7 @@ namespace Invictus.Api.Controllers.Pedagogico
             var anotacoes = await _pedagMatriculaQueries.GetAnotacoesMatricula(matriculaId);
 
 
-            return Ok(new { aluno = aluno, respFin = respFin, respMenor = respMenor, anotacoes = anotacoes });
+            return Ok(new { aluno = aluno, respFin = respFin, respMenor = respMenor, anotacoes = anotacoes, turma = turma });
         }
 
         
