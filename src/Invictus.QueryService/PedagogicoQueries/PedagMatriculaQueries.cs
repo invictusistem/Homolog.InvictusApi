@@ -47,9 +47,9 @@ namespace Invictus.QueryService.PedagogicoQueries
         alunos.dataCadastro ,
         alunos.ativo ,
         alunos.unidadeId
-FROM Alunos 
-left join matriculas on alunos.id = matriculas.alunoid
-where matriculas.id = @matriculaId";
+        FROM Alunos 
+        left join matriculas on alunos.id = matriculas.alunoid
+        where matriculas.id = @matriculaId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -67,7 +67,13 @@ where matriculas.id = @matriculaId";
 
         public async Task<IEnumerable<AnotacaoDto>> GetAnotacoesMatricula(Guid matriculaId)
         {
-            var query = @"select * from alunosanotacoes WHERE alunosanotacoes.matriculaId = @matriculaId";
+            var query = @"select 
+                        colaboradores.nome as titulo,
+                        alunosanotacoes.comentario,
+                        alunosanotacoes.dataregistro
+                        from alunosanotacoes 
+                        inner join colaboradores on alunosanotacoes.userId = colaboradores.id 
+                        where alunosanotacoes.matriculaId = @matriculaId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
