@@ -35,6 +35,16 @@ namespace Invictus.Api.Controllers.Pedagogico
             return File(memory, doc.contentArquivo, doc.nome);
         }
 
+        [HttpGet]
+        [Route("lista/{matriculaId}")]
+        public async Task<ActionResult> GetMatriculaDocs(Guid matriculaId)
+        {
+
+            var docs = await _pedagDocQueries.GetDocsMatriculaViewModel(matriculaId);
+
+            return Ok(new { docs = docs });
+        }
+
         [HttpPut]
         [Route("{alunoDocumentId}")]
         public async Task<IActionResult> SaveDocAluno(Guid alunoDocumentId, IFormFile file)
