@@ -13,11 +13,13 @@ namespace Invictus.Api.Controllers.Pedagogico
     {
         private readonly IPedagMatriculaQueries _pedagMatriculaQueries;
         private readonly ITurmaPedagQueries _pedagTurmaQueries;
+        private readonly IPedagDocsQueries _pedagDocsQueries;
 
-        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries, ITurmaPedagQueries pedagTurmaQueries)
+        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries, ITurmaPedagQueries pedagTurmaQueries, IPedagDocsQueries pedagDocsQueries)
         {
             _pedagMatriculaQueries = pedagMatriculaQueries;
             _pedagTurmaQueries = pedagTurmaQueries;
+            _pedagDocsQueries = pedagDocsQueries;
         }
 
         [HttpGet]
@@ -36,8 +38,10 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             var anotacoes = await _pedagMatriculaQueries.GetAnotacoesMatricula(matriculaId);
 
+            var docs = await _pedagDocsQueries.GetDocsMatriculaViewModel(matriculaId);
 
-            return Ok(new { aluno = aluno, respFin = respFin, respMenor = respMenor, anotacoes = anotacoes, turma = turma });
+
+            return Ok(new { aluno = aluno, respFin = respFin, respMenor = respMenor, anotacoes = anotacoes, turma = turma, docs = docs });
         }
 
         

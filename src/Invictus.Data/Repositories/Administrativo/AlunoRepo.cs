@@ -31,6 +31,11 @@ namespace Invictus.Data.Repositories.Administrativo
             await _db.Alunos.SingleUpdateAsync(newAluno);
         }
 
+        public async Task EditAlunoDoc(AlunoDocumento doc)
+        {
+            await _db.AlunosDocs.SingleUpdateAsync(doc);
+        }
+
         public async Task SaveAluno(Aluno newAluno)
         {
             await _db.Alunos.AddAsync(newAluno);

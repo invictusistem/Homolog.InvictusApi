@@ -60,17 +60,39 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<PacoteDto> GetPacoteById(Guid typePacoteId)
+        public async Task<PacoteDto> GetPacoteById(Guid pacoteId)
         {
-            var query = @"SELECT * FROM Pacotes WHERE Pacotes.Id = @typePacoteId";
+            var query = @"SELECT * FROM Pacotes WHERE Pacotes.Id = @pacoteId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var results = await connection.QuerySingleAsync<PacoteDto>(query, new { typePacoteId = typePacoteId });
+                var results = await connection.QuerySingleAsync<PacoteDto>(query, new { pacoteId = pacoteId });
 
+                connection.Close();
+
+                return results;
+
+            }
+        }
+
+        public async Task<PacoteDtoTeste> GetPacoteByIdTeste(Guid pacoteId)
+        {
+            var query = @"SELECT * FROM Pacotes WHERE Pacotes.Id = @pacoteId";
+            var query1 = @"SELECT * FROM PacotesMaterias WHERE PacotesMaterias.PacoteId = @pacoteId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QuerySingleAsync<PacoteDtoTeste>(query, new { pacoteId = pacoteId });
+
+                results.materias = new List<PacoteMateriaDto>();
+                var materias = await connection.QueryAsync<PacoteMateriaDto>(query1, new { pacoteId = pacoteId });
+                results.materias = materias.ToList();
                 connection.Close();
 
                 return results;

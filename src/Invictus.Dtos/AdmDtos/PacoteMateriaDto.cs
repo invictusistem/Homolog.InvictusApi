@@ -10,7 +10,7 @@ namespace Invictus.Dtos.AdmDtos
     {
         public Guid id { get; set; }
         public Guid materiaId { get; set; }
-        public string descricao { get; set; }
+       // public string descricao { get; set; }
         public string nome { get; set; }
         public string ordem { get; set; }
         public int cargaHoraria { get; set; }

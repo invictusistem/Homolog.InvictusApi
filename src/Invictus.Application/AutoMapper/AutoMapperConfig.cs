@@ -34,7 +34,7 @@ namespace Invictus.Application.AutoMapper
     public class DomainToViewModelMappingProfile : Profile
     {
         public DomainToViewModelMappingProfile()
-        {   
+        {
         }
     }
 
@@ -55,13 +55,13 @@ namespace Invictus.Application.AutoMapper
                      new ColaboradorEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<AlunoDto, Aluno>()
-                 .ConstructUsing(c => new Aluno(c.nome,c.nomeSocial, c.cpf,c.rg,c.nomePai,c.nomeMae,c.nascimento,c.naturalidade,c.naturalidadeUF,
-                 c.email,c.telReferencia,c.nomeContatoReferencia,c.telCelular,c.telResidencial,c.telWhatsapp,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                 .ConstructUsing(c => new Aluno(c.nome, c.nomeSocial, c.cpf, c.rg, c.nomePai, c.nomeMae, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 c.email, c.telReferencia, c.nomeContatoReferencia, c.telCelular, c.telResidencial, c.telWhatsapp,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new AlunoEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<MatForm, Responsavel>()
-                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo),c.nome, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
-                 c.email, c.telCelular,c.telResidencial,c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
 
 
@@ -80,13 +80,13 @@ namespace Invictus.Application.AutoMapper
                 .ConstructUsing(m => new PacoteMateria(m.nome, m.materiaId, ModalidadeCurso.TryParse(m.modalidade), m.cargaHoraria));
 
             CreateMap<DocumentacaoExigidaDto, DocumentacaoExigencia>()
-                .ConstructUsing(d => new DocumentacaoExigencia(d.descricao, d.comentario, TitularDoc.TryParse(d.titular),d.validadeDias,d.obrigatorioParaMatricula));
+                .ConstructUsing(d => new DocumentacaoExigencia(d.descricao, d.comentario, TitularDoc.TryParse(d.titular), d.validadeDias, d.obrigatorioParaMatricula));
 
             CreateMap<DiasSemanaCommand, Horario>()
                 .ConstructUsing(h => new Horario(DiaDaSemana.TryParseStringToString(h.diaSemana), h.horarioInicio, h.horarioFim));
 
             CreateMap<TurmaMateriasDto, TurmaMaterias>()
-                .ConstructUsing(t => new TurmaMaterias(t.nome, t.descricao, ModalidadeCurso.TryParse(t.modalidade), t.cargaHoraria, t.typePacoteId,t.materiaId, t.ativo));
+                .ConstructUsing(t => new TurmaMaterias(t.nome, t.descricao, ModalidadeCurso.TryParse(t.modalidade), t.cargaHoraria, t.typePacoteId, t.materiaId, t.ativo));
 
             CreateMap<ParametrosKeyDto, ParametrosKey>();
 
@@ -94,10 +94,12 @@ namespace Invictus.Application.AutoMapper
                 .ConstructUsing(p => new ParametrosValue(p.value, p.descricao, p.comentario, p.parametrosKeyId));
 
             CreateMap<TurmaDto, Turma>()
-                .ConstructUsing(t => new Turma(t.descricao, t.totalAlunos, t.minimoAlunos, t.unidadeId, t.salaId, t.pacoteId, t.typePacoteId, 
-                new Previsao(t.previsaoAtual,t.previsaoTerminoAtual,t.previsaoInfo,t.dataCriacao)));
+                .ConstructUsing(t => new Turma(t.descricao, t.totalAlunos, t.minimoAlunos, t.unidadeId, t.salaId, t.pacoteId, t.typePacoteId,
+                new Previsao(t.previsaoAtual, t.previsaoTerminoAtual, t.previsaoInfo, t.dataCriacao)));
 
             CreateMap<AnotacaoDto, AlunoAnotacao>();
+
+            CreateMap<AlunoDocumentoDto, AlunoDocumento>();
 
             CreateMap<ContratoView, Contrato>();
             CreateMap<ContratoDto, Contrato>();

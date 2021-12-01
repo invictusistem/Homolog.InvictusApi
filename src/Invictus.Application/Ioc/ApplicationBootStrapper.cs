@@ -22,6 +22,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IMatriculaApplication, MatriculaApplication>();
             services.AddScoped<IPacoteApplication, PacoteApplication>();
             services.AddScoped<IParametroApplication, ParametroApplication>();
+            services.AddScoped<IPedagDocApp, PedagDocApp>();
             services.AddScoped<IPlanoPagamentoApplication, PlanoPagamentoApplication>();
             services.AddScoped<IProdutoApplication, ProdutoApplication>();
             services.AddScoped<IProfessorApplication, ProfessorApplication>();

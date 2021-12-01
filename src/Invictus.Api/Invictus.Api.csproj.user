@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Invictus.Api - Development</ActiveDebugProfile>
+    <ActiveDebugProfile>Invictus.Api - Production</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

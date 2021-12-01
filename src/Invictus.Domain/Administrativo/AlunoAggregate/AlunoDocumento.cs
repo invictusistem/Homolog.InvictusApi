@@ -73,6 +73,8 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
             DataFile = bytes;
             ContentArquivo = contentType;
             Tamanho = tamanho;
+
+            DataCriacao = DateTime.Now;
         }
 
         public void SetDataCriacao()

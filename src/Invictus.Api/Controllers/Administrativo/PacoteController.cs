@@ -18,13 +18,15 @@ namespace Invictus.Api.Controllers
         private readonly IPacoteApplication _pacoteApplication;
         private readonly ITypePacoteQueries _typeQueries;
         private readonly IDocTemplateQueries _docQueries;
+        private readonly IMateriaTemplateQueries _materiaQueries;
         public PacoteController(IPacoteQueries pacoteQueries, IPacoteApplication pacoteApplication,
-            ITypePacoteQueries typeQueries, IDocTemplateQueries docQueries)
+            ITypePacoteQueries typeQueries, IDocTemplateQueries docQueries, IMateriaTemplateQueries materiaQueries)
         {
             _pacoteQueries = pacoteQueries;
             _pacoteApplication = pacoteApplication;
             _typeQueries = typeQueries;
             _docQueries = docQueries;
+            _materiaQueries = materiaQueries;
         }
 
         [HttpGet]
@@ -63,12 +65,26 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{typePacoteId}")]
-        public async Task<IActionResult> GetPacote(Guid typePacoteId)
+        [Route("{pacoteId}")]
+        public async Task<IActionResult> GetPacote(Guid pacoteId)
         {
-            var pacote = await _pacoteQueries.GetPacoteById(typePacoteId);
+            var pacote = await _pacoteQueries.GetPacoteById(pacoteId);
 
             return Ok(new { pacote = pacote });
+        }
+
+        [HttpGet]
+        [Route("edit/{pacoteId}")]
+        public async Task<IActionResult> GetEditPacoteView(Guid pacoteId)
+        {
+           // var pacote = await _pacoteQueries.GetPacoteById(pacoteId);
+            var pacoteTeste = await _pacoteQueries.GetPacoteByIdTeste(pacoteId);
+
+            var materias = await _materiaQueries.GetMateriaByTypePacoteId(pacoteTeste.typePacoteId);
+
+            var docs = await _docQueries.GetAll();
+
+            return Ok(new { pacote = pacoteTeste, materias = materias, docs = docs });
         }
 
         [HttpPost]

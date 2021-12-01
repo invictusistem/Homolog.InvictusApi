@@ -14,7 +14,6 @@ using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Domain.Pedagogico.Responsaveis.Interfaces;
-using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using System;
