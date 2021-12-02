@@ -10,5 +10,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
     public interface IPedagDocApp
     {
         Task ADdFileToDocument(Guid documentId, IFormFile file);
+        Task ExcluirDoc(Guid documentId);
     }
 }

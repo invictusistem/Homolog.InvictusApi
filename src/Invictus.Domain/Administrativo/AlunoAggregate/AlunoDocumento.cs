@@ -77,6 +77,18 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
             DataCriacao = DateTime.Now;
         }
 
+        public void RemoveDocumento()
+        {
+            Nome = null;// nome;
+            TipoArquivo = null;// tipoArquivo;
+            DocEnviado = false;// true;
+            DataFile = null;// bytes;
+            ContentArquivo = null;// contentType;
+            Tamanho = 0;// tamanho;
+
+            //DataCriacao = DateTime.Now;
+        }
+
         public void SetDataCriacao()
         {
             DataCriacao = DateTime.Now;

@@ -54,5 +54,17 @@ namespace Invictus.Application.AdmApplication
 
             _alunoRepo.Commit();
         }
+
+        public async Task ExcluirDoc(Guid documentId)
+        {
+            var docDto = await _pedagDocQueries.GetDocumentById(documentId);
+            var doc = _mapper.Map<AlunoDocumento>(docDto);
+
+            doc.RemoveDocumento();
+
+            await _alunoRepo.EditAlunoDoc(doc);
+
+            _alunoRepo.Commit();
+        }
     }
 }

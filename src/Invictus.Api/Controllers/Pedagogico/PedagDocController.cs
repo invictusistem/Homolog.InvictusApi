@@ -54,5 +54,15 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             return Ok();
         }
+
+        [HttpPut]
+        [Route("excluir/{documentId}")]
+        public async Task<IActionResult> ExcluirDocAluno(Guid documentId)
+        {
+
+            await _pedagDocApp.ExcluirDoc(documentId);
+
+            return Ok();
+        }
     }
 }
