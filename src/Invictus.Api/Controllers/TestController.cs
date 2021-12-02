@@ -1,25 +1,60 @@
-﻿using Invictus.QueryService.AdministrativoQueries.Interfaces;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/teste")]
     public class TestController : ControllerBase
     {       
         public UserManager<IdentityUser> UserManager { get; set; }
         public RoleManager<IdentityRole> RoleManager { get; set; }
+        private IConverter _converter;
         public TestController(
             UserManager<IdentityUser> userMgr,
-                                RoleManager<IdentityRole> roleMgr)
+            IConverter converter,
+            RoleManager<IdentityRole> roleMgr)
         {            
             UserManager = userMgr;
             RoleManager = roleMgr;
+            _converter = converter;
         }
+        [HttpGet]
+        [Route("export-dk-pdf")]
+        public IActionResult ExportPDF()
+        {
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PDF Report"
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
+              //  WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+            };
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            var file = _converter.Convert(pdf);
+            return File(file, "application/pdf");
+        }
+
 
         //[HttpGet]
         //public async Task<IActionResult> GetInfo()
