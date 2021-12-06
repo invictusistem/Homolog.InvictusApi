@@ -1,6 +1,7 @@
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using Invictus.Api.Configurations;
+using Invictus.Api.Helpers;
 using Invictus.Api.Identity;
 using Invictus.Application.AutoMapper;
 using Invictus.Application.Ioc;
@@ -204,7 +205,7 @@ namespace Invictus.Api
             );
 
             #endregion
-
+            services.AddScoped<ITemplate, TemplateGenerator>();
             RegisterServices(services);
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,17 +1,15 @@
-﻿using Invictus.Application.AdmApplication;
-using Invictus.Application.AdmApplication.Interfaces;
+﻿using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
 {
     [Route("api/parametro")]
     [ApiController]
+    [Authorize]
     public class ParametrosController : ControllerBase
     {
         private readonly IParametroApplication _paramApp;

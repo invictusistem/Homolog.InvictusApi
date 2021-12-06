@@ -20,3 +20,22 @@ table th {
     background-color: green;
     color: white;
 }
+
+.divOne {
+    border: 1px solid black;
+    height: 100%;
+    position: relative
+}
+
+.divTwo {
+    z-index: 1;
+    border: 1px solid red;
+    text-align: center;
+    float: right;
+    width: 200px;
+    height: 50px;
+}
+
+.imageOne {
+    src: url(../assets/img/nophoto.png)
+}

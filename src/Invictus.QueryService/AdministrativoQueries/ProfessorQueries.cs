@@ -131,5 +131,80 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return result;
             }
         }
+
+        public async Task<IEnumerable<MateriaHabilitadaViewModel>> GetProfessoresMaterias(Guid professorId)
+        {
+            string query = @"select 
+                            ProfessoresMaterias.id,
+                            ProfessoresMaterias.PacoteMateriaId,
+                            MateriasTemplate.nome,
+                            TypePacote.nome as nomePacote
+                            from ProfessoresMaterias
+                            inner join MateriasTemplate on ProfessoresMaterias.PacoteMateriaId = MateriasTemplate.id
+                            inner join TypePacote on MateriasTemplate.TypePacoteId = TypePacote.Id
+                            where ProfessoresMaterias.ProfessorId = @professorId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<MateriaHabilitadaViewModel>(query, new { professorId = professorId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<UnidadeDto>> GetProfessoresUnidadesDisponiveis(Guid professorId)
+        {
+            string query = @"select * from unidades 
+                            where unidades.id not in (
+                            select professoresDisponibilidades.unidadeId 
+                            from professoresDisponibilidades 
+                            where professoresDisponibilidades.PessoaId = @professorId )";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<UnidadeDto>(query, new { professorId = professorId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<DisponibilidadeView>> GetProfessorDisponibilidade(Guid professorId)
+        {
+            string query = @"select 
+                            ProfessoresDisponibilidades.Id,
+                            ProfessoresDisponibilidades.Domingo,
+                            ProfessoresDisponibilidades.Segunda,
+                            ProfessoresDisponibilidades.Terca,
+                            ProfessoresDisponibilidades.Quarta,
+                            ProfessoresDisponibilidades.Quinta,
+                            ProfessoresDisponibilidades.Sexta,
+                            ProfessoresDisponibilidades.Sabado,
+                            Unidades.Descricao
+                            from ProfessoresDisponibilidades 
+                            inner join Unidades on ProfessoresDisponibilidades.UnidadeId = Unidades.id
+                            where ProfessoresDisponibilidades.PessoaId = @professorId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<DisponibilidadeView>(query, new { professorId = professorId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
     }
 }

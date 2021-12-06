@@ -12,5 +12,8 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<PaginatedItemsViewModel<ProfessorDto>> GetProfessores(int itemsPerPage,int currentPage, string paramsJson);
         Task<ProfessorDto> GetProfessorById(Guid professorId);
+        Task<IEnumerable<MateriaHabilitadaViewModel>> GetProfessoresMaterias(Guid professorId);
+        Task<IEnumerable<UnidadeDto>> GetProfessoresUnidadesDisponiveis(Guid professorId);
+        Task<IEnumerable<DisponibilidadeView>> GetProfessorDisponibilidade(Guid professorId);
     }
 }

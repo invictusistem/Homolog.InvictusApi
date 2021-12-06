@@ -12,5 +12,8 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
         Task SaveProfessor(ProfessorDto newProfessor);
         Task EditProfessor(ProfessorDto editedProfessor);
+        Task AddProfessorMateria(Guid profId, Guid materiaId);
+        Task RemoveProfessorMateria(Guid profMateriaId);
+        Task AddDisponibilidade(DisponibilidadeDto disponibilidade);
     }
 }

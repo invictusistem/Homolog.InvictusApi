@@ -2,9 +2,6 @@
 using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.Data.Repositories.Administrativo
@@ -39,6 +36,19 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.SaveChanges();
         }
 
-       
+        public async Task AddProfessorMateria(MateriaHabilitada profMateria)
+        {
+            await _db.MateriasHabilitadas.AddAsync(profMateria);
+        }
+
+        public async Task RemoveProfessorMateria(Guid profMateriaId)
+        {
+            await _db.MateriasHabilitadas.DeleteByKeyAsync(profMateriaId);//.AddAsync(profMateria);
+        }
+
+        public async Task AddDisponibilidade(Disponibilidade disponibilidade)
+        {
+            await _db.Disponibilidades.AddAsync(disponibilidade);
+        }
     }
 }

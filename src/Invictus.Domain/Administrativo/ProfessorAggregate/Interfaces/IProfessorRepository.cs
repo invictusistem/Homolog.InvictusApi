@@ -10,6 +10,9 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces
     {
         Task AddProfessor(Professor professor);
         Task EditProfessor(Professor professor);
+        Task AddProfessorMateria(MateriaHabilitada profMateria);
+        Task RemoveProfessorMateria(Guid profMateriaId);
+        Task AddDisponibilidade(Disponibilidade disponibilidade);
         void Save();
     }
 }

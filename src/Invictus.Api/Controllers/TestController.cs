@@ -1,5 +1,6 @@
 ﻿using DinkToPdf;
 using DinkToPdf.Contracts;
+using Invictus.Api.Helpers;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,14 +19,17 @@ namespace Invictus.Api.Controllers
         public UserManager<IdentityUser> UserManager { get; set; }
         public RoleManager<IdentityRole> RoleManager { get; set; }
         private IConverter _converter;
+        private readonly ITemplate _template;
         public TestController(
-            UserManager<IdentityUser> userMgr,
+            ITemplate template,
+        UserManager<IdentityUser> userMgr,
             IConverter converter,
             RoleManager<IdentityRole> roleMgr)
         {            
             UserManager = userMgr;
             RoleManager = roleMgr;
             _converter = converter;
+            _template = template;
         }
         [HttpGet]
         [Route("export-dk-pdf")]
@@ -44,8 +48,8 @@ namespace Invictus.Api.Controllers
                 var objectSettings = new ObjectSettings
                 {
                     PagesCount = true,
-                    HtmlContent = @"<div> PDF </div>", //TemplateGenerator.GetHTMLString(),
-                                                       //  WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                    HtmlContent = _template.GetHTMLString(),// TemplateGenerator.GetHTMLString(),//@"<div><div style=""color: red""> PDF </div></div>", //TemplateGenerator.GetHTMLString(),
+                    WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
                     HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
                     FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
                 };
