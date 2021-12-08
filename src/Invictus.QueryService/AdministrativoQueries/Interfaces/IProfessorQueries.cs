@@ -15,5 +15,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<MateriaHabilitadaViewModel>> GetProfessoresMaterias(Guid professorId);
         Task<IEnumerable<UnidadeDto>> GetProfessoresUnidadesDisponiveis(Guid professorId);
         Task<IEnumerable<DisponibilidadeView>> GetProfessorDisponibilidade(Guid professorId);
+        Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId);
     }
 }

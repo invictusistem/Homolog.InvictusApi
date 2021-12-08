@@ -42,6 +42,11 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<TurmaDto> GetTurmaByMatriculaId(Guid matriculaId)
         {
             var query = @"select 

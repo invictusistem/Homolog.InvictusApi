@@ -3,6 +3,7 @@ using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,6 +15,11 @@ namespace Invictus.Data.Repositories.Administrativo
         public TurmaRepo(InvictusDbContext db)
         {
             _db = db;
+        }
+
+        public async Task AddProfsNaTurma(IEnumerable<TurmaProfessor> professores)
+        {
+            await _db.TurmasProfessores.AddRangeAsync(professores);
         }
 
         public async Task AdiarInicio(Guid turmaId)
@@ -56,6 +62,21 @@ namespace Invictus.Data.Repositories.Administrativo
         public async Task SavePrevisoes(Previsoes previ)
         {
             await _db.Previsoes.AddAsync(previ);
+        }
+
+        public async Task UpdateMateriaDaTurma(TurmaMaterias turmaMateria)
+        {
+            await _db.TurmasMaterias.SingleUpdateAsync(turmaMateria);
+        }
+
+        public async Task RemoverProfessorDaTurma(TurmaProfessor professor)
+        {   
+            await _db.TurmasProfessores.SingleDeleteAsync(professor);
+        }
+
+        public void AtualizarTurmasMaterias(IEnumerable<TurmaMaterias> turmasMaterias)
+        {
+            _db.TurmasMaterias.UpdateRange(turmasMaterias);
         }
     }
 }

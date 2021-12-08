@@ -56,9 +56,11 @@ namespace Invictus.Api.Controllers
 
             var turma = await _turmaQueries.GetTurmaInfo(turmaId);
 
+            var professores = await _turmaQueries.GetProfessoresDaTurma(turmaId);
+
             // if (salas.Count() == 0 || typePacotes.Count() == 0) return NotFound();
 
-            return Ok(new { alunos = alunos });//Ok(new { salas = salas, typePacotes = typePacotes });
+            return Ok(new { alunos = alunos, professores = professores });//Ok(new { salas = salas, typePacotes = typePacotes });
 
         }
 

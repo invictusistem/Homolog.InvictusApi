@@ -28,6 +28,29 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate
             Ativo = ativo;
 
         }
+
+        public TurmaMaterias(string nome,
+                                string descricao,
+                                ModalidadeCurso modalidade,
+                                int cargaHoraria,
+                                bool ativo,
+                                Guid typePacoteId,
+                                Guid turmaId,
+                                Guid materiaId
+                                //bool ativo
+                                )
+        {
+            Nome = nome;
+            Descricao = descricao;
+            Modalidade = modalidade.DisplayName;
+            CargaHoraria = cargaHoraria;
+            Ativo = ativo;
+            TypePacoteId = typePacoteId;
+            TurmaId = turmaId;
+            MateriaId = materiaId;
+            
+
+        }
         public string Nome { get; private set; }
         public string Descricao { get; private set; }
         public string Modalidade { get; private set; }
@@ -35,7 +58,18 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate
         public bool Ativo { get; private set; }
         public Guid TypePacoteId { get; private set; }
         public Guid TurmaId { get; private set; }
+        public Guid ProfessorId { get; private set; }
         public Guid MateriaId { get; private set; } // referência ao Id do MateriaTemplate
+
+        public void RemoveProfessorDaMateria()
+        {
+            ProfessorId = new Guid("00000000-0000-0000-0000-000000000000");
+        }
+
+        public void AddProfessorNaMateria(Guid professorId)
+        {
+            ProfessorId = professorId;
+        }
 
         #region EF
 

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    [Migration("20211124183238_Initial")]
-    partial class Initial
+    [Migration("20211207045535_update2")]
+    partial class update2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -885,6 +885,9 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("TurmaId")
                         .HasColumnType("uniqueidentifier");
 
@@ -896,6 +899,23 @@ namespace Invictus.Data.Migrations
                     b.HasIndex("TurmaId");
 
                     b.ToTable("TurmasMaterias");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Administrativo.TurmaAggregate.TurmaProfessor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TurmaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TurmasProfessores");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Sala", b =>

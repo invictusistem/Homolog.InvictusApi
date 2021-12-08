@@ -13,6 +13,10 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate.Interfaces
         Task SavePrevisoes(Previsoes previ);
         Task IniciarTurma(Guid turmaId);
         Task AdiarInicio(Guid turmaId);
+        Task AddProfsNaTurma(IEnumerable<TurmaProfessor> professores);
+        Task UpdateMateriaDaTurma(TurmaMaterias turmaMateria);
+        Task RemoverProfessorDaTurma(TurmaProfessor professor);
+        void AtualizarTurmasMaterias(IEnumerable<TurmaMaterias> turmasMaterias);
         void Commit();
     }
 }

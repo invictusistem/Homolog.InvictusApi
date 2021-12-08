@@ -9,25 +9,44 @@ namespace Invictus.Domain.Administrativo.PacoteAggregate
         public PacoteMateria(//int id,
                         string nome,
                         Guid materiaId,
-                        //string modalidade,
                         ModalidadeCurso modalidade,
                         int cargaHoraria
-                        //int moduloId,
-                        //int qntProvas,
-                        //bool temRecuperacao
+            )
+        {
+            Nome = nome;
+            MateriaId = materiaId;
+            Modalidade = modalidade.DisplayName;
+            CargaHoraria = cargaHoraria;
+            
+        }
+
+        public PacoteMateria(//int id,
+                        string nome,
+                        Guid materiaId,
+                        int ordem,
+                        int cargaHoraria,//string modalidade,
+                        ModalidadeCurso modalidade,
+                        Guid pacoteId
+                       // int cargaHoraria
+                       //int moduloId,
+                       //int qntProvas,
+                       //bool temRecuperacao
             )
         {
             //Id = id;
             Nome = nome;
             MateriaId = materiaId;
             //QntAulas = qntAulas;
+            Ordem = ordem;
+            CargaHoraria = cargaHoraria;
             Modalidade = modalidade.DisplayName;
+            PacoteId = pacoteId;
             //Modalidade = modalidade.DisplayName;
             //Semestre = semestre;
-            CargaHoraria = cargaHoraria;
             
+
         }
-        
+
         //public string Descricao { get; private set; } // Nome do MateriaTemplate
         public string Nome { get; private set; }
         public Guid MateriaId { get; private set; }

@@ -29,4 +29,19 @@ namespace Invictus.Dtos.AdmDtos
         public string tipoConta { get; set; }
 
     }
+
+    public class ProfessorTurmaView
+    {
+        public Guid id { get; set; }
+        public string nome { get; set; }
+        public string email { get; set; }
+
+        public List<MateriaProfessorView> materias { get; set; }
+    }
+
+    public class MateriaProfessorView
+    {
+        public Guid materiaId { get; set; }
+        public string nome { get; set; }
+    }
 }

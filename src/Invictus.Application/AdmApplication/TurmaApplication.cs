@@ -7,6 +7,7 @@ using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -115,6 +116,69 @@ namespace Invictus.Application.AdmApplication
             await _turmaRepo.AdiarInicio(turmaId);
             // depois de adiar refazer calendario, deletar todos registros e refazer
             //_turmaRepo.Commit();
+        }
+
+        public async Task AddProfessoresNaTurma(SaveProfsCommand command)
+        {
+
+            var professores = new List<TurmaProfessor>();
+            foreach (var id in command.listProfsIds)
+            {
+                professores.Add(new TurmaProfessor(id, command.turmaId));
+            }
+
+            await _turmaRepo.AddProfsNaTurma(professores);
+
+            _turmaRepo.Commit();
+        }
+
+        public async Task SetMateriaProfessor(Guid turmaId, Guid professorId, IEnumerable<MateriaView> profsMatCommand)
+        {
+            foreach (var item in profsMatCommand)
+            {
+                var turmaMatDto = await _turmaQueries.GetTurmaMateria(item.id);
+                var turmaMat = _mapper.Map<TurmaMaterias>(turmaMatDto);
+
+                if (item.isProfessor)
+                {
+                    turmaMat.AddProfessorNaMateria(professorId);
+                }
+                else
+                {
+                    turmaMat.RemoveProfessorDaMateria();
+                }
+
+                await _turmaRepo.UpdateMateriaDaTurma(turmaMat);
+
+            }
+
+            _turmaRepo.Commit();
+
+        }
+
+        public async Task RemoverProfessorDaTurma(Guid professorId, Guid turmaId)
+        {
+            var turmaProfDto = await _turmaQueries.GetTurmaProfessor(professorId, turmaId);
+
+            var turmaProf = _mapper.Map<TurmaProfessor>(turmaProfDto);
+
+            await _turmaRepo.RemoverProfessorDaTurma(turmaProf);
+
+            var turmasMateriasDto = await _turmaQueries.GetTurmaMateriasFromProfessorId(professorId, turmaId);
+
+            var turmasMaterias = _mapper.Map<List<TurmaMaterias>>(turmasMateriasDto);
+
+            if(turmasMaterias.Count() > 0)
+            {
+                foreach (var item in turmasMaterias)
+                {
+                    item.RemoveProfessorDaMateria();
+                }
+
+                _turmaRepo.AtualizarTurmasMaterias(turmasMaterias);
+            }
+
+            _turmaRepo.Commit();
         }
     }
 }

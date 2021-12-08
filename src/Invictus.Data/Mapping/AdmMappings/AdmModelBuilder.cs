@@ -48,6 +48,7 @@ namespace Invictus.Data.Mapping.AdmMappings
             modelBuilder.ApplyConfiguration(new PrevisoesDbMapping());
             modelBuilder.ApplyConfiguration(new TurmaDbMaping());
             modelBuilder.ApplyConfiguration(new TurmaMateriaDbMapping());
+            modelBuilder.ApplyConfiguration(new TurmaProfessorDbMapping());
             modelBuilder.ApplyConfiguration(new TypePacoteDbMapping());
             modelBuilder.ApplyConfiguration(new SalaDbMapping());
             modelBuilder.ApplyConfiguration(new UnidadeDbMapping());

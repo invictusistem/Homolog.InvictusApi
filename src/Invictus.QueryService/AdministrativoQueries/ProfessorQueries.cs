@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
@@ -19,11 +20,16 @@ namespace Invictus.QueryService.AdministrativoQueries
         private readonly IConfiguration _config;
         private readonly IAspNetUser _user;
         private readonly IUnidadeQueries _unidadeQueries;
-        public ProfessorQueries(IAspNetUser user, IUnidadeQueries unidadeQueries, IConfiguration config)
+        private readonly ITurmaQueries _turmaQueries;
+        private readonly List<ProfessorDto> _professores;
+        public ProfessorQueries(IAspNetUser user, IUnidadeQueries unidadeQueries, IConfiguration config,
+            ITurmaQueries turmaQueries)
         {
             _user = user;
             _unidadeQueries = unidadeQueries;
             _config = config;
+            _turmaQueries = turmaQueries;
+            _professores = new List<ProfessorDto>();
         }
 
         public async Task<PaginatedItemsViewModel<ProfessorDto>> GetProfessores(int itemsPerPage, int currentPage, string paramsJson)
@@ -206,5 +212,139 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return result;
             }
         }
+
+        #region GetProfDisponiveis
+        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId)
+        {
+            // var turmaId = "";
+            var turma = await _turmaQueries.GetTurma(turmaId);
+            var turmaHorarios = await GetDiasSemanaDaTurma(turmaId);
+            // parse turmaHorarios para os Bools do ProfessorDisponibilidades
+            //var diasTurma = ParseDiaSemana
+            // var profIds = GetProfJaAdicionadoNaTurma();
+            var professores = await GetProfessoresDisponiveisNoDia(turma.unidadeId, turmaHorarios, turmaId);
+            // REMOVER PROF JA ADICIONADO!!!!!!!!!!!!!!!!!!!
+            return professores;
+        }
+
+        private string ParseDiaSemana(string diaSemana)
+        {
+            if (diaSemana == "Segunda-feira")
+            {
+                return "Segunda";
+
+            }
+            else if (diaSemana == "Terça-feira")
+            {
+                return "Terca";
+            }
+            else if (diaSemana == "Quarta-feira")
+            {
+                return "Quarta";
+            }
+            else if (diaSemana == "Quinta-feira")
+            {
+                return "Quinta";
+            }
+            else if (diaSemana == "Sexta-feira")
+            {
+                return "Sexta";
+            }
+            else if (diaSemana == "Sábado")
+            {
+                return "Sabado";
+            }
+            else
+            {
+                return "Domingo";
+            }
+        }
+
+        private async Task<List<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
+        {   
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
+            queryCount.Append("inner join Professores on ProfessoresDisponibilidades.PessoaId = Professores.Id where ");
+            queryCount.Append(" ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
+            queryCount.Append(" AND Professores.ativo = 'True' ");
+            queryCount.Append(" AND ProfessoresDisponibilidades.PessoaId not in ");// (select TurmasMaterias.ProfessorId from TurmasMaterias 
+            queryCount.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId+"') AND ");
+
+            if (diasSemana.Count() == 1)
+            {
+                var stringDiaSemana = ParseDiaSemana(diasSemana[0]);
+                queryCount.Append(" ProfessoresDisponibilidades."+ stringDiaSemana+" = 'True'  ");
+               
+
+            }
+            else
+            {
+                for (int i = 0; i < diasSemana.Count(); i++)
+                {
+                    var stringDiaSemana = ParseDiaSemana(diasSemana[i]);
+                    queryCount.Append("ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
+                    if(i != diasSemana.Count() - 1) queryCount.Append(" OR ");
+                    //queryCount.Append(" AND ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
+                }
+
+            }
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ProfessorDto>(queryCount.ToString());
+
+                connection.Close();
+
+                return result.ToList();
+            }
+        }
+
+        private async Task<List<Guid>> GetProfessoresDaTurma(Guid turmaId)
+        {
+            string query = @"select 
+                            TurmasMaterias.ProfessorId 
+                            from TurmasMaterias 
+                            where TurmasMaterias.TurmaId = @turmaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<Guid>(query, new { turmaId  = turmaId });
+
+                connection.Close();
+
+                return result.Distinct().ToList();
+            }
+        }
+
+        private async Task<List<string>> GetDiasSemanaDaTurma(Guid turmaId)
+        {
+            string query = @"select 
+                            TurmasHorarios.DiaSemanada
+                            from TurmasHorarios 
+                            where TurmasHorarios.turmaId = @turmaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<string>(query, new { turmaId = turmaId });
+
+                connection.Close();
+
+                return result.ToList();
+            }
+        }
+
+
+        #endregion
+
+
     }
 }

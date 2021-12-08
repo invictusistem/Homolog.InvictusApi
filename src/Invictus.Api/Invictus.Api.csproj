@@ -41,4 +41,8 @@
 		<ProjectReference Include="..\Invictus.IoC\Invictus.IoC.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+
 </Project>

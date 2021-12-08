@@ -103,6 +103,8 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<DisponibilidadeDto, Disponibilidade>();
 
+            CreateMap<TurmaProfessoresDto, TurmaProfessor>();
+
             CreateMap<ContratoView, Contrato>();
             CreateMap<ContratoDto, Contrato>();
             CreateMap<ContratoConteudoDto, Conteudo>();

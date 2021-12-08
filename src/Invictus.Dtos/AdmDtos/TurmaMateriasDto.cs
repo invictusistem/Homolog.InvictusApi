@@ -16,6 +16,7 @@ namespace Invictus.Dtos.AdmDtos
         public bool ativo { get; set; }
         public Guid materiaId { get; set; }
         public Guid typePacoteId { get; set; }
+        public Guid professorId { get; set; }
         public Guid turmaId { get; set; }
     }
 }

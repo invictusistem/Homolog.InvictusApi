@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Invictus.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210925191945_initial")]
-    partial class initial
+    [Migration("20211207023232_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
