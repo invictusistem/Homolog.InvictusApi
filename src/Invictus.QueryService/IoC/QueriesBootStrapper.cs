@@ -21,6 +21,7 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IAgendaTriQueries, AgendaTriQueries>();
             services.AddScoped<IAlunoQueries, AlunoQueries>();
             services.AddScoped<IAutorizacaoQueries, AutorizacaoQueries>();
+            services.AddScoped<ICalendarioQueries, CalendarioQueries>();
             services.AddScoped<IColaboradorQueries, ColaboradorQueries>();
             services.AddScoped<IContratoQueries, ContratoQueries>();
             services.AddScoped<IDocTemplateQueries, DocTemplateQueries>();

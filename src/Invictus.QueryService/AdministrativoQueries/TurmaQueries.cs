@@ -375,6 +375,84 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<IEnumerable<TurmaViewModel>> GetTurmasPedagViewModel()
+        {
+            var unidadeSigla = _aspUser.ObterUnidadeDoUsuario();
+
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+
+            var query = @"SELECT id, identificador, descricao, 
+                        statusAndamento
+                        FROM Turmas WHERE Turmas.UnidadeId = @unidadeId 
+                        AND Turmas.statusAndamento <> 'Aguardando início'  ";
+
+            var query2 = @"select 
+                            DiaAula, 
+                            HoraInicial, 
+                            HoraFinal
+                            from calendarios where turmaId = @turmaId  
+                            and DiaAula = @DataPesquisa
+                            order by DiaAula asc";
+
+            var DataPesquisa = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+           
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+               
+                var results = await connection.QueryAsync<TurmaViewModel>(query, new { unidadeId = unidade.id });
+
+                //foreach (var item in results)
+                //{
+                //    var dateNow = DateTime.Now;
+
+                //    var result = await connection.QueryAsync<Result>(query2, new { turmaId = item.id, DataPesquisa = DataPesquisa });
+
+
+                //    var quantasAulasNoDia = result.Where(d => d.DiaAula == DataPesquisa).Count();
+
+                //    if (quantasAulasNoDia == 0)
+                //    {
+                //        item.podeIniciar = false;
+
+                //    }
+                //    else if (quantasAulasNoDia == 1)
+                //    {
+
+                //        var agora = DateTime.Now;
+                //        var timespantest = new TimeSpan(0, 10, 0);
+
+                //        var timespan1 = result.ToArray()[0].HoraInicial;
+                //        var timespan2 = result.ToArray()[0].HoraFinal;
+                //        var horaMinuto1 = timespan1.Split(":");
+                //        var horaMinuto2 = timespan2.Split(":");
+                //        var horaInicio = new DateTime(result.ToArray()[0].DiaAula.Year, result.ToArray()[0].DiaAula.Month, result.ToArray()[0].DiaAula.Day, Convert.ToInt32(horaMinuto1[0]), Convert.ToInt32(horaMinuto1[1]), 0).Subtract(timespantest);
+                      
+                //        var horaFim = new DateTime(result.ToArray()[0].DiaAula.Year, result.ToArray()[0].DiaAula.Month, result.ToArray()[0].DiaAula.Day, Convert.ToInt32(horaMinuto2[0]), Convert.ToInt32(horaMinuto2[1]), 0);
+
+                //        if (agora >= horaInicio && agora <= horaFim)
+                //        {
+                //            item.podeIniciar = true;
+                //        }
+                //        else
+                //        {
+                //            item.podeIniciar = false;
+                //        }
+
+
+                //    }
+
+                //}
+
+                return results;
+
+            }
+
+            //throw new NotImplemen tedException();
+        }
+
         public async Task<IEnumerable<Guid>> GetTypePacotesTurmasMatriculadas(Guid alunoId)
         {
             var query = @"select turmas.TypePacoteId From Turmas

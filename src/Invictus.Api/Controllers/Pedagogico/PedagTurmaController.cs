@@ -18,11 +18,52 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly IProfessorQueries _profQueries;
         private readonly ITurmaApplication _turmaApp;
         private readonly ITurmaQueries _turmaQueries;
-        public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries)
+        private readonly ICalendarioQueries _calendarioQueries;
+        public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries,
+            ICalendarioQueries calendarioQueries)
         {
             _profQueries = profQueries;
             _turmaApp = turmaApp;
             _turmaQueries = turmaQueries;
+            _calendarioQueries = calendarioQueries;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTurmas()
+        {
+            var turmas = await _turmaQueries.GetTurmasPedagViewModel();
+            if (turmas.Count() == 0) return NotFound();
+
+            //var unidadeId = await _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).SingleOrDefaultAsync();
+            //var turmas = await _pedagogicoQuery.GetTurmas(unidadeId);
+
+            //var data = DateTime.Now;
+            //foreach (var item in turmas)
+            //{
+            //    var temAula = await _context.Calendarios.Where(c => c.DiaAula.Year == data.Year & c.DiaAula.Month == data.Month & c.DiaAula.Day == data.Day & c.TurmaId == item.id).ToListAsync();
+
+            //    if (temAula.Count() > 0)
+            //    {
+            //        item.podeIniciar = true;
+            //        item.calendarioId = temAula[0].Id;
+            //    }
+            //    else
+            //    {
+            //        item.podeIniciar = false;
+            //        item.calendarioId = 0;
+            //    }
+            //}
+
+            return Ok(new { turmas = turmas });
+        }
+
+        [HttpGet]
+        [Route("calendario/{turmaId}")]
+        public async Task<ActionResult> GetCalendarios(Guid turmaId)
+        {
+            var calends = await _calendarioQueries.GetCalendarioByTurmaId(turmaId);
+
+            return Ok(new { calends = calends });
         }
 
         [HttpGet]
