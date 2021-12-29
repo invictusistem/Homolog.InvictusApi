@@ -13,6 +13,9 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces
         Task AddProfessorMateria(MateriaHabilitada profMateria);
         Task RemoveProfessorMateria(Guid profMateriaId);
         Task AddDisponibilidade(Disponibilidade disponibilidade);
+        Task EditDisponibilidade(Disponibilidade disponibilidade);
+        Task RemoveDisponibilidade(Disponibilidade disponibilidade);
+
         void Save();
     }
 }

@@ -113,6 +113,11 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
             DataCadastro = DateTime.Now;
         }
 
+        public void SetDataCadastro(DateTime data)
+        {
+            DataCadastro = data;
+        }
+
         public void DesativarAluno()
         {
             Ativo = false;

@@ -46,6 +46,8 @@ namespace Invictus.Api.Controllers
         {
             var salas = await _unidadeQuery.GetSalas(unidadeId);//.CreateUnidade(command);
 
+            if (salas.Count() > 0) return NotFound();
+
             return Ok(new { salas = salas });
         }
 
@@ -57,10 +59,6 @@ namespace Invictus.Api.Controllers
 
             return Ok(new { sala = sala });
         }
-
-        
-
-       
         
 
         #endregion

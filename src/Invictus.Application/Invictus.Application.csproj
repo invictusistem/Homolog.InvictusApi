@@ -5,12 +5,15 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
+		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.8" />
 		<PackageReference Include="NETCore.MailKit" Version="2.0.3" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\Invictus.BackgroundTasks\Invictus.BackgroundTasks.csproj" />
+		<ProjectReference Include="..\Invictus.Data\Invictus.Data.csproj" />
 		<ProjectReference Include="..\Invictus.Domain\Invictus.Domain.csproj" />
 		<ProjectReference Include="..\Invictus.Dtos\Invictus.Dtos.csproj" />
 		<ProjectReference Include="..\Invictus.QueryService\Invictus.QueryService.csproj" />

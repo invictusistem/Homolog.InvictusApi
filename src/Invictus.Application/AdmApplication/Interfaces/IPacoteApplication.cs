@@ -9,7 +9,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IPacoteApplication
     {
-        Task SavePacote(PacoteDto newPacote);
+        Task<IEnumerable<string>> SavePacote(PacoteDto newPacote);
         Task EditPacote(PacoteDto editPacote);
     }
 }

@@ -10,7 +10,7 @@ namespace Invictus.Dtos.PedagDto
     {
         public MatriculaCommand()
         {
-
+            plano = new PlanCommand();
         }
         // public Guid planoSelectId { get; set; }
         public PlanCommand plano { get; set; }
@@ -52,13 +52,22 @@ namespace Invictus.Dtos.PedagDto
     {
         public PlanCommand()
         {
-
+            infoParcelas = new List<Parcela>();
         }
-        public decimal valor { get; set; }
-        public decimal taxaMatricula { get; set; }
-        public bool confirmacaoPagmMat { get; set; }
-        public decimal bonusPontualidade { get; set; }
-        public int parcelas { get; set; }
-        public Guid planoId { get; set; }
+        public decimal valor { get; set; }  // ok
+        public decimal taxaMatricula { get; set; }// ??
+        public bool confirmacaoPagmMat { get; set; } // true
+        public decimal bonusPontualidade { get; set; } // ok
+        public decimal valorParcela { get; set; } // ok - OBS: ver parc diferentes
+        public int parcelas { get; set; } // count nas linhas 
+        public Guid planoId { get; set; } // pegar e ver se todos sao iguais
+        public List<Parcela> infoParcelas { get; set; }
+    }
+
+    public class Parcela
+    {
+        public string parcelaNo { get; set; }// ideia ordenar por data
+        public decimal valor { get; set; } // tem na planilha
+        public DateTime vencimento { get; set; } // tem na planilha
     }
 }

@@ -1,17 +1,18 @@
 ﻿using DinkToPdf;
 using DinkToPdf.Contracts;
 using Invictus.Api.Helpers;
+using Invictus.Api.HuSignalR;
+using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.BackgroundTasks;
 using Invictus.Core.Enums;
 using Invictus.Data.Context;
-using Invictus.Domain.Administrativo.AlunoAggregate;
+using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.PacoteAggregate;
-using Invictus.Domain.Administrativo.Parametros;
-using Invictus.Domain.Administrativo.TurmaAggregate;
-using Invictus.QueryService.AdministrativoQueries.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MoreLinq;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,24 +25,46 @@ namespace Invictus.Api.Controllers
     //[Authorize]
     [Route("api/teste")]
     public class TestController : ControllerBase
-    {       
+    {
         public UserManager<IdentityUser> UserManager { get; set; }
+        private IHubContext<ChartHub> _hub;
+        private readonly IRelatorioApp _relatorioApp;
         public RoleManager<IdentityRole> RoleManager { get; set; }
         private IConverter _converter;
         private readonly ITemplate _template;
         private readonly InvictusDbContext _db;
+        private readonly BackgroundWorkerQueue _backgroundWorkerQueue;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly ILogger<TestController> _logger;
+
         public TestController(
+            IRelatorioApp relatorioApp,
+            IHubContext<ChartHub> hub,
+           BackgroundWorkerQueue backgroundWorkerQueue,
+           ILogger<TestController> logger,
+            IServiceScopeFactory serviceScopeFactory,
+            // IHostedService demoService,
+            //IBackgroundTaskQueue backgroundTaskQueue,
+
             InvictusDbContext db,
             ITemplate template,
-        UserManager<IdentityUser> userMgr,
+            UserManager<IdentityUser> userMgr,
             IConverter converter,
             RoleManager<IdentityRole> roleMgr)
-        {            
+        {
+            _relatorioApp = relatorioApp;
+            _hub = hub;
             UserManager = userMgr;
             RoleManager = roleMgr;
             _converter = converter;
             _template = template;
             _db = db;
+            _backgroundWorkerQueue = backgroundWorkerQueue;
+            _serviceScopeFactory = serviceScopeFactory;
+            _logger = logger;
+            // _demoService = demoService;
+            //_backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
+
         }
         [HttpGet]
         [Route("export-dk-pdf")]
@@ -73,7 +96,7 @@ namespace Invictus.Api.Controllers
                 var file = _converter.Convert(pdf);
                 return File(file, "application/pdf");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
@@ -81,8 +104,118 @@ namespace Invictus.Api.Controllers
 
 
         [HttpGet]
+        [Route("hubtest")]
+        public IActionResult Get()
+        {
+            var timerManager = new TimerManager(() => _hub.Clients.All.SendAsync("transferchartdata", DataManager.GetData()));
+
+            return Ok(new { Message = "Request Completed" });
+        }
+
+        [HttpGet]
+        [Route("senmsg")]
+        public IActionResult send()
+        {
+            var timerManager = new TimerManager(() => _hub.Clients.All.SendAsync("transferchartdata", DataManager.GetData()));
+
+            return Ok(new { Message = "Request Completed" });
+        }
+
+        [HttpGet]
+        [Route("bck")]
+        public async Task<IActionResult> StartBackGround()
+        {
+            //check user account
+            //(bool isStarted, string data) result = backgroundService.Start();
+            //work.ExecuteTask();
+            await CallSlowApi();
+
+
+            return Ok("Process start! Plz WAIT");
+        }
+
+        private async Task CallSlowApi()
+        {
+            _backgroundWorkerQueue.QueueBackgroundWorkItem(async token =>
+            {
+                await Task.Delay(20000);
+                _logger.LogInformation($"Done at {DateTime.UtcNow.TimeOfDay}");
+            });
+        }
+
+        [HttpGet]
+        [Route("readexcelalunos")]
+        public string ReadExcel()
+        {
+            _relatorioApp.ReadAndSaveExcel();
+            return "invictus Ok";
+        }
+
+
+
+        [HttpGet]
         public IActionResult GetInfo()
         {
+            var pacoteDocs = _db.DocumentacoesExigencias.Where(d => d.PacoteId == new Guid("3b1f2590-897f-4107-80fa-08d9af7ea64a"));
+
+            var aphEnfermagem = new Guid("08f55f62-cab5-4008-c364-08d9b478a235");
+
+            var pacDocs = new List<DocumentacaoExigencia>();
+
+            foreach (var item in pacoteDocs)
+            {
+                var doc = new DocumentacaoExigencia(item.Descricao, item.Comentario, TitularDoc.TryParse(item.Titular), item.ValidadeDias, item.ObrigatorioParaMatricula);
+                doc.SetPacoteId(aphEnfermagem);
+
+                pacDocs.Add(doc);
+
+            }
+
+            _db.DocumentacoesExigencias.AddRange(pacDocs);
+
+            _db.SaveChanges();
+
+            var x = pacoteDocs;
+
+            /*
+            var colabList = new List<Colaborador>();
+
+            var colab1 = new Colaborador("TESTE COLABORADOR 2", "testecolab2@gmail.com", "12345678914", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab1.SetDataCriacao();
+
+            var colab2 = new Colaborador("TESTE COLABORADOR 3", "testecolab3@gmail.com", "12345678915", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab2.SetDataCriacao();
+
+            var colab3 = new Colaborador("TESTE COLABORADOR 4", "testecolab4@gmail.com", "12345678916", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab3.SetDataCriacao();
+
+            var colab4 = new Colaborador("TESTE COLABORADOR 5", "testecolab5@gmail.com", "12345678917", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab4.SetDataCriacao();
+
+            var colab5 = new Colaborador("TESTE COLABORADOR 6", "testecolab6@gmail.com", "12345678918", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab5.SetDataCriacao();
+
+            var colab6 = new Colaborador("TESTE COLABORADOR 7", "testecolab7@gmail.com", "12345678919", "21999999999", new Guid("331ba75a-8bbf-41d9-851f-895addb491aa"),
+                new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c"), true, new ColaboradorEndereco("BAIRRO TAL", "23050000", "COMPLEMENTO TAL", "LOGRAD TAL", "TAL", "RIO DE JANEIRO", "RJ"));
+            colab6.SetDataCriacao();
+
+            colabList.Add(colab1);
+            colabList.Add(colab2);
+            colabList.Add(colab3);
+            colabList.Add(colab4);
+            colabList.Add(colab5);
+            colabList.Add(colab6);
+
+            _db.Colaboradores.AddRange(colabList);
+
+            _db.SaveChanges();
+            */
+            /*
             var pacoteDocs = _db.DocumentacoesExigencias;
 
             var alunosDocs = _db.AlunosDocs;
@@ -103,6 +236,7 @@ namespace Invictus.Api.Controllers
             }
 
             _db.SaveChanges();
+            */
             /*
             var guid = new Guid("9ea84227-44fa-45f6-9867-419ce36590b9");
 

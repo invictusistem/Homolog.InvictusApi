@@ -32,6 +32,8 @@ namespace Invictus.Api.Controllers
         public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetColaboradorV2([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
             var results = await _colaboradorQueries.GetColaboradoresByUnidadeId(itemsPerPage, currentPage, paramsJson);
+            
+            if (results.Data.Count() == 0) return NotFound();
 
             return Ok(results);
         }

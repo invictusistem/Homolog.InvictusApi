@@ -195,6 +195,9 @@ namespace Invictus.QueryService.AdministrativoQueries
                             ProfessoresDisponibilidades.Quinta,
                             ProfessoresDisponibilidades.Sexta,
                             ProfessoresDisponibilidades.Sabado,
+                            ProfessoresDisponibilidades.UnidadeId,
+                            ProfessoresDisponibilidades.PessoaId,
+                            ProfessoresDisponibilidades.DataAtualizacao,
                             Unidades.Descricao
                             from ProfessoresDisponibilidades 
                             inner join Unidades on ProfessoresDisponibilidades.UnidadeId = Unidades.id

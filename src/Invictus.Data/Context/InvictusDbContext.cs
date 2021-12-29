@@ -1,4 +1,5 @@
 ﻿using Invictus.Data.Mapping.AdmMappings;
+using Invictus.Data.Mapping.FinanceiroMappings;
 using Invictus.Data.Mapping.PedagMappings;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.Calendarios;
@@ -14,6 +15,7 @@ using Invictus.Domain.Administrativo.RegistroMatricula;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Administrativo.UnidadeAuth;
+using Invictus.Domain.Financeiro;
 using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
@@ -68,12 +70,19 @@ namespace Invictus.Data.Context
         public DbSet<AlunoAnotacao> AlunosAnotacoes { get; set; }
 
         #endregion
+
+        #region FINANC
+
+        public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
+        public DbSet<Boleto> Boletos { get; set; }
+
+        #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             AdmModelBuilder.RegisterBuilders(modelBuilder);
-
             PedagModelBuilder.RegisterBuilders(modelBuilder);
+            FinancModelBuilder.RegisterBuilders(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -29,6 +29,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<ITurmaApplication, TurmaApplication>();
             services.AddScoped<IUnidadeApplication, UnidadeApplication>();
             services.AddScoped<IUsuarioApplication, UsuarioApplication>();
+            services.AddScoped<IBoletoService, BoletoService>();
 
         }
     }

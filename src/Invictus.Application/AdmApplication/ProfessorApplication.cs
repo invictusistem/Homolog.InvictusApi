@@ -44,6 +44,28 @@ namespace Invictus.Application.AdmApplication
             _profRepository.Save();
         }
 
+        public async Task EditDisponibilidade(DisponibilidadeDto dispoDto)
+        {
+            if(dispoDto.domingo == false &
+                dispoDto.segunda == false &
+                dispoDto.terca == false &
+                dispoDto.quarta == false &
+                dispoDto.quinta == false &
+                dispoDto.sexta == false &
+                dispoDto.sabado == false)
+            {
+                var dispo = _mapper.Map<Disponibilidade>(dispoDto);
+                await _profRepository.RemoveDisponibilidade(dispo);
+            }
+            else
+            {
+                var dispo = _mapper.Map<Disponibilidade>(dispoDto);
+                await _profRepository.EditDisponibilidade(dispo);
+            }
+
+            _profRepository.Save();
+        }
+
         public async Task EditProfessor(ProfessorDto editedProfessor)
         {  
             var professor = _mapper.Map<Professor>(editedProfessor);

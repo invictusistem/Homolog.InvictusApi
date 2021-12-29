@@ -47,6 +47,11 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate
             Ativo = false;
         }
 
+        public void SetDataCriacao()
+        {
+            DataCriacao = DateTime.Now;
+        }
+
         public void TratarEmail(string email)
         {
             Email = RemoveDiacritics(email);

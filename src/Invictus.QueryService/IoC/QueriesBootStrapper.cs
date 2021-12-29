@@ -2,6 +2,8 @@
 
 using Invictus.QueryService.AdministrativoQueries;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Invictus.QueryService.FinanceiroQueries;
+using Invictus.QueryService.FinanceiroQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Invictus.QueryService.Utilitarios;
@@ -43,6 +45,9 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IPedagDocsQueries, PedagDocsQueries>();
             services.AddScoped<IPedagMatriculaQueries, PedagMatriculaQueries>();
             services.AddScoped<ITurmaPedagQueries, TurmaPedagQueries>();
+
+            //Financeiro
+            services.AddScoped<IFinanceiroQueries, FinancQueries>();
         }
 
     }

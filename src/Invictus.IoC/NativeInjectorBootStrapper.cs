@@ -2,6 +2,7 @@
 using Invictus.Core;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Repositories.Administrativo;
+using Invictus.Data.Repositories.Financeiro;
 using Invictus.Data.Repositories.Pedagogico;
 using Invictus.Domain.Administrativo.AdmProduto.Interfaces;
 using Invictus.Domain.Administrativo.AgendaTri.Interfaces;
@@ -19,6 +20,7 @@ using Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAuth.Interfaces;
+using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Domain.Padagogico.AlunoAggregate.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Domain.Pedagogico.Responsaveis.Interfaces;
@@ -59,6 +61,8 @@ namespace Invictus.IoC
             // Pedag
             services.AddScoped<IAlunoPedagRepo, AlunoPedagRepo>();
             services.AddScoped<IRespRepo, RespRepo>();
+            // Financ
+            services.AddTransient<IDebitosRepos, InfoFinancRepo>();
 
 
         }

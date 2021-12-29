@@ -999,6 +999,106 @@ namespace Invictus.Data.Migrations
                     b.ToTable("Autorizacoes");
                 });
 
+            modelBuilder.Entity("Invictus.Domain.Financeiro.Boleto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CentroCustoUnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataPagamento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Desconto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiasDesconto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("InformacaoDebitoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Juros")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JurosFixo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Multa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MultaFixo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ReparcelamentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StatusBoleto")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Valor")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<decimal>("ValorPago")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.Property<DateTime>("Vencimento")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CentroCustoUnidadeId");
+
+                    b.HasIndex("InformacaoDebitoId");
+
+                    b.HasIndex("StatusBoleto");
+
+                    b.ToTable("Boletos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Historico")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("NumeroParcelas")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Origem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StatusPagamento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubConta")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UnidadeCusto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ValorTotal")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InformacoesDebitos");
+                });
+
             modelBuilder.Entity("Invictus.Domain.Padagogico.NotasTurmas.TurmaNotas", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1458,6 +1558,85 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Endereco");
                 });
 
+            modelBuilder.Entity("Invictus.Domain.Financeiro.Boleto", b =>
+                {
+                    b.HasOne("Invictus.Domain.Financeiro.InformacaoDebito", "InformacaoDebito")
+                        .WithMany("Boletos")
+                        .HasForeignKey("InformacaoDebitoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Invictus.Domain.Financeiro.BoletoResponseInfo", "infoBoletos", b1 =>
+                        {
+                            b1.Property<Guid>("BoletoId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Banco_numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Banco_numero");
+
+                            b1.Property<string>("Credencial")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Credencial");
+
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Id_unico")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Id_unico");
+
+                            b1.Property<string>("Id_unico_original")
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("Id_unico_original");
+
+                            b1.Property<string>("LinhaDigitavel")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("LinhaDigitavel");
+
+                            b1.Property<string>("LinkBoleto")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("LinkBoleto");
+
+                            b1.Property<string>("LinkGrupo")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("LinkGrupo");
+
+                            b1.Property<string>("Msg")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Msg");
+
+                            b1.Property<string>("Nossonumero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Nossonumero");
+
+                            b1.Property<string>("Pedido_numero")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Pedido_numero");
+
+                            b1.Property<string>("Status")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Status");
+
+                            b1.Property<string>("Token_facilitador")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Token_facilitador");
+
+                            b1.HasKey("BoletoId");
+
+                            b1.ToTable("Boletos");
+
+                            b1.WithOwner("Boleto")
+                                .HasForeignKey("BoletoId");
+
+                            b1.Navigation("Boleto");
+                        });
+
+                    b.Navigation("infoBoletos");
+
+                    b.Navigation("InformacaoDebito");
+                });
+
             modelBuilder.Entity("Invictus.Domain.Pedagogico.Responsaveis.Responsavel", b =>
                 {
                     b.OwnsOne("Invictus.Domain.Pedagogico.Responsaveis.ResponsavelEndereco", "Endereco", b1 =>
@@ -1536,6 +1715,11 @@ namespace Invictus.Data.Migrations
             modelBuilder.Entity("Invictus.Domain.Administrativo.UnidadeAggregate.Unidade", b =>
                 {
                     b.Navigation("Salas");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>
+                {
+                    b.Navigation("Boletos");
                 });
 #pragma warning restore 612, 618
         }

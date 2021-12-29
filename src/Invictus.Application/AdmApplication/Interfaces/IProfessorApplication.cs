@@ -15,5 +15,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
         Task AddProfessorMateria(Guid profId, Guid materiaId);
         Task RemoveProfessorMateria(Guid profMateriaId);
         Task AddDisponibilidade(DisponibilidadeDto disponibilidade);
+        Task EditDisponibilidade(DisponibilidadeDto disponibilidade);
     }
 }

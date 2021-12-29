@@ -50,5 +50,15 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             await _db.Disponibilidades.AddAsync(disponibilidade);
         }
+
+        public async Task EditDisponibilidade(Disponibilidade disponibilidade)
+        {
+            await _db.Disponibilidades.SingleUpdateAsync(disponibilidade);
+        }
+
+        public async Task RemoveDisponibilidade(Disponibilidade disponibilidade)
+        {
+            await _db.Disponibilidades.SingleDeleteAsync(disponibilidade);
+        }
     }
 }

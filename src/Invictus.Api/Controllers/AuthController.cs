@@ -31,7 +31,7 @@ namespace Invictus.Api.Controllers
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly IColaboradorQueries _colaboradorQueries;
         private readonly IAutorizacaoQueries _autorizacoesQueries;
-        public AuthController(SignInManager<IdentityUser> signInManager, 
+        public AuthController(SignInManager<IdentityUser> signInManager,
                             UserManager<IdentityUser> userManager,
                             IOptions<AppSettings> appSettings,
                             IUnidadeQueries unidadeQueries,
@@ -96,9 +96,61 @@ namespace Invictus.Api.Controllers
             return Ok(new { message = "logado!!!!" });
         }
 
-        [HttpPost("login")]
+        [HttpPost("pre-login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(UserLogin user)
+        public async Task<IActionResult> PreLogin(UserLogin user)
+        {
+            // if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+            var usuario = await _userManager.FindByEmailAsync(user.Email);
+            var result = await _signInManager.PasswordSignInAsync(usuario, user.Senha, false, true);
+
+
+            // if (result.Succeeded) return Ok(await GerarJwt(user.Email));
+            if (result.Succeeded)
+            {
+
+                var claims = await _userManager.GetClaimsAsync(usuario);
+                var userRoles = await _userManager.GetRolesAsync(usuario);
+
+                //var siglaUnidade = "ALC";
+                /*
+                 trazer a lista de claims, excluindo a que foi SLELECIONADA
+                entao pegar, dar um FORECH CASO o resultado seja maior que 0
+                 */
+                var unidades = claims.Where(c => c.Type == "Unidade");
+
+                var listaUnidades = new List<string>();
+
+                listaUnidades.AddRange(unidades.Select(u => u.Value));
+
+                var unidadeSelect = new List<UnidadeSelect>();
+
+                foreach (var uni in listaUnidades)
+                {
+                    var desc = await _unidadeQueries.GetUnidadeBySigla(uni);
+                    unidadeSelect.Add(new UnidadeSelect() { unidadeId = desc.id, sigla = uni, value= desc.descricao });
+                }
+
+
+
+                return Ok(new { unidades = unidadeSelect });    //return CustomResponse(await GerarJwt(usuario));
+            }
+
+            if (result.IsLockedOut)
+            {
+                AdicionarErroProcessamento("Usuário temporariamente bloqueado. Tente novamente em alguns minutos.");
+                return CustomResponse();
+            }
+
+            AdicionarErroProcessamento("Usuário ou senha incorretos.");
+            // return BadRequest();
+            return CustomResponse();
+        }
+
+        [HttpPost("login/{unidadeId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(UserLogin user, Guid unidadeId)
         {
             // if (!ModelState.IsValid) return BadRequest();
             if (!ModelState.IsValid) return CustomResponse(ModelState);
@@ -106,15 +158,15 @@ namespace Invictus.Api.Controllers
             var result = await _signInManager.PasswordSignInAsync(usuario, user.Senha, false, true);
 
             // if (result.Succeeded) return Ok(await GerarJwt(user.Email));
-            if (result.Succeeded) return CustomResponse(await GerarJwt(usuario));
+            if (result.Succeeded) return CustomResponse(await GerarJwt(usuario, unidadeId));
 
             if (result.IsLockedOut)
             {
-                AdicionarErroProcessamento("Usuário temporariamente bloqueado");
+                AdicionarErroProcessamento("Usuário temporariamente bloqueado. Tente novamente em alguns minutos.");
                 return CustomResponse();
             }
 
-            AdicionarErroProcessamento("Usuário ou senha incorretos");
+            AdicionarErroProcessamento("Usuário ou senha incorretos.");
             // return BadRequest();
             return CustomResponse();
         }
@@ -127,15 +179,33 @@ namespace Invictus.Api.Controllers
             return autorizacoes;
         }
 
-        private async Task<UserResponseLogin> GerarJwt(IdentityUser user)
+        private async Task<UserResponseLogin> GerarJwt(IdentityUser user, Guid unidadeId)
         {
 
             var claims = await _userManager.GetClaimsAsync(user);
             var userRoles = await _userManager.GetRolesAsync(user);
 
+            var siglaUnidade = await _unidadeQueries.GetUnidadeById(unidadeId);   //"ALC";
+            /*
+             trazer a lista de claims, excluindo a que foi SLELECIONADA
+            entao pegar, dar um FORECH CASO o resultado seja maior que 0
+             */
+            var result = claims.Where(c => c.Type == "Unidade" & c.Value != siglaUnidade.sigla);
+            try
+            {
+                if (result.Count() > 0)
+                {
+                    foreach (var item in result.ToList())
+                    {
+                        claims.Remove(item);
+                    }
+                }
+            }catch(Exception ex)
+            {
 
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            }
+
+
             claims.Add(new Claim("Nome", user.UserName));
 
             var autorizacoes = await GetAutorizacoes(user.Email);
@@ -151,6 +221,9 @@ namespace Invictus.Api.Controllers
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
             claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+
 
             foreach (var userRole in userRoles)
             {
@@ -159,10 +232,12 @@ namespace Invictus.Api.Controllers
 
             var identityClaims = new ClaimsIdentity();
             identityClaims.AddClaims(claims);
+            //identityClaims.RemoveClaim(claims.Where(c => c.Type == "Unidade").FirstOrDefault());
 
             //validar
-            var claimUnidade = identityClaims.FindFirst("Unidade").Value;
-           
+            //var claimUnidade = identityClaims.FindFirst("Unidade").Value;
+            var claimUnidade = identityClaims.FindAll("Unidade").Select(c => c.Value);
+
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var Key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -197,5 +272,12 @@ namespace Invictus.Api.Controllers
 
         private static long ToUnixEpochDate(DateTime date)
             => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);//
+    }
+
+    public class UnidadeSelect
+    {
+        public Guid unidadeId { get; set; }
+        public string sigla { get; set; }
+        public string value { get; set; }
     }
 }

@@ -30,6 +30,10 @@ namespace Invictus.Domain.Administrativo.PacoteAggregate
         public int ValidadeDias { get; private set; }
         public bool ObrigatorioParaMatricula { get; private set; }
 
+        public void SetPacoteId(Guid pacoteId)
+        {
+            PacoteId = pacoteId;
+        }
 
         #region EF
 

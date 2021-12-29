@@ -2,9 +2,13 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using Invictus.Api.Configurations;
 using Invictus.Api.Helpers;
+using Invictus.Api.HuSignalR;
 using Invictus.Api.Identity;
+using Invictus.Application.AdmApplication;
+using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.AutoMapper;
 using Invictus.Application.Ioc;
+using Invictus.BackgroundTasks;
 using Invictus.Data.Context;
 using Invictus.Dtos;
 using Invictus.IoC;
@@ -62,7 +66,7 @@ namespace Invictus.Api
             #endregion
 
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-
+            services.AddSignalR();
             #region Newtonsoft
             services.AddControllers().AddNewtonsoftJson(options =>
                   options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -168,6 +172,7 @@ namespace Invictus.Api
                     builder.AllowAnyOrigin()
                        .AllowAnyHeader()
                        .AllowAnyMethod();
+                       //.AllowCredentials();
                 });
             });
 
@@ -206,6 +211,10 @@ namespace Invictus.Api
 
             #endregion
             services.AddScoped<ITemplate, TemplateGenerator>();
+            services.AddScoped<IRelatorioApp, RelatorioApp>();
+            services.AddHostedService<LongRunningService>();
+            services.AddSingleton<BackgroundWorkerQueue>();
+
             RegisterServices(services);
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -231,11 +240,15 @@ namespace Invictus.Api
 
             app.UseAuthorization();
 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChartHub>("/chart");
                 //.RequireCors(MyAllowSpecificOrigins); ;
             });
+
+
             if (env.IsDevelopment())
             {
                 //SeedData.EnsurePopulated(app, Configuration);

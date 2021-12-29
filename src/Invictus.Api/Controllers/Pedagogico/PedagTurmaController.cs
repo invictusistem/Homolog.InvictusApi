@@ -32,27 +32,8 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> GetTurmas()
         {
             var turmas = await _turmaQueries.GetTurmasPedagViewModel();
+
             if (turmas.Count() == 0) return NotFound();
-
-            //var unidadeId = await _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).SingleOrDefaultAsync();
-            //var turmas = await _pedagogicoQuery.GetTurmas(unidadeId);
-
-            //var data = DateTime.Now;
-            //foreach (var item in turmas)
-            //{
-            //    var temAula = await _context.Calendarios.Where(c => c.DiaAula.Year == data.Year & c.DiaAula.Month == data.Month & c.DiaAula.Day == data.Day & c.TurmaId == item.id).ToListAsync();
-
-            //    if (temAula.Count() > 0)
-            //    {
-            //        item.podeIniciar = true;
-            //        item.calendarioId = temAula[0].Id;
-            //    }
-            //    else
-            //    {
-            //        item.podeIniciar = false;
-            //        item.calendarioId = 0;
-            //    }
-            //}
 
             return Ok(new { turmas = turmas });
         }

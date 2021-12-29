@@ -98,6 +98,15 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPut]
+        [Route("disponibilidade")]
+        public async Task<IActionResult> EditProfessorDisponibilidade([FromBody] DisponibilidadeDto dispo)
+        {
+             await _profApplication.EditDisponibilidade(dispo);
+
+            return Ok();
+        }
+
+        [HttpPut]
         public async Task<IActionResult> EditProfessor([FromBody] ProfessorDto editedProfessor)
         {
             await _profApplication.EditProfessor(editedProfessor);

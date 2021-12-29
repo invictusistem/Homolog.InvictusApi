@@ -15,5 +15,6 @@ namespace Invictus.Dtos.AdmDtos
         public string titular { get; set; }
         public int validadeDias { get; set; }
         public bool obrigatorioParaMatricula { get; set; }
+        public Guid pacoteId { get; set; }
     }
 }

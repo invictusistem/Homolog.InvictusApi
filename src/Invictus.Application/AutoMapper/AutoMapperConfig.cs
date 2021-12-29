@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Invictus.Application.AdmApplication;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Enums;
 using Invictus.Domain.Administrativo.AlunoAggregate;
@@ -12,9 +13,11 @@ using Invictus.Domain.Administrativo.Parametros;
 using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
+using Invictus.Domain.Financeiro;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.PedagDto;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -105,6 +108,10 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<TurmaProfessoresDto, TurmaProfessor>();
 
+            CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
+                .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,
+                b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));
+
             CreateMap<ContratoView, Contrato>();
             CreateMap<ContratoDto, Contrato>();
             CreateMap<ContratoConteudoDto, Conteudo>();
@@ -112,6 +119,12 @@ namespace Invictus.Application.AutoMapper
             CreateMap<PlanoPagamentoDto, PlanoPagamentoTemplate>();
             CreateMap<AgendaTrimestreDto, AgendaTrimestre>();
             CreateMap<DocumentacaoTemplateDto, DocumentacaoTemplate>();
+
+            CreateMap<AlunoExcelDto, Aluno>()
+                 .ConstructUsing(c => new Aluno(c.Nome, c.NomeSocial, c.CPF, c.RG, c.NomePai, c.NomeMae, c.Nascimento, c.Naturalidade, c.NaturalidadeUF,
+                 c.Email, c.TelReferencia, c.NomeContatoReferencia, c.TelCelular, c.TelResidencial, c.TelWhatsapp,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                     new AlunoEndereco(c.Bairro, c.CEP, c.Complemento, c.Logradouro, c.Numero, c.Cidade, c.UF)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
+
         }
     }
 }

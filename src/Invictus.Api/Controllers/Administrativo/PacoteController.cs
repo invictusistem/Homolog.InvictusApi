@@ -50,6 +50,8 @@ namespace Invictus.Api.Controllers
         {
             var pacotes = await _pacoteQueries.GetPacotes(typePacoteId, unidadeId);
 
+            if (pacotes.Count() == 0) return NotFound();
+
             return Ok(new { pacotes = pacotes });
         }
 
@@ -77,69 +79,33 @@ namespace Invictus.Api.Controllers
         [Route("edit/{pacoteId}")]
         public async Task<IActionResult> GetEditPacoteView(Guid pacoteId)
         {
-           // var pacote = await _pacoteQueries.GetPacoteById(pacoteId);
-            var pacoteTeste = await _pacoteQueries.GetPacoteByIdTeste(pacoteId);
+            var pacote = await _pacoteQueries.GetPacoteByIdTeste(pacoteId);
 
-            var materias = await _materiaQueries.GetMateriaByTypePacoteId(pacoteTeste.typePacoteId);
+            var materias = await _materiaQueries.GetMateriaByTypePacoteId(pacote.typePacoteId);
 
             var docs = await _docQueries.GetAll();
 
-            return Ok(new { pacote = pacoteTeste, materias = materias, docs = docs });
+            return Ok(new { pacote = pacote, materias = materias, docs = docs });
         }
 
         [HttpPost]
-       // [Route("modulo")]
         public async Task<IActionResult> SavePacote([FromBody] PacoteDto newPacote)
         {
 
-            await _pacoteApplication.SavePacote(newPacote);
+            var validationsError = await _pacoteApplication.SavePacote(newPacote);
+
+            if (validationsError.Any()) return Conflict(new { erros = validationsError });
 
             return Ok();
-
-            //var modulo = _mapper.Map<Pacote>(newModulo);
-
-            //modulo.SetCreateDate();
-            //modulo.SetTotalHours(modulo.Materias);
-            //var unidadeId = _context.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefault();
-            //modulo.SetUnidadeId(unidadeId);
-
-            //_context.Modulos.Add(modulo);
-
-            //_context.SaveChanges();
-
-            //var listDocumentacaoExigida = new List<DocumentacaoExigencia>();
-
-
-            //foreach (var item in newModulo.documentos)
-            //{
-            //    var doc = new DocumentacaoExigencia(item.descricao, item.comentario, modulo.Id);
-            //    doc.SetTitular(item.titular);
-            //    listDocumentacaoExigida.Add(doc);
-            //}
-            //if (newModulo.documentos.Count > 0)
-            //{
-            //    _context.DocsExigencias.AddRange(listDocumentacaoExigida);
-
-            //    _context.SaveChanges();
-            //}
-
-            //return Ok();
         }
 
         [HttpPut]
-       // [Route("pacote-editar")]
         public async Task<IActionResult> UpdatePacote([FromBody] PacoteDto editedPacote)
         {
-            await _pacoteApplication.EditPacote(editedPacote);
+            //await _pacoteApplication.EditPacote(editedPacote);
 
             return Ok();
 
-            //var pacote = _mapper.Map<Pacote>(editedPacote);
-
-            //_context.Modulos.Update(pacote);
-            //_context.SaveChanges();
-
-            //return Ok();
         }
 
     }

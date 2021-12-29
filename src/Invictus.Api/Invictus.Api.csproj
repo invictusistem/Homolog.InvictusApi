@@ -19,6 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
 		<PackageReference Include="morelinq" Version="3.3.2" />
 		<PackageReference Include="DinkToPdf" Version="1.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.8" />
@@ -37,6 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Invictus.BackgroundTasks\Invictus.BackgroundTasks.csproj" />
 		<ProjectReference Include="..\Invictus.Data\Invictus.Data.csproj" />
 		<ProjectReference Include="..\Invictus.Dtos\Invictus.Dtos.csproj" />
 		<ProjectReference Include="..\Invictus.IoC\Invictus.IoC.csproj" />
