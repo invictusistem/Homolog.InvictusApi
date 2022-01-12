@@ -30,5 +30,10 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             await _db.TurmasNotas.AddRangeAsync(notas);
         }
+
+        public void UpdateNotas(IEnumerable<TurmaNotas> notas)
+        {
+            _db.TurmasNotas.UpdateRange(notas);
+        }
     }
 }

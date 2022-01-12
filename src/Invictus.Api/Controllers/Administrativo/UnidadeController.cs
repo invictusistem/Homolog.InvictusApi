@@ -46,7 +46,7 @@ namespace Invictus.Api.Controllers
         {
             var salas = await _unidadeQuery.GetSalas(unidadeId);//.CreateUnidade(command);
 
-            if (salas.Count() > 0) return NotFound();
+            if (!salas.Any()) return NotFound();
 
             return Ok(new { salas = salas });
         }

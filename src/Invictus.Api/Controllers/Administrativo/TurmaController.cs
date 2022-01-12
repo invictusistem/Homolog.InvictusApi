@@ -2,6 +2,7 @@
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace Invictus.Api.Controllers
 {
     [Route("api/turma")]
+    [Authorize]
     [ApiController]
     public class TurmaController : ControllerBase
     {
@@ -106,6 +108,18 @@ namespace Invictus.Api.Controllers
             if (turmas.Count() == 0) return NotFound();
 
             return Ok(new { turmas = turmas });
+
+        }
+
+        [HttpGet]
+        [Route("materias/{turmaId}")]
+        public async Task<IActionResult> GetMateriasDaTurma(Guid turmaId)
+        {
+            var materias = await _turmaQueries.GetMateriasDaTurma(turmaId);
+
+            if (materias.Count() == 0) return NotFound();
+
+            return Ok(new { materias = materias });
 
         }
 

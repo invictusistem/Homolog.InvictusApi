@@ -33,5 +33,42 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok(new { debitos = debitos.OrderBy(c => c.vencimento), turma = turma });
             
         }
+
+        [HttpGet]
+        [Route("alunos")]
+        public async Task<IActionResult> BuscarCadastroAlunoFin([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        {
+
+            var alunos = await _finQueries.GetAlunosFinanceiro(itemsPerPage, currentPage, paramsJson);
+            if (alunos.Data.Count() == 0) return NotFound();
+
+            return Ok(new { alunos = alunos });
+            // OLD
+            //var param = JsonConvert.DeserializeObject<ParametrosDTO>(paramsJson);
+            //var unidadeId = await _db.Unidades.Where(u => u.Sigla == unidade).Select(u => u.Id).FirstOrDefaultAsync();
+            //var pessoas = await _financeiroQueries.GetAlunoFin(itemsPerPage, currentPage, param, unidadeId);// _matriculaQueries.BuscaAlunos(param.email, param.cpf, param.nome);
+            ////  var pessoas = await _matriculaQueries.BuscaAlunos(itemsPerPage, currentPage, parametros, unidadeId);
+            //pessoas.Data = SetCPFBind(pessoas.Data);
+            //return Ok(pessoas);
+            //return Ok(pessoas);
+        }
+
+       
+        //public List<AlunoDto> SetCPFBind(List<AlunoDto> datas)
+        //{
+        //    foreach (var data in datas)
+        //    {
+
+        //        var newValue = "***.***." + data.cpf.Substring(6, 3) + "-**";
+
+        //        data.cpf = newValue;
+
+        //    }
+        //    //var newValue = "***.***." + CPF.Substring(6, 3) + "-**";
+
+        //    //CPF = newValue;
+
+        //    return datas;
+        //}
     }
 }

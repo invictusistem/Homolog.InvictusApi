@@ -67,6 +67,38 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
         //{
         //    TurmaId = turmaId;
         //}
+        public static TurmaNotas CreateNota(Guid id,
+                                string avaliacaoUm,
+                                string segundaChamadaAvaliacaoUm,
+                                string avaliacaoDois,
+                                string segundaChamadaAvaliacaoDois,
+                                string avaliacaoTres,
+                                string segundaChamadaAvaliacaoTres,
+                                Guid materiaId,
+                                string materiaDescricao,
+                                Guid matriculaId,
+                                Guid turmaId,
+                                ResultadoNotas resultado)
+        {
+
+            var notas = new TurmaNotas();
+
+            notas.Id = id;
+            notas.AvaliacaoUm = avaliacaoUm;
+            notas.SegundaChamadaAvaliacaoUm = segundaChamadaAvaliacaoUm;
+            notas.AvaliacaoDois = avaliacaoDois;
+            notas.SegundaChamadaAvaliacaoDois = segundaChamadaAvaliacaoDois;
+            notas.AvaliacaoTres = avaliacaoTres;
+            notas.SegundaChamadaAvaliacaoTres = segundaChamadaAvaliacaoTres;
+            notas.MateriaId = materiaId;
+            notas.MateriaDescricao = materiaDescricao;
+            notas.MatriculaId = matriculaId;
+            notas.TurmaId = turmaId;
+
+            notas.Resultado = resultado.DisplayName;
+
+            return notas;
+        }
         public void VerificarStatusResultado()
         {
             var media = 7;

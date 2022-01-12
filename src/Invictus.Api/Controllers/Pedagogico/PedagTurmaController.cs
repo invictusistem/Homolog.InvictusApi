@@ -1,6 +1,7 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -19,13 +20,15 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly ITurmaApplication _turmaApp;
         private readonly ITurmaQueries _turmaQueries;
         private readonly ICalendarioQueries _calendarioQueries;
+        private readonly ITurmaPedagQueries _turmaPedagQueries;
         public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries,
-            ICalendarioQueries calendarioQueries)
+            ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries)
         {
             _profQueries = profQueries;
             _turmaApp = turmaApp;
             _turmaQueries = turmaQueries;
             _calendarioQueries = calendarioQueries;
+            _turmaPedagQueries = turmaPedagQueries;
         }
 
         [HttpGet]
@@ -57,6 +60,15 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { profs = profs });
         }
 
+        [HttpGet]
+        [Route("notas/{turmaId}/{materiaId}")]
+        public async Task<IActionResult> GetNotasDasTurmasPorMateria(Guid turmaId, Guid materiaId)
+        {
+            var notas = await _turmaPedagQueries.GetNotasFromTurma(turmaId, materiaId);
+
+            return Ok(new { notas = notas });
+        }
+
         [HttpPost]
         [Route("Professores")]
         public async Task<IActionResult> SaveProfsInTurma([FromBody] SaveProfsCommand command)
@@ -82,6 +94,15 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> SetProfessorNaTurma(Guid turmaId, Guid professorId, [FromBody] IEnumerable<MateriaView> profsMatCommand)
         {
             await _turmaApp.SetMateriaProfessor(turmaId, professorId, profsMatCommand);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("notas")]
+        public async Task<IActionResult> PutNotaAlunos([FromBody] List<TurmaNotasDto> notas)
+        {
+            await _turmaApp.UpdateNotas(notas);
 
             return Ok();
         }

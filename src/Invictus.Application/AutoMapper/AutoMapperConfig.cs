@@ -14,6 +14,7 @@ using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Financeiro;
+using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
@@ -107,6 +108,8 @@ namespace Invictus.Application.AutoMapper
             CreateMap<DisponibilidadeDto, Disponibilidade>();
 
             CreateMap<TurmaProfessoresDto, TurmaProfessor>();
+
+            CreateMap<TurmaNotasDto, TurmaNotas>();
 
             CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
                 .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,

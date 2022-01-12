@@ -13,5 +13,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<PaginatedItemsViewModel<UsuarioDto>> GetUsuarios(int itemsPerPage, int currentPage, string paramsJson);
         Task<UsuarioDto> GetUsuario(Guid colaboradorId);
         Task<CreateUsuarioView> GetCreateUsuarioViewModel(string email);
+        Task<IEnumerable<string>> GetAllIdentityRoles();
+        Task<IEnumerable<UsuarioAcessoViewModel>> GetUsuarioAcessoViewModel(Guid usuarioId);
     }
 }

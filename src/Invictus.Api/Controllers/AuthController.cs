@@ -118,6 +118,13 @@ namespace Invictus.Api.Controllers
                  trazer a lista de claims, excluindo a que foi SLELECIONADA
                 entao pegar, dar um FORECH CASO o resultado seja maior que 0
                  */
+
+                var ativo = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
+
+                if (Convert.ToBoolean(ativo.Value) == false) return Unauthorized();
+                //var x = ativo.Value;
+
+
                 var unidades = claims.Where(c => c.Type == "Unidade");
 
                 var listaUnidades = new List<string>();
@@ -191,8 +198,8 @@ namespace Invictus.Api.Controllers
             entao pegar, dar um FORECH CASO o resultado seja maior que 0
              */
             var result = claims.Where(c => c.Type == "Unidade" & c.Value != siglaUnidade.sigla);
-            try
-            {
+            //try
+            //{
                 if (result.Count() > 0)
                 {
                     foreach (var item in result.ToList())
@@ -200,10 +207,10 @@ namespace Invictus.Api.Controllers
                         claims.Remove(item);
                     }
                 }
-            }catch(Exception ex)
-            {
+            //}catch(Exception ex)
+            //{
 
-            }
+            //}
 
 
             claims.Add(new Claim("Nome", user.UserName));

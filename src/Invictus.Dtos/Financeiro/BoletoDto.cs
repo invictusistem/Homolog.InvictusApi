@@ -20,6 +20,8 @@ namespace Invictus.Dtos.Financeiro
         public string desconto { get; set; }
         public string diasDesconto { get; set; }
         public string statusBoleto { get; set; }
+        public string historico { get; set; }
+        public string subConta { get; set; }
         public Guid reparcelamentoId { get; set; }
         public Guid centroCustoUnidadeId { get; set; }
         public Guid informacaoDebitoId { get; set; }

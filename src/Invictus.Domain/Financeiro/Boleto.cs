@@ -21,9 +21,9 @@ namespace Invictus.Domain.Financeiro
                     string multaFixo,
                     string desconto,
                     string diasDesconto,
-                    StatusPagamento statusBoleto,
+                    StatusPagamento statusBoleto,                    
                     //Guid reparcelamentoId,
-                     Guid centroCustoUnidadeId,
+                    Guid centroCustoUnidadeId,
                     Guid informacaoDebitoId,
                     BoletoResponseInfo infoBoletos
                     )
@@ -39,7 +39,6 @@ namespace Invictus.Domain.Financeiro
             Desconto = desconto;
             DiasDesconto = diasDesconto;
             StatusBoleto = statusBoleto.DisplayName;
-            //ReparcelamentoId = reparcelamentoId;
             CentroCustoUnidadeId = centroCustoUnidadeId;
             InformacaoDebitoId = informacaoDebitoId;
             InfoBoletos = infoBoletos;
@@ -57,10 +56,17 @@ namespace Invictus.Domain.Financeiro
         public string Desconto { get; private set; }
         public string DiasDesconto { get; private set; }
         public string StatusBoleto { get; private set; }   
+        public string Historico { get; private set; }
+        public string SubConta { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
         public Guid CentroCustoUnidadeId { get; private set; }
         public Guid InformacaoDebitoId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
+
+        public void SetSubConta(string subConta)
+        {
+            SubConta = subConta;
+        }
 
         #region EF
         
@@ -71,7 +77,7 @@ namespace Invictus.Domain.Financeiro
 
     }
 
-    public class BoletoResponseInfo : Entity
+    public class BoletoResponseInfo //: Entity
     {
         public BoletoResponseInfo(string id_unico,
                                 string id_unico_original,

@@ -8,6 +8,8 @@ using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.Calendarios.Interfaces;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
+using Invictus.Domain.Padagogico.NotasTurmas;
+using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -29,9 +31,10 @@ namespace Invictus.Application.AdmApplication
         private readonly IParametrosQueries _paramQueries;
         private readonly IMapper _mapper;
         private readonly ITurmaRepo _turmaRepo;
+        private readonly ITurmaNotasRepo _notasRepo;
         public TurmaApplication(IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser, ITurmaQueries turmaQueries,
             IPacoteQueries pacoteQueries,IMapper mapper,ITurmaRepo turmaRepo, IParametrosQueries paramQueries,
-            ICalendarioRepo calendarioRepo)
+            ICalendarioRepo calendarioRepo, ITurmaNotasRepo notasRepo)
         {
             _unidadeQueries = unidadeQueries;
             _aspNetUser = aspNetUser;
@@ -41,6 +44,7 @@ namespace Invictus.Application.AdmApplication
             _turmaRepo = turmaRepo;
             _paramQueries = paramQueries;
             _calendarioRepo = calendarioRepo;
+            _notasRepo = notasRepo;
         }
         public async Task CreateTurma(CreateTurmaCommand command)
         {
@@ -133,10 +137,10 @@ namespace Invictus.Application.AdmApplication
             //var x = calendarios?[300];
 
            
-            var qntAulas = 0;
+            //var qntAulas = 0;
            
-            try
-            {
+            //try
+            //{
                 var diaCalendario = 0;
                 for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
                 {
@@ -167,10 +171,10 @@ namespace Invictus.Application.AdmApplication
 
                 }
 
-            }catch(Exception ex)
-            {
+            //}catch(Exception ex)
+            //{
 
-            }
+            //}
 
             
 
@@ -259,6 +263,50 @@ namespace Invictus.Application.AdmApplication
             }
 
             _turmaRepo.Commit();
+        }
+
+        public async Task UpdateNotas(List<TurmaNotasDto> notas)
+        {
+            foreach (var item in notas)
+            {
+                if (String.IsNullOrEmpty(item.avaliacaoUm))
+                    item.avaliacaoUm = null;
+
+                if (String.IsNullOrEmpty(item.avaliacaoDois))
+                    item.avaliacaoDois = null;
+
+                if (String.IsNullOrEmpty(item.avaliacaoTres))
+                    item.avaliacaoTres = null;
+
+                if (String.IsNullOrEmpty(item.segundaChamadaAvaliacaoUm))
+                    item.segundaChamadaAvaliacaoUm = null;
+
+                if (String.IsNullOrEmpty(item.segundaChamadaAvaliacaoDois))
+                    item.segundaChamadaAvaliacaoDois = null;
+
+                if (String.IsNullOrEmpty(item.segundaChamadaAvaliacaoTres))
+                    item.segundaChamadaAvaliacaoTres = null;
+
+            }
+
+            var listaNotas = new List<TurmaNotas>();
+
+            foreach (var nota in notas)
+            {
+                var notasDisc = TurmaNotas.CreateNota(nota.id,nota.avaliacaoUm,nota.segundaChamadaAvaliacaoUm,nota.avaliacaoDois,nota.segundaChamadaAvaliacaoDois,
+                    nota.avaliacaoTres,nota.segundaChamadaAvaliacaoTres,nota.materiaId,nota.materiaDescricao,nota.matriculaId,nota.turmaId,ResultadoNotas.TryParse(nota.resultado));
+                
+                notasDisc.VerificarStatusResultado();
+
+                listaNotas.Add(notasDisc);
+
+
+            }
+
+            _notasRepo.UpdateNotas(listaNotas);
+
+            _notasRepo.Commit();
+
         }
     }
 }

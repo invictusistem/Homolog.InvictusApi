@@ -14,5 +14,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
         Task AddProfessoresNaTurma(SaveProfsCommand command);
         Task SetMateriaProfessor(Guid turmaId, Guid professorId, IEnumerable<MateriaView> profsMatCommand);
         Task RemoverProfessorDaTurma(Guid professorId, Guid turmaId);
+        Task UpdateNotas(List<TurmaNotasDto> notas);
     }
 }

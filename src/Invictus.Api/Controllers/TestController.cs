@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,6 +67,9 @@ namespace Invictus.Api.Controllers
             //_backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
 
         }
+
+
+
         [HttpGet]
         [Route("export-dk-pdf")]
         public IActionResult ExportPDF()
@@ -85,8 +89,8 @@ namespace Invictus.Api.Controllers
                     PagesCount = true,
                     HtmlContent = _template.GetHTMLString(),// TemplateGenerator.GetHTMLString(),//@"<div><div style=""color: red""> PDF </div></div>", //TemplateGenerator.GetHTMLString(),
                     WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
-                    HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-                    FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+                    HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+                    FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
                 };
                 var pdf = new HtmlToPdfDocument()
                 {
@@ -110,6 +114,53 @@ namespace Invictus.Api.Controllers
             var timerManager = new TimerManager(() => _hub.Clients.All.SendAsync("transferchartdata", DataManager.GetData()));
 
             return Ok(new { Message = "Request Completed" });
+        }
+
+        [HttpGet]
+        [Route("codes")]
+        public IActionResult TesteCodes()
+        {
+            var boletos = _db.Boletos.ToList();
+
+            foreach (var item in boletos)
+            {
+                item.SetSubConta("MENSALIDADE");
+            }
+
+            _db.Boletos.UpdateRange(boletos);
+
+            _db.SaveChanges();
+          //  decimal valor1 = 0;
+          //  decimal valor2 = 45;
+          //  decimal valor3 = 35.5m;
+
+          //  decimal valor4 = 35.5m;
+          //  NumberFormatInfo nfi = new System.Globalization.NumberFormatInfo();
+          //  nfi.NumberDecimalSeparator = ".";
+          ////  Console.Write(a.ToString(nfi));
+          //  string a = valor1.ToString(nfi);
+          //  string b = valor2.ToString(nfi);
+          //  string c = valor3.ToString(nfi);
+          //  string d = valor4.ToString(nfi);
+
+
+
+            return Ok();
+        }
+
+
+        [HttpGet]
+        [Route("addrole")]
+        public async Task<IActionResult> AddRole()
+        {
+            //var unidade = await _unidadeQueries.GetUnidadeById(newuser.UnidadeId);
+            //var usuario = await UserManager.FindByEmailAsync("invictusalc@master.com");
+
+            //await UserManager.AddToRoleAsync(usuario, "");
+            //await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", newuser.IsActive.ToString()));
+            //await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("Unidade", unidade.sigla));
+
+            return Ok();
         }
 
         [HttpGet]
@@ -452,5 +503,24 @@ namespace Invictus.Api.Controllers
 
         //    return Ok();
         //}
+
+        [HttpPost]
+        [Route("salvarteste")]
+        public async Task<IActionResult> Salver([FromBody] Testando testa)
+        {
+
+            return Ok();
+        }
+    }
+
+    public class Testando
+    {
+        public string nome { get; set; }
+        public Child child { get; set; }
+    }
+
+    public class Child
+    {
+        public string nome { get; set; }
     }
 }

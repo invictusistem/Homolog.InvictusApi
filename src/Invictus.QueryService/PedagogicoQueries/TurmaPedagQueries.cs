@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using Invictus.Core.Extensions;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -37,12 +39,51 @@ namespace Invictus.QueryService.PedagogicoQueries
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
                 var alunos = await connection.QueryAsync<AlunoDto>(query, new { turmaId = turmaId });
 
+                foreach (var item in alunos)
+                {
+                    item.cpf = item.cpf.BindingCPF();
+                }
+
                 return alunos;
 
             }
         }
 
-        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId)
+        public async Task<IEnumerable<TurmaNotasViewModel>> GetNotasFromTurma(Guid turmaId, Guid materiaId)
+        {
+            var query = @"select 
+                        *
+                        from TurmasNotas where
+                        TurmasNotas.TurmaId = @turmaId AND 
+                        TurmasNotas.MateriaId = @materiaId ";
+
+            var query2 = @"select 
+                        Alunos.Nome
+                        from Alunos
+                        inner join Matriculas on Alunos.Id = Matriculas.AlunoId 
+                        where Matriculas.id = @matriculaId
+                        AND Matriculas.TurmaId = @turmaId ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var notas = await connection.QueryAsync<TurmaNotasViewModel>(query, new { turmaId = turmaId, materiaId  = materiaId });
+
+                foreach (var item in notas)
+                {
+                    item.nome = await connection.QuerySingleAsync<string>(query2, new { turmaId = turmaId, matriculaId = item.matriculaId });
+                }
+
+
+                return notas;
+
+            }
+        }
+
+        public Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId)
         {
             throw new NotImplementedException();
         }

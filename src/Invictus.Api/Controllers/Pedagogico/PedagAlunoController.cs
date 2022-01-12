@@ -67,5 +67,18 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { aluno = aluno, });
         }
 
+        [HttpGet]
+        [Route("alunos/{turmaId}")]
+        public async Task<IActionResult> GetAlunos(Guid turmaId)
+        {
+
+            var alunos = await _pedagTurmaQueries.GetAlunosDaTurma(turmaId);
+
+            return Ok(new { alunos = alunos });
+        }
+
+
+       
+
     }
 }

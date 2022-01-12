@@ -1,41 +1,44 @@
-﻿.header {
-    text-align: center;
-    color: green;
-    padding-bottom: 35px;
+﻿.imagediv {
+    position: absolute;
+    display: flex;
+    padding: 0px;
+    margin-left: 0%;
+    display: inline-block;
+    overflow: hidden;
+    margin-top: 5px;
+    width: 250px;
+    height: 100px;
 }
 
-table {
-    width: 80%;
-    border-collapse: collapse;
+.image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
-td, th {
-    border: 1px solid gray;
-    padding: 15px;
-    font-size: 22px;
-    text-align: center;
+.titulo {
+    padding: 10px;
+    font-size: 1.1em;
+    color: rgb(6, 6, 177);
+    text-decoration: underline;
+    font-weight: bold;
 }
 
-table th {
-    background-color: green;
-    color: white;
+.subtitulo {
+    font-size: 1em;
+    color: rgb(6, 6, 177);
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
-.divOne {
-    border: 1px solid black;
-    height: 100%;
-    position: relative
+.inputs {
+    font-size: 1em;
+    color: rgb(6, 6, 177);
+    text-decoration: underline;
+    font-weight: 400
 }
 
-.divTwo {
-    z-index: 1;
-    border: 1px solid red;
-    text-align: center;
-    float: right;
-    width: 200px;
-    height: 50px;
-}
-
-.imageOne {
-    src: url(../assets/img/nophoto.png)
+.doc {
+    margin-bottom: 5px;
 }

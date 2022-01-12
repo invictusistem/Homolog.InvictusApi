@@ -113,13 +113,9 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
                 IEnumerable<MateriaView> results = new List<MateriaView>();
-                try
-                {
+               
                     results = await connection.QueryAsync<MateriaView>(query.ToString());
-                }catch(Exception ex)
-                {
-
-                }
+               
                 connection.Close();
 
                 foreach (var mat in results)
@@ -386,13 +382,13 @@ namespace Invictus.QueryService.AdministrativoQueries
                         FROM Turmas WHERE Turmas.UnidadeId = @unidadeId 
                         AND Turmas.statusAndamento <> 'Aguardando início'  ";
 
-            var query2 = @"select 
-                            DiaAula, 
-                            HoraInicial, 
-                            HoraFinal
-                            from calendarios where turmaId = @turmaId  
-                            and DiaAula = @DataPesquisa
-                            order by DiaAula asc";
+            //var query2 = @"select 
+            //                DiaAula, 
+            //                HoraInicial, 
+            //                HoraFinal
+            //                from calendarios where turmaId = @turmaId  
+            //                and DiaAula = @DataPesquisa
+            //                order by DiaAula asc";
 
             var DataPesquisa = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
            

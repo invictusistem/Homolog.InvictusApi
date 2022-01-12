@@ -1,4 +1,5 @@
 ﻿using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.PedagDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
         Task<IEnumerable<AlunoDto>> GetAlunosDaTurma(Guid turmaId);
         Task<TurmaDto> GetTurmaByMatriculaId(Guid matriculaId);
         Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId);
+        Task<IEnumerable<TurmaNotasViewModel>> GetNotasFromTurma(Guid turmaId, Guid materiaId);
     }
 }

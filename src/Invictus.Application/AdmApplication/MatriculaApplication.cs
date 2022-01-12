@@ -317,7 +317,7 @@ namespace Invictus.Application.AdmApplication
 
             }
 
-            var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, pessoa);
+            var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa);
             var turmaX = await _turmaQueries.GetTurma(turmaId);
             var boletos = new List<Boleto>();
 
@@ -344,8 +344,8 @@ namespace Invictus.Application.AdmApplication
             }
 
             infoFin.AddBoletos(boletos);
-            try
-            {
+            //try
+            //{
 
 
                 using (var scope = _serviceScopeFactory.CreateScope())
@@ -356,10 +356,10 @@ namespace Invictus.Application.AdmApplication
                 }
                 //await _debi toRepos.SaveInfoFinanceira(infoFin);
                 //_db.InformacoesDebito.Add(infoFin);
-            }catch(Exception ex)
-            {
-                Debug.WriteLine("error");
-            }
+            //}catch(Exception ex)
+            //{
+            //    Debug.WriteLine("error");
+            //}
             //_db.SaveChanges();
             //_debitoRepos.Commit();
 

@@ -1,9 +1,12 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.PedagDto;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -27,9 +30,11 @@ namespace Invictus.Application.AdmApplication
     public class BoletoService : IBoletoService
     {
         private readonly ILogger<BoletoService> _logger;
-        public BoletoService(ILogger<BoletoService> logger)
+        private readonly InvictusDbContext _db;
+        public BoletoService(ILogger<BoletoService> logger, InvictusDbContext db)
         {
             _logger = logger;
+            _db = db;
         }
         //public List<BoletoLoteResponse> GerarBoletosEmLote(List<BoletoLoteDto> boletos)
         public List<BoletoLoteResponse> GerarBoletosEmLote(List<Parcela> boletos, DadosPessoaDto pessoa)
@@ -40,6 +45,8 @@ namespace Invictus.Application.AdmApplication
 
             //parametross.Add("key1", "value1");
             //parametross.Add("key2", "value2");
+
+            // criar numeros sequenciais baseado no count
 
             for (int i = 0; i < boletos.Count(); i++)
             {
@@ -100,30 +107,35 @@ namespace Invictus.Application.AdmApplication
             return boletosResponse.ToList();
         }
 
-        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletos, DadosPessoaDto pessoa)
+        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletos, decimal valorBonusPontualidade, DadosPessoaDto pessoa)
         {
             _logger.LogInformation($"Start to create boletos at {DateTime.UtcNow.TimeOfDay}");
+
             var url = "https://sandbox.pjbank.com.br/recebimentos/27f8b64b8168ee9d9775d3b529e985fd8e3698aa/transacoes";
 
             var boletosResponse = new List<BoletoLoteResponse>();
 
             for (int i = 0; i < boletos.Count(); i++)
             {
+                int qntBoletosSalvos = _db.LogBoletos.Count();
+
+                NumberFormatInfo config = new NumberFormatInfo();
+                config.NumberDecimalSeparator = ".";
 
                 var parametross = new Dictionary<string, string>();
                 parametross.Add("vencimento", boletos[i].vencimento.ToString("MM/dd/yyyy"));   // "12/30/2021");
                 parametross.Add("valor", boletos[i].valor.ToString());
-                parametross.Add("juros", "0");
+                parametross.Add("juros", "1");
                 parametross.Add("juros_fixo", "0");
                 parametross.Add("multa", "0");
                 parametross.Add("multa_fixo", "0");
-                parametross.Add("desconto", "20.00");
+                parametross.Add("desconto", valorBonusPontualidade.ToString(config)); // colocar bonus pontualidade AQUI
                 parametross.Add("diasdesconto1", "");
                 parametross.Add("desconto2", "");
                 parametross.Add("diasdesconto2", "");
                 parametross.Add("desconto3", "");
                 parametross.Add("diasdesconto3", "");
-                parametross.Add("nunca_atualizar_boleto", "0");
+                parametross.Add("nunca_atualizar_boleto", "1");
                 parametross.Add("nome_cliente", pessoa.nome); //boletos[i].nomete);// ;// ;
                 //parametross.Add("email_cliente", "value1");
                 parametross.Add("telefone_cliente", pessoa.telefone); //boletos[i].telefone_cliente);
@@ -135,12 +147,12 @@ namespace Invictus.Application.AdmApplication
                 parametross.Add("estado_cliente", pessoa.estado); //boletos[i].estado_cliente);
                 parametross.Add("cep_cliente", pessoa.cep); //boletos[i].cep_cliente);
                 parametross.Add("logo_url", "https://pjbank.com.br/assets/images/logo-pjbank.png");
-                parametross.Add("texto", "Texto opcional");
-                parametross.Add("instrucoes", "Este é um boleto de exemplo");
-                parametross.Add("instrucao_adicional", "Este boleto não deve ser pago pois é um exemplo");
+                parametross.Add("texto", "");
+                parametross.Add("instrucoes", "");
+                parametross.Add("instrucao_adicional", "");
                 parametross.Add("grupo", "Boletos00" + i);
-                parametross.Add("webhook", "http://example.com.br");
-                parametross.Add("pedido_numero", (i + 1).ToString());
+               // parametross.Add("webhook", "http://example.com.br");
+                parametross.Add("pedido_numero", qntBoletosSalvos.ToString());
                 parametross.Add("especie_documento", "DS");
                 parametross.Add("pix", "pix-e-boleto");
 
@@ -152,11 +164,19 @@ namespace Invictus.Application.AdmApplication
 
                     var retorno = response.Content.ReadAsStringAsync().Result;
 
+                    var boletoLog = new LogBoletos(Guid.NewGuid(), retorno, DateTime.Now);
+
+                    _db.LogBoletos.Add(boletoLog);
+
+                    _db.SaveChanges();
+
                     boletosResponse.Add(JsonSerializer.Deserialize<BoletoLoteResponse>(retorno));
 
                     _logger.LogInformation($"Boleto {i + 1} create at {DateTime.UtcNow.TimeOfDay}");
 
                 }
+
+
 
             }
 

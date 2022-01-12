@@ -11,6 +11,8 @@ namespace Invictus.Dtos.AdmDtos
         public Guid id { get; set; }
         public string nome { get; set; }
         public string email { get; set; }
+        public string unidadeSigla { get; set; }
+        public string roleName { get; set; }
         public bool ativo { get; set; }
         public List<Claims> claims { get; set; }// = new List<Claims>();
     }
@@ -23,12 +25,12 @@ namespace Invictus.Dtos.AdmDtos
     }
 
     public class CreateUsuarioView
-    {  
+    {
 
         public Guid id { get; set; }
         public string nome { get; set; }
         public string email { get; set; }
         public string cargo { get; set; }
-        
+
     }
 }

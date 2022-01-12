@@ -4,6 +4,7 @@ using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,6 +17,7 @@ using System.Threading.Tasks;
 namespace Invictus.Api.Controllers
 {
     [Route("api/usuario")]
+    [Authorize]
     [ApiController]
     public class UsuarioController : ControllerBase
     {
@@ -59,6 +61,15 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var roles = await _userQueries.GetAllIdentityRoles();
+
+            return Ok(new { roles = roles });
+        }
+
+        [HttpGet]
         [Route("procurar")]
         public async Task<IActionResult> SearchColaborador([FromQuery] string email)
         {   
@@ -97,7 +108,7 @@ namespace Invictus.Api.Controllers
                 EmailConfirmed = true
             };
 
-            var senha = GenerateRandomPassword();// GenerateRandomPassword();
+            var senha = "Abc*123456";// GenerateRandomPassword();// GenerateRandomPassword();
 
             var result = await _userManager.CreateAsync(user, senha);
 
@@ -119,10 +130,47 @@ namespace Invictus.Api.Controllers
 
             
 
-            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
-            await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
+            //var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
+            //await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
 
             return NoContent();
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> EditarUsuario(UsuarioDto usuario)
+        {
+            var user = await _userManager.FindByEmailAsync(usuario.email);
+
+            var claims = await _userManager.GetClaimsAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var claim = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
+
+            // Claim
+            await _userManager.RemoveClaimAsync(user, claim);
+
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", usuario.ativo.ToString()));
+            
+            // Role
+            await _userManager.RemoveFromRolesAsync(user, userRoles);
+
+            await _userManager.AddToRoleAsync(user, usuario.roleName);
+
+            //await _userManager.RemoveClaimAsync
+
+            //var siglaUnidade = await _unidadeQueries.GetUnidadeById(unidadeId);   //"ALC";
+            ///*
+            // trazer a lista de claims, excluindo a que foi SLELECIONADA
+            //entao pegar, dar um FORECH CASO o resultado seja maior que 0
+            // */
+            //var result = claims.Where(c => c.Type == "Unidade" & c.Value != siglaUnidade.sigla);
+
+
+            //var claim = usuario.
+            //await _userManager.RemoveClaimAsync()
+
+
+            return Ok();
         }
 
         static string RemoveDiacritics(string text)

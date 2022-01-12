@@ -7,6 +7,7 @@ using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.ContratoAggregate;
 using Invictus.Domain.Administrativo.ContratosAggregate;
 using Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.Parametros;
@@ -42,6 +43,7 @@ namespace Invictus.Data.Context
         public DbSet<Conteudo> Conteudos { get; set; }
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<DocumentacaoTemplate> DocumentacoesTemplate { get; set; }
+        public DbSet<LogBoletos> LogBoletos { get; set; }
         public DbSet<MateriaTemplate> MateriasTemplates { get; set; }
         public DbSet<DocumentacaoExigencia> DocumentacoesExigencias { get; set; }
         public DbSet<PacoteMateria> Materias { get; set; }

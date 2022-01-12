@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Invictus.Api.Controllers
 {
     [Route("api/contrato")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class ContratoController : ControllerBase
     {
