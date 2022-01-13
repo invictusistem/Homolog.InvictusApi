@@ -48,7 +48,7 @@ namespace Invictus.Api.Controllers
 
             if (usuarios.Data.Count() == 0) return NotFound();
 
-            return Ok(new { usuarios = usuarios });
+            return Ok(usuarios);
         }
 
         [HttpGet]
@@ -70,9 +70,18 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("acessos/{colaboradorId}")]
+        public async Task<IActionResult> GetAcessos(Guid colaboradorId)
+        {
+            var acessos = await _userQueries.GetUsuarioAcessoViewModel(colaboradorId);
+
+            return Ok(new { acessos = acessos.OrderBy(a => a.podeAlterar) });
+        }
+
+        [HttpGet]
         [Route("procurar")]
         public async Task<IActionResult> SearchColaborador([FromQuery] string email)
-        {   
+        {
 
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -108,7 +117,7 @@ namespace Invictus.Api.Controllers
                 EmailConfirmed = true
             };
 
-            var senha = "Abc*123456";// GenerateRandomPassword();// GenerateRandomPassword();
+            var senha = GenerateRandomPassword();// GenerateRandomPassword();
 
             var result = await _userManager.CreateAsync(user, senha);
 
@@ -128,12 +137,21 @@ namespace Invictus.Api.Controllers
                 return BadRequest();
             }
 
-            
 
-            //var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
-            //await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
+
+            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
+            await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
 
             return NoContent();
+        }
+
+        [HttpPut]
+        [Route("acessos")]
+        public async Task<ActionResult> EditarAcesso(List<UsuarioAcessoViewModel> acessos)
+        {
+            await _userApplication.EditarAcesso(acessos);
+
+            return Ok();
         }
 
         [HttpPut]
@@ -150,7 +168,7 @@ namespace Invictus.Api.Controllers
             await _userManager.RemoveClaimAsync(user, claim);
 
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", usuario.ativo.ToString()));
-            
+
             // Role
             await _userManager.RemoveFromRolesAsync(user, userRoles);
 

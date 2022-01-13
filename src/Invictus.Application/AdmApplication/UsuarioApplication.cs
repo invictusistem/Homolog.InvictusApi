@@ -1,10 +1,13 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAuth;
 using Invictus.Domain.Administrativo.UnidadeAuth.Interfaces;
+using Invictus.Dtos.AdmDtos;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +16,13 @@ namespace Invictus.Application.AdmApplication
     public class UsuarioApplication : IUsuarioApplication
     {
         private readonly IAutorizacaoRepo _autoRepo;
-        public UsuarioApplication(IAutorizacaoRepo autoRepo)
+        private readonly IColaboradorQueries _colabQueries;
+        private readonly UserManager<IdentityUser> _userManager;
+        public UsuarioApplication(IAutorizacaoRepo autoRepo, UserManager<IdentityUser> userManager, IColaboradorQueries colabQueries)
         {
             _autoRepo = autoRepo;
+            _userManager = userManager;
+            _colabQueries = colabQueries;
         }
 
         private List<char> chars = new List<char>();
@@ -84,6 +91,37 @@ namespace Invictus.Application.AdmApplication
                 
             });
             return new string(chars.ToArray());
+        }
+
+        public async Task EditarAcesso(List<UsuarioAcessoViewModel> acessos)
+        {
+            var acessosSemDefault = acessos.Where(a => a.podeAlterar != false & a.acesso == true);
+            var acessoDefault = acessos.Where(a => a.podeAlterar == false).FirstOrDefault();
+            // remover claims com exceção da default
+            var colab = await _colabQueries.GetColaboradoresById(acessos[0].id);
+            
+            var usuario = await _userManager.FindByEmailAsync(colab.email);
+            var claims = await _userManager.GetClaimsAsync(usuario);
+
+            var unidadesClaims = claims.Where(c => c.Type == "Unidade");
+            // remove default
+            var unidadesSemDefault = unidadesClaims.Where(c => c.Value != acessoDefault.sigla);
+            if (unidadesClaims.Count() > 1) {
+                IdentityResult result = await _userManager.RemoveClaimsAsync(usuario, unidadesSemDefault);
+
+                if (!result.Succeeded) throw new NotImplementedException();
+            }
+            
+
+
+            if (acessosSemDefault.Count() > 0)
+            {
+                foreach (var item in acessosSemDefault)
+                {
+                    await _userManager.AddClaimAsync(usuario, new Claim("Unidade", item.sigla));
+                }
+            }
+           
         }
     }
 }

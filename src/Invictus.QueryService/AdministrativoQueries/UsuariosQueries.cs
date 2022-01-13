@@ -260,90 +260,74 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<UsuarioAcessoViewModel>> GetUsuarioAcessoViewModel(Guid colaboradorId)
         {
+            var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);
 
-            throw new NotImplementedException();
-            //var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);
-
-            //var query = @"select 
-            //            AspNetUserClaims.ClaimValue 
-            //            from AspNetUserClaims 
-            //            inner join AspNetUsers on
-            //            AspNetUserClaims.UserId = AspNetUsers.Id 
-            //            where AspNetUsers.Email = @colaboradorEmail
-            //            and AspNetUserClaims.ClaimType = 'Unidade'";
+            var query = @"select 
+                        AspNetUserClaims.ClaimValue 
+                        from AspNetUserClaims 
+                        inner join AspNetUsers on
+                        AspNetUserClaims.UserId = AspNetUsers.Id 
+                        where AspNetUsers.Email = @colaboradorEmail
+                        and AspNetUserClaims.ClaimType = 'Unidade'";
 
 
-            //await using (var connection = new SqlConnection(
-            //         _config.GetConnectionString("InvictusConnection")))
-            //{
-            //    connection.Open();
+            await using (var connection = new SqlConnection(
+                     _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
 
-            //    var result = await connection.QueryAsync<string>(query, new { colaboradorEmail = colaborador.email });
+                var claimUnidades = await connection.QueryAsync<string>(query, new { colaboradorEmail = colaborador.email });
 
-            //    connection.Close();
+                connection.Close();
 
-            //    var acessosView = new List<UsuarioAcessoViewModel>();
+                var acessosView = new List<UsuarioAcessoViewModel>();
 
-            //    //setar o default
-            //    // colaborador.unidadeId == get unidade .Select SIGLA == 
-            //    //return result;
-            //    //var uni = await _unidadeQueries.GetUnidadeById(colaborador.unidadeId);
+                //setar o default
+                // colaborador.unidadeId == get unidade .Select SIGLA == 
+                //return result;
+                //var uni = await _unidadeQueries.GetUnidadeById(colaborador.unidadeId);
+                
+                var todasUnidades = await _unidadeQueries.GetUnidades();
+                var unidadesSemDefault = todasUnidades.Where(u => u.id != colaborador.unidadeId);
+                // criar objeto com todas unidaes e valores defaults
+                foreach (var item in todasUnidades)
+                {
+                    acessosView.Add(new UsuarioAcessoViewModel()
+                    {
+                        id = colaborador.id, //colab id default
+                        descricao = item.descricao,
+                        sigla = item.sigla,
+                        unidadeId = item.id, 
+                        acesso = false, // default
+                        podeAlterar = true // default
 
-            //    var todasUnidades = await _unidadeQueries.GetUnidades();
-            //    var unidadesSemDefault = todasUnidades.Where(u => u.id != colaborador.unidadeId);
+                    });
+                }
+                //set unidadeDefault a partir do colaborador.unidadeId
+                foreach (var item in acessosView.Where(a => a.unidadeId == colaborador.unidadeId))
+                {
+                    item.acesso = true;
+                    item.podeAlterar = false;
+                }
 
-            //    foreach (var item in todasUnidades)
-            //    {
-            //        acessosView.Add(new UsuarioAcessoViewModel()
-            //        {
-            //            id = colaborador.id,
-            //            descricao = item.descricao,
-            //            sigla = item.sigla,
-            //            unidadeId = item.id,
-            //            acesso = false,
-            //            podeAlterar = true
+                //set unidades que o usuario tem acesso - verificar pela Clam, excluída a DEFAULT
+                if (claimUnidades.Count() > 1)
+                {
+                    // setUni com acessos
+                    foreach (var item in acessosView.Where(a => a.unidadeId != colaborador.unidadeId))
+                    {
+                        var temUnidade = unidadesSemDefault.Where(u => u.id == item.unidadeId);
+                        if(temUnidade.Count() != 0)
+                        {
+                            item.acesso = true;
+                        }
+                    }
 
-            //        });
-            //    }
-            //    //set unidadeDefault
-            //    foreach (var item in acessosView.Where(a => a.unidadeId == colaborador.unidadeId))
-            //    {
-            //        item.acesso = true;
-            //        item.podeAlterar = false;
-            //    }
+                }
 
-            //    if(acessosView.Count() > 1)
-            //    {
-            //        // setUni com acessos
-            //        foreach (var item in acessosView.Where(a => a.podeAlterar == true))
-            //        {
+                return acessosView;
 
-            //            foreach (var uni in unidadesSemDefault)
-            //            {
-
-
-            //            }
-
-
-
-
-
-            //        }
-
-            //    }
-
-
-
-            //    var uniClaimSemDefault = result.Where(c => c != uni.sigla);
-            //foreach (var unid in unidadesSemDefault)
-            //{
-
-            //    var temAcesso = unidadesSemDefault.Where(u => u.sigla)
-            //    var outrasUnidComAcesso = todasUnidades.Where(u => u.id != colaboradorId)
-
-            //}
-
+            }
         }
     }
 }
-

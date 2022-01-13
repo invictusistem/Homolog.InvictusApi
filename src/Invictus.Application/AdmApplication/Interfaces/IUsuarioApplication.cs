@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Invictus.Dtos.AdmDtos;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
        string GenerateRandomPassword(PasswordOptions opts = null);
         Task CriarAcessoInicial(Guid colaboradorId, string siglaUnidade, Guid unidadeId);
+        Task EditarAcesso(List<UsuarioAcessoViewModel> acessos);
     }
 }
