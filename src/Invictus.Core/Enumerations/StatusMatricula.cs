@@ -19,7 +19,33 @@ namespace Invictus.Core.Enumerations
         {
 
         }
-        public StatusMatricula(int id, string name) : base(id, name) { }        
-        
+        public StatusMatricula(int id, string name) : base(id, name) { }
+
+        public static StatusMatricula TryParse(string compare)
+        {
+            if (compare == "Aguardando confirmação")
+            {
+                return AguardoConfirmacao;
+
+            }
+            else if (compare == "Suspensa")
+            {
+                return Suspensa;
+
+            }
+            else if (compare == "Regular")
+            {
+                return Regular;
+
+            }
+            else if (compare == "Encerrada")
+            {
+                return Encerrada;
+
+            }
+
+            throw new NotImplementedException();
+        }
+
     }
 }

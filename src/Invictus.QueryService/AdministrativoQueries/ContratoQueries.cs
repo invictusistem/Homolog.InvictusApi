@@ -118,6 +118,44 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<ContratoDto> GetContratoCompletoByTypeId(Guid typePacoteId)
+        {
+            string query = @"select * from Contratos inner join ConteudoContratos on Contratos.id = ConteudoContratos.ContratoId 
+                             WHERE Contratos.typePacoteId = @typePacoteId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var alunoDictionary = new Dictionary<Guid, ContratoDto>();
+
+                var contrato = connection.Query<ContratoDto, ContratoConteudoDto, ContratoDto>(query,
+                    (contratoDto, conteudoDto) =>
+                    {
+                        ContratoDto contratoEntry;
+
+                        if (!alunoDictionary.TryGetValue(contratoDto.id, out contratoEntry))
+                        {
+                            contratoEntry = contratoDto;
+                            contratoEntry.conteudos = new List<ContratoConteudoDto>();
+                            alunoDictionary.Add(contratoEntry.id, contratoEntry);
+                        }
+
+                        if (conteudoDto != null)
+                        {
+                            contratoEntry.conteudos.Add(conteudoDto);
+                        }
+                        return contratoEntry;
+
+                    }, new { typePacoteId = typePacoteId }, splitOn: "Id").Distinct().ToList();
+
+                connection.Close();
+
+                return contrato.FirstOrDefault();
+            }
+        }
+
         public async Task<IEnumerable<ContratoDto>> GetContratosViewModel()
         {
             var query = @"select 

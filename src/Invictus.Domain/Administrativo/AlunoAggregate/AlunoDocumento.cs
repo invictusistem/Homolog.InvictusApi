@@ -1,4 +1,5 @@
 ﻿using Invictus.Core;
+using Invictus.Core.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,9 +59,14 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
         public DateTime? DataCriacao { get; private set; }
         public int PrazoValidade { get; private set; }
         public Guid TurmaId { get; private set; }
+        public string ClassificacaoDoc { get; private set; }
 
         //public int EstagioMatriculaId { get; private set; }
         //public virtual EstagioMatricula EstagioMatricula { get; private set; }
+        public void SetDocClassificacao(ClassificacaoDoc docClass)
+        {
+            ClassificacaoDoc = docClass.DisplayName;
+        }
         public void SetTurmaId(Guid turmaId)
         {
             TurmaId = turmaId;

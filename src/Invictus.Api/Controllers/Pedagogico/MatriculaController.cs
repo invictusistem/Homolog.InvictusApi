@@ -56,6 +56,19 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { anotacoes = anotacoes });
         }
 
+        [HttpGet]
+        [Route("aluno-indicacao")]
+        public async Task<IActionResult> GetAlunosIndicacao()
+        {
+            // cadastro aluno baseado na matricula
+
+            var alunos = await _pedagMatriculaQueries.GetAlunosIndicacao();
+
+
+
+            return Ok(new { alunos = alunos });
+        }
+
         [HttpPost]
         [Route("{turmaId}/{alunoId}")]
         public async Task<IActionResult> Matricular(Guid turmaId, Guid alunoId, [FromBody] MatriculaCommand command)
@@ -63,9 +76,9 @@ namespace Invictus.Api.Controllers.Pedagogico
             //var msg = await _utils.ValidaDocumentosAluno(command.)
 
             _matriculaApplication.AddParams(turmaId, alunoId, command);
-            await _matriculaApplication.Matricular();            
+            var matriculaId = await _matriculaApplication.Matricular();            
 
-            return Ok();
+            return Ok(new { matriculaId = matriculaId });
         }
 
         [HttpPost]

@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.ReportService;
+using Invictus.Application.ReportService.Interfaces;
 using Invictus.BackgroundTasks;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.AlunoAggregate.Interface;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Administrativo.MatriculaRegistro;
 using Invictus.Domain.Administrativo.RegistroMatricula;
 using Invictus.Domain.Administrativo.TurmaAggregate;
@@ -33,6 +36,7 @@ namespace Invictus.Application.AdmApplication
     public class MatriculaApplication : IMatriculaApplication
     {
         private readonly IPlanoPagamentoQueries _planoQueries;
+        private readonly IColaboradorQueries _colabQueries;
         private readonly IBoletoService _boletoService;
         private readonly IAlunoQueries _alunoQueries;
         private readonly ITurmaQueries _turmaQueries;
@@ -47,6 +51,8 @@ namespace Invictus.Application.AdmApplication
         private readonly IAspNetUser _aspNetUser;
         private readonly IAlunoPedagRepo _alunoPedagRepo;
         private readonly IDebitosRepos _debitoRepos;
+        private readonly IReportServices _reportService;
+        private readonly IUnidadeQueries _unidadeQueries;
         private readonly ILogger<MatriculaApplication> _logger;
         private readonly BackgroundWorkerQueue _backgroundWorkerQueue;
         private readonly InvictusDbContext _db;
@@ -61,12 +67,15 @@ namespace Invictus.Application.AdmApplication
         private bool _temRespFinanc;
         private Turma _turma;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        public int _qntBolatos;
         public MatriculaApplication(IPlanoPagamentoQueries planoQueries, IAlunoQueries alunoQueries, ITurmaQueries turmaQueries, IMapper mapper,
             IPacoteQueries pacoteQueries, ITurmaRepo turmaRepo, IMatriculaRepo matRepo, IAlunoRepo alunoRepo, ITurmaNotasRepo turmaNotasRepo,
             IMatriculaQueries matQueries, IRespRepo respRepo, IAspNetUser aspNetUser, IAlunoPedagRepo alunoPedagRepo,
             IBoletoService boletoService, IDebitosRepos debitoRepos, BackgroundWorkerQueue backgroundWorkerQueue, ILogger<MatriculaApplication> logger,
-            InvictusDbContext db, IServiceScopeFactory serviceScopeFactory)
+            InvictusDbContext db, IServiceScopeFactory serviceScopeFactory, IColaboradorQueries colabQueries,
+            IReportServices reportService, IUnidadeQueries unidadeQueries)
         {
+            _colabQueries = colabQueries;
             _planoQueries = planoQueries;
             _alunoQueries = alunoQueries;
             _turmaQueries = turmaQueries;
@@ -80,6 +89,8 @@ namespace Invictus.Application.AdmApplication
             _alunoRepo = alunoRepo;
             _aspNetUser = aspNetUser;
             _alunoPedagRepo = alunoPedagRepo;
+            _reportService = reportService;
+            _unidadeQueries = unidadeQueries;
             _turmaId = Guid.NewGuid();
             _alunoId = Guid.NewGuid();
             _newMatriculaId = Guid.NewGuid();
@@ -100,7 +111,7 @@ namespace Invictus.Application.AdmApplication
 
         public void AddParams(Guid turmaId, Guid alunoId, MatriculaCommand command) { _turmaId = turmaId; _alunoId = alunoId; _command = command; }
 
-        public async Task Matricular()
+        public async Task<Guid> Matricular()
         {
             await VerificarResponsaveis();
 
@@ -116,10 +127,17 @@ namespace Invictus.Application.AdmApplication
 
             await CreateResponsaveis();
 
-            //SaveContratoAluno();
+            await SaveFichaMatricula();
 
-            //SaveFichaMatricula();
+            await SaveContratoAluno();
 
+            //await ProcurarPorLead();
+            _qntBolatos = _db.Boletos.Count();
+            var boletoLog = new LogBoletos(Guid.NewGuid(), "", DateTime.Now);
+
+            _db.LogBoletos.Add(boletoLog);
+
+            //_db.SaveChanges();
             // TODO
             //await CreateInfoFinanceirasDoAluno(_turmaId, _newMatriculaId, _alunoId, _command);
             _backgroundWorkerQueue.QueueBackgroundWorkItem(async token =>
@@ -133,6 +151,8 @@ namespace Invictus.Application.AdmApplication
 
             await _turmaRepo.Edit(_turma);
             _matRepo.Commit();
+
+            return _newMatriculaId;
         }
 
         private async Task VerificarResponsaveis()
@@ -159,18 +179,22 @@ namespace Invictus.Application.AdmApplication
         {
             _turma = _mapper.Map<Turma>(await _turmaQueries.GetTurma(_turmaId));
             _turma.AddAlunoNaTurma();
-            //await _turmaRepo.Edit(_turma);
+            await _turmaRepo.Edit(_turma);
             _pacoteId = _turma.PacoteId;
         }
 
         private async Task CreateMatriculaDoAluno()
-        {
+        {    
             var aluno = await _alunoQueries.GetAlunoById(_alunoId);
             var status = SetMatriculaStatus(_command.plano.confirmacaoPagmMat);
             var newMatricula = new Matricula(_alunoId, aluno.nome, aluno.cpf, status, _turmaId);
             newMatricula.SetDiaMatricula();
             var totalMatriculados = await _matQueries.TotalMatriculados();
             newMatricula.SetNumeroMatricula(totalMatriculados);
+            var colabId = _aspNetUser.ObterUsuarioId();
+            newMatricula.SetColaboradorResponsavelMatricula(colabId);
+            newMatricula.SetCiencia(_command.plano.ciencia, _command.plano.cienciaAlunoId);
+            newMatricula.SetBolsaId(_command.plano.bolsaId);
             await _matRepo.Save(newMatricula);//  newMatricula.Repo
             _newMatriculaId = newMatricula.Id;
         }
@@ -189,14 +213,18 @@ namespace Invictus.Application.AdmApplication
             var documentacao = await _pacoteQueries.GetDocsByPacoteId(_pacoteId);
             foreach (var doc in documentacao.Where(d => d.titular == "Aluno"))
             {
-                _alunoDocs.Add(new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId));
-            } 
+                var documento = new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId);
+                documento.SetDocClassificacao(ClassificacaoDoc.Outros);
+                _alunoDocs.Add(documento);
+            }
 
             if (_temRespMenor)
             {
                 foreach (var doc in documentacao.Where(d => d.titular == "Responsável menor"))
                 {
-                    _alunoDocs.Add(new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId));
+                    var documento = new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId);
+                    documento.SetDocClassificacao(ClassificacaoDoc.Outros);
+                    _alunoDocs.Add(documento);
                 }
             }
 
@@ -204,7 +232,9 @@ namespace Invictus.Application.AdmApplication
             {
                 foreach (var doc in documentacao.Where(d => d.titular == "Responsável financeiro"))
                 {
-                    _alunoDocs.Add(new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId));
+                    var documento = new AlunoDocumento(_newMatriculaId, doc.descricao, doc.comentario, false, false, false, doc.validadeDias, _turmaId);
+                    documento.SetDocClassificacao(ClassificacaoDoc.Outros);
+                    _alunoDocs.Add(documento);
                 }
             }
 
@@ -250,15 +280,6 @@ namespace Invictus.Application.AdmApplication
             }
 
         }
-
-
-
-
-
-
-
-
-
 
 
         public async Task CreateInfoFinanceirasDoAluno(Guid turmaId, Guid newMatriculaId, Guid alunoId, MatriculaCommand comand)
@@ -316,14 +337,14 @@ namespace Invictus.Application.AdmApplication
                 }
 
             }
-
-            var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa);
+            
+            var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa, _qntBolatos);
             var turmaX = await _turmaQueries.GetTurma(turmaId);
             var boletos = new List<Boleto>();
 
             for (int i = 1; i <= comand.plano.infoParcelas.Count(); i++)
             {
-                var boletoResp = boletosResponse.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
+                var boletoResp = boletosResponse[i - 1];//.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
 
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletoResp);
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletosResponse[i - 1]);
@@ -348,14 +369,14 @@ namespace Invictus.Application.AdmApplication
             //{
 
 
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetService<InvictusDbContext>();
-                    db.InformacoesDebito.Add(infoFin);
-                    db.SaveChanges();
-                }
-                //await _debi toRepos.SaveInfoFinanceira(infoFin);
-                //_db.InformacoesDebito.Add(infoFin);
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetService<InvictusDbContext>();
+                db.InformacoesDebito.Add(infoFin);
+                db.SaveChanges();
+            }
+            //await _debi toRepos.SaveInfoFinanceira(infoFin);
+            //_db.InformacoesDebito.Add(infoFin);
             //}catch(Exception ex)
             //{
             //    Debug.WriteLine("error");
@@ -382,14 +403,99 @@ namespace Invictus.Application.AdmApplication
         public async Task SetAnotacao(AnotacaoDto anotacao)
         {
             anotacao.dataRegistro = DateTime.Now;
-            // setar dataRegistro = DateTime.Now
-            // buscar Id do usuario
+
             anotacao.userId = _aspNetUser.ObterUsuarioId();
             var anot = _mapper.Map<AlunoAnotacao>(anotacao);
 
             await _alunoPedagRepo.SaveAnotacao(anot);
 
             _alunoPedagRepo.Commit();
+        }
+
+        private async Task SaveFichaMatricula()
+        {
+            var usuarioId = _aspNetUser.ObterUsuarioId();
+            var colaborador = await _colabQueries.GetColaboradoresById(usuarioId);
+            var aluno = await _alunoQueries.GetAlunoById(_alunoId);
+            var infosToPrintPDF = new GenerateFichaMatriculaDTO()
+            {
+                nomeCurso = _turma.Descricao,
+                dataInicio = _turma.Previsao.PrevisaoAtual,
+                nomeAluno = aluno.nome,
+                nascimento = aluno.nascimento,
+                naturalidade = aluno.naturalidade,
+                rg = aluno.rg,
+                cpf = aluno.cpf,
+                cep = aluno.cep,
+                bairro = aluno.bairro,
+                complemento = aluno.complemento,
+                logradouro = aluno.logradouro,
+                numero = aluno.numero,
+                cidade = aluno.cidade,
+                uf = aluno.uf,
+                telResiencia = aluno.telWhatsapp,
+                whatsapp = aluno.telWhatsapp,
+                email = aluno.email,
+                pai = aluno.nomePai,
+                mae = aluno.nomeMae,
+                nomeResponsavelMatricula = colaborador.nome
+            };
+
+            var file = await _reportService.GenerateFichaMatricula(infosToPrintPDF);
+
+            var doc = new AlunoDocumento(_newMatriculaId, "ficha de matrícula", "ficha de matrícula", true, true, true, 0, _turmaId);
+            doc.AddDocumento(file, "ficha", ".pdf", "application/pdf", file.Length);
+            doc.SetDataCriacao();
+            doc.SetDocClassificacao(ClassificacaoDoc.Outros);
+
+            await _alunoRepo.SaveAlunoDoc(doc);
+        }
+
+        private async Task SaveContratoAluno()
+        {
+            //var usuarioId = _aspNetUser.ObterUsuarioId();
+            var unidade = await _unidadeQueries.GetUnidadeById(_turma.UnidadeId);
+            // var colaborador = await _colabQueries.GetColaboradoresById(usuarioId);
+            //var aluno = await _alunoQueries.GetAlunoById(_alunoId);
+            var menorDeIdade = await _alunoQueries.GetIdadeAluno(_alunoId);
+            int age = 0;
+            age = DateTime.Now.Subtract(menorDeIdade).Days;
+            age = age / 365;
+            var menor = true;
+            if (age >= 18) menor = false;
+
+            if (menor)
+            {
+                _temRespMenor = true;
+            }
+
+            if (_command.temRespFin)
+            {
+                _temRespFinanc = true;
+            }
+
+            var infosToPrintPDF = new GenerateContratoDTO()
+            {
+                nome = "",
+                cpf = "",
+                cnpj = unidade.cnpj,
+                bairro = unidade.bairro,
+                complemento = unidade.complemento,
+                logradouro = unidade.logradouro,
+                numero = unidade.numero,
+                cidade = unidade.cidade,
+                uf = unidade.uf
+
+            };
+
+            var contratoFile = await _reportService.GenerateContrato(infosToPrintPDF, _turma.TypePacoteId);
+
+            var doc = new AlunoDocumento(_newMatriculaId, "contrato", "contrato", true, true, true, 0, _turmaId);
+            doc.AddDocumento(contratoFile, "contrato", ".pdf", "application/pdf", contratoFile.Length);
+            doc.SetDataCriacao();
+            doc.SetDocClassificacao(ClassificacaoDoc.Outros);
+
+            await _alunoRepo.SaveAlunoDoc(doc);
         }
     }
 }

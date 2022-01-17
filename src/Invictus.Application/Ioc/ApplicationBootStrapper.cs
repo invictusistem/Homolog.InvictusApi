@@ -1,5 +1,11 @@
 ﻿using Invictus.Application.AdmApplication;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.FinancApplication;
+using Invictus.Application.FinancApplication.Interfaces;
+using Invictus.Application.PedagApplication;
+using Invictus.Application.PedagApplication.Interfaces;
+using Invictus.Application.ReportService;
+using Invictus.Application.ReportService.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +37,13 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IUsuarioApplication, UsuarioApplication>();
             services.AddScoped<IBoletoService, BoletoService>();
 
+            //pedag
+            services.AddScoped<IPedagogicoApplication, PedagogicoApplication>();
+            // report services
+            services.AddScoped<IReportServices, ReportServices>();
+            services.AddScoped<IPDFDesigns, PDFDesigns>();
+            // Financ
+            services.AddScoped<IBolsasApp, BolsasApp>();
         }
     }
 }

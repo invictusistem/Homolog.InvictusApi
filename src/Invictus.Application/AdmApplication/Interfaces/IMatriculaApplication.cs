@@ -10,7 +10,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IMatriculaApplication
     {
-        Task Matricular();
+        Task<Guid> Matricular();
         void AddParams(Guid turmaId, Guid alunoId, MatriculaCommand command);
         Task SetAnotacao(AnotacaoDto anotacao);
     }

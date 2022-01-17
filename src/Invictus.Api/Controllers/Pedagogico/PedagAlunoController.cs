@@ -1,4 +1,6 @@
-﻿using Invictus.QueryService.PedagogicoQueries.Interfaces;
+﻿using Invictus.Application.PedagApplication.Interfaces;
+using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,12 +16,15 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly IPedagMatriculaQueries _pedagMatriculaQueries;
         private readonly ITurmaPedagQueries _pedagTurmaQueries;
         private readonly IPedagDocsQueries _pedagDocsQueries;
+        private readonly IPedagogicoApplication _pedagApplication;
 
-        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries, ITurmaPedagQueries pedagTurmaQueries, IPedagDocsQueries pedagDocsQueries)
+        public PedagAlunoController(IPedagMatriculaQueries pedagMatriculaQueries, ITurmaPedagQueries pedagTurmaQueries, IPedagDocsQueries pedagDocsQueries,
+            IPedagogicoApplication pedagApplication)
         {
             _pedagMatriculaQueries = pedagMatriculaQueries;
             _pedagTurmaQueries = pedagTurmaQueries;
             _pedagDocsQueries = pedagDocsQueries;
+            _pedagApplication = pedagApplication;
         }
 
         [HttpGet]
@@ -40,7 +45,6 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             var docs = await _pedagDocsQueries.GetDocsMatriculaViewModel(matriculaId);
 
-
             return Ok(new { aluno = aluno, respFin = respFin, respMenor = respMenor, anotacoes = anotacoes, turma = turma, docs = docs });
         }
 
@@ -50,8 +54,16 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("responsavel/{respId}")]
         public async Task<IActionResult> GetResponsavel(Guid respId)
         {
-
             var resp = await _pedagMatriculaQueries.GetResponsavel(respId);
+
+            return Ok(new { resp = resp });
+        }
+
+        [HttpGet]
+        [Route("responsavel-aluno/{respId}")]
+        public async Task<IActionResult> GetResponsavelById(Guid respId)
+        {
+            var resp = await _pedagMatriculaQueries.GetResponsavelById(respId);
 
             return Ok(new { resp = resp });
         }
@@ -60,9 +72,7 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("aluno/{matriculaId}")]
         public async Task<IActionResult> GetAluno(Guid matriculaId)
         {
-
             var aluno = await _pedagMatriculaQueries.GetAlunoByMatriculaId(matriculaId);
-
 
             return Ok(new { aluno = aluno, });
         }
@@ -71,14 +81,22 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("alunos/{turmaId}")]
         public async Task<IActionResult> GetAlunos(Guid turmaId)
         {
-
             var alunos = await _pedagTurmaQueries.GetAlunosDaTurma(turmaId);
 
             return Ok(new { alunos = alunos });
         }
 
+        [HttpPut]
+        [Route("responsavel")]
+        public async Task<IActionResult> EditResponsavel([FromBody] ResponsavelDto responsavel)
+        {
+            await _pedagApplication.EditResponsavel(responsavel);
 
-       
+            return Ok();
+        }
+
+
+
 
     }
 }

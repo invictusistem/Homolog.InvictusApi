@@ -107,18 +107,18 @@ namespace Invictus.Application.AdmApplication
             return boletosResponse.ToList();
         }
 
-        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletos, decimal valorBonusPontualidade, DadosPessoaDto pessoa)
+        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletos, decimal valorBonusPontualidade, DadosPessoaDto pessoa, int qndBoletosSalvos)
         {
             _logger.LogInformation($"Start to create boletos at {DateTime.UtcNow.TimeOfDay}");
 
             var url = "https://sandbox.pjbank.com.br/recebimentos/27f8b64b8168ee9d9775d3b529e985fd8e3698aa/transacoes";
 
             var boletosResponse = new List<BoletoLoteResponse>();
-
+            _logger.LogInformation($"count Boletos {boletos.Count()}");
             for (int i = 0; i < boletos.Count(); i++)
             {
-                int qntBoletosSalvos = _db.LogBoletos.Count();
-
+                //int qntBoletosSalvos = _db.LogBoletos.Count();
+                
                 NumberFormatInfo config = new NumberFormatInfo();
                 config.NumberDecimalSeparator = ".";
 
@@ -151,8 +151,8 @@ namespace Invictus.Application.AdmApplication
                 parametross.Add("instrucoes", "");
                 parametross.Add("instrucao_adicional", "");
                 parametross.Add("grupo", "Boletos00" + i);
-               // parametross.Add("webhook", "http://example.com.br");
-                parametross.Add("pedido_numero", qntBoletosSalvos.ToString());
+                parametross.Add("webhook", "http://example.com.br");
+                parametross.Add("pedido_numero", (qndBoletosSalvos + 1).ToString());
                 parametross.Add("especie_documento", "DS");
                 parametross.Add("pix", "pix-e-boleto");
 
@@ -164,11 +164,13 @@ namespace Invictus.Application.AdmApplication
 
                     var retorno = response.Content.ReadAsStringAsync().Result;
 
-                    var boletoLog = new LogBoletos(Guid.NewGuid(), retorno, DateTime.Now);
+                    
 
-                    _db.LogBoletos.Add(boletoLog);
+                    //var boletoLog = new LogBoletos(Guid.NewGuid(), retorno, DateTime.Now);
 
-                    _db.SaveChanges();
+                    //_db.LogBoletos.Add(boletoLog);
+
+                    //_db.SaveChanges();
 
                     boletosResponse.Add(JsonSerializer.Deserialize<BoletoLoteResponse>(retorno));
 

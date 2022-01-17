@@ -22,6 +22,11 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.Dispose();
         }
 
+        public async Task Edit(Responsavel responsavel)
+        {
+            await _db.Responsaveis.SingleUpdateAsync(responsavel);
+        }
+
         public async Task Save(Responsavel responsavel)
         {
             await _db.Responsaveis.AddAsync(responsavel);

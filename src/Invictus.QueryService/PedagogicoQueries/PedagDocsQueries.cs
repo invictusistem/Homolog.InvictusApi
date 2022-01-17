@@ -18,6 +18,9 @@ namespace Invictus.QueryService.PedagogicoQueries
         {
             _config = config;
         }
+
+       
+
         public async Task<IEnumerable<AlunoDocumentoDto>> GetDocsMatriculaViewModel(Guid matriculaId)
         {
             var query = @"select 
@@ -64,6 +67,46 @@ namespace Invictus.QueryService.PedagogicoQueries
                 connection.Open();
 
                 var result = await connection.QuerySingleAsync<AlunoDocumentoDto>(query, new { docId = docId });
+
+                //connection.Close();
+
+                return result;
+
+            }
+        }
+
+        public async Task<AlunoDocumentoDto> GetContrato(Guid matriculaId)
+        {
+            var query = @"select * from alunosDocumentos 
+                        Where AlunosDocumentos.MatriculaId = @matriculaId 
+                        AND AlunosDocumentos.Descricao = 'contrato' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<AlunoDocumentoDto>(query, new { matriculaId = matriculaId });
+
+                //connection.Close();
+
+                return result;
+
+            }
+        }
+
+        public async Task<AlunoDocumentoDto> GetFicha(Guid matriculaId)
+        {
+            var query = @"select * from alunosDocumentos 
+                        Where AlunosDocumentos.MatriculaId = @matriculaId 
+                        AND AlunosDocumentos.Descricao = 'ficha de matrícula' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<AlunoDocumentoDto>(query, new { matriculaId = matriculaId });
 
                 //connection.Close();
 

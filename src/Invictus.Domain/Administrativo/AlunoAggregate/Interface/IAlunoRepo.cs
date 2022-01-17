@@ -12,6 +12,7 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate.Interface
         Task Edit(Aluno newAluno);
         Task SaveAlunoPlano(AlunoPlanoPagamento newPlano);
         Task SaveAlunoDocs(IEnumerable<AlunoDocumento> docs);
+        Task SaveAlunoDoc(AlunoDocumento docs);
         Task EditAlunoDoc(AlunoDocumento doc);
         void Commit();
     }

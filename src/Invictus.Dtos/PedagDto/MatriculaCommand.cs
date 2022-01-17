@@ -61,6 +61,11 @@ namespace Invictus.Dtos.PedagDto
         public decimal valorParcela { get; set; } // ok - OBS: ver parc diferentes
         public int parcelas { get; set; } // count nas linhas 
         public Guid planoId { get; set; } // pegar e ver se todos sao iguais
+        public string codigoDesconto { get; set; }
+        public string bolsaId { get; set; }
+        public string ciencia { get; set; }
+        public string cienciaAlunoId { get; set; }
+
         public List<Parcela> infoParcelas { get; set; }
     }
 

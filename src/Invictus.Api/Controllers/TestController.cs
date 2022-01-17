@@ -6,6 +6,7 @@ using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.BackgroundTasks;
 using Invictus.Core.Enums;
 using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Microsoft.AspNetCore.Identity;
@@ -68,9 +69,52 @@ namespace Invictus.Api.Controllers
 
         }
 
-
-
         [HttpGet]
+        [Route("export-contrato")]
+        public IActionResult GetContrato()
+        {
+            var conteudos = _db.Conteudos.Where(c => c.ContratoId == new Guid("3419e3ed-9d11-45f2-9a91-8017b012e80f")).ToList();
+
+            try
+            {
+                var globalSettings = new GlobalSettings
+                {
+                    ColorMode = ColorMode.Color,
+                    Orientation = Orientation.Portrait,
+                    PaperSize = PaperKind.A4,
+                    Margins = new MarginSettings { Top = 10 },
+                    DocumentTitle = "PDF Report"
+                };
+                var objectSettings = new ObjectSettings
+                {
+                    PagesCount = true,
+                    HtmlContent = _template.GetContratoHTMLString(conteudos),// TemplateGenerator.GetHTMLString(),//@"<div><div style=""color: red""> PDF </div></div>", //TemplateGenerator.GetHTMLString(),
+                    WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                    HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+                    FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
+                };
+                var pdf = new HtmlToPdfDocument()
+                {
+                    GlobalSettings = globalSettings,
+                    Objects = { objectSettings }
+                };
+                var file = _converter.Convert(pdf);
+               
+
+
+                return File(file, "application/pdf");
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+            [HttpGet]
         [Route("export-dk-pdf")]
         public IActionResult ExportPDF()
         {
@@ -98,7 +142,43 @@ namespace Invictus.Api.Controllers
                     Objects = { objectSettings }
                 };
                 var file = _converter.Convert(pdf);
+                ///////////////////////////
+                ///
+
+                //var docDto = await _pedagDocQueries.GetDocumentById(documentId);
+                //var doc = _mapper.Map<AlunoDocumento>(docDto);
+
+                //var fileName = Path.GetFileName(file.FileName);
+
+                //var fileExtension = Path.GetExtension(fileName);
+
+                //var newFileName = String.Concat(System.Convert.ToString(Guid.NewGuid()), fileExtension);
+
+                byte[] arquivo = file;
+
+                //using (var target = new MemoryStream())
+                //{
+                //    file.CopyTo(target);
+                //    arquivo = target.ToArray();
+                //}
+
+                var tamanho = arquivo.Length / 1024;
+
+                //var document = new AlunoDocumento()
+
+                //doc.AddDocumento(arquivo, fileName, fileExtension, file.ContentType, System.Convert.ToInt32(tamanho));
+
+
+                //await _alunoRepo.EditAlunoDoc(doc);
+
+
+
+
                 return File(file, "application/pdf");
+                
+
+
+
             }
             catch (Exception ex)
             {

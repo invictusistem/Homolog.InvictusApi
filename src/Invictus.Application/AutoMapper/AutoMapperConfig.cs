@@ -14,6 +14,7 @@ using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Financeiro;
+using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
@@ -115,7 +116,14 @@ namespace Invictus.Application.AutoMapper
                 .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,
                 b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));
 
+            CreateMap<ResponsavelDto, Responsavel>()
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                     new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
+
             CreateMap<ContratoView, Contrato>();
+
+            CreateMap<BolsaDto, Bolsa>();
             CreateMap<ContratoDto, Contrato>();
             CreateMap<ContratoConteudoDto, Conteudo>();
             CreateMap<ProdutoDto, Produto>();

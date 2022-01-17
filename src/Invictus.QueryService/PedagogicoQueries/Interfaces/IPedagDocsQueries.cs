@@ -11,5 +11,7 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
     {
         Task<IEnumerable<AlunoDocumentoDto>> GetDocsMatriculaViewModel(Guid matriculaId);
         Task<AlunoDocumentoDto> GetDocumentById(Guid docId);
+        Task<AlunoDocumentoDto> GetContrato(Guid matriculaId);
+        Task<AlunoDocumentoDto> GetFicha(Guid matriculaId);
     }
 }

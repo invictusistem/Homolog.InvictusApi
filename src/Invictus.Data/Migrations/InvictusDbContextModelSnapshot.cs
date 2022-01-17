@@ -93,6 +93,9 @@ namespace Invictus.Data.Migrations
                     b.Property<bool>("Analisado")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ClassificacaoDoc")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Comentario")
                         .HasColumnType("nvarchar(max)");
 
@@ -762,8 +765,20 @@ namespace Invictus.Data.Migrations
                     b.Property<Guid>("AlunoId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BolsaId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CPF")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ciencia")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CienciaAlunodId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ColaboradorResponsavelMatricula")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DiaMatricula")
                         .HasColumnType("datetime2");
@@ -1085,6 +1100,41 @@ namespace Invictus.Data.Migrations
                     b.HasIndex("StatusBoleto");
 
                     b.ToTable("Boletos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Financeiro.Bolsas.Bolsa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Colaborador")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataExpiracao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PercentualDesconto")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Senha")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TypePacoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UnidadeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bolsas");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>

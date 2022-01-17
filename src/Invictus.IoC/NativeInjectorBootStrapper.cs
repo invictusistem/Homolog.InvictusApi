@@ -20,6 +20,7 @@ using Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAuth.Interfaces;
+using Invictus.Domain.Financeiro.Bolsas.Interfaces;
 using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Domain.Padagogico.AlunoAggregate.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
@@ -57,11 +58,12 @@ namespace Invictus.IoC
             services.AddScoped<IAlunoRepo, AlunoRepo>();
             services.AddScoped<IMatriculaRepo, MatriculaRepo>();
             services.AddScoped<ITurmaNotasRepo, TurmaNotasRepo>();
-            services.AddScoped<IAutorizacaoRepo,AutorizacaoRepo > ();
+            services.AddScoped<IAutorizacaoRepo, AutorizacaoRepo>();
             // Pedag
             services.AddScoped<IAlunoPedagRepo, AlunoPedagRepo>();
             services.AddScoped<IRespRepo, RespRepo>();
             // Financ
+            services.AddScoped<IBolsaRepo, BolsaRepo>();
             services.AddTransient<IDebitosRepos, InfoFinancRepo>();
 
 

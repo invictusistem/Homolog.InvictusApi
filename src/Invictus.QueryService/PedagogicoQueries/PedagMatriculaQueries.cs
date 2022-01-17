@@ -65,6 +65,28 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<IEnumerable<AlunoDto>> GetAlunosIndicacao()
+        {
+            var query = @"select 
+                        alunos.id,
+                        alunos.nome
+                        from Alunos 
+                        inner join Matriculas on Alunos.id = Matriculas.AlunoId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<AlunoDto>(query);
+
+                // connection.Close();
+
+                return result;
+
+            }
+        }
+
         public async Task<IEnumerable<AnotacaoDto>> GetAnotacoesMatricula(Guid matriculaId)
         {
             var query = @"select 
@@ -104,6 +126,7 @@ namespace Invictus.QueryService.PedagogicoQueries
         responsaveis.temRespFin ,
         responsaveis.telCelular ,
         responsaveis.telResidencial ,
+        responsaveis.matriculaId ,
         responsaveis.telWhatsapp ,
         responsaveis.bairro,
         responsaveis.cep ,
@@ -146,6 +169,7 @@ Responsaveis.tipo = 'Responsável financeiro'";
         responsaveis.temRespFin ,
         responsaveis.telCelular ,
         responsaveis.telResidencial ,
+        responsaveis.matriculaId ,
         responsaveis.telWhatsapp ,
         responsaveis.bairro,
         responsaveis.cep ,
@@ -207,6 +231,22 @@ where matriculas.id = @matriculaId ";
                 var result = await connection.QueryAsync<ResponsavelDto>(query, new { matriculaId = matriculaId });
 
                 // connection.Close();
+
+                return result.FirstOrDefault();
+
+            }
+        }
+
+        public async Task<ResponsavelDto> GetResponsavelById(Guid id)
+        {
+            var query = @"select * FROM Responsaveis WHERE Responsaveis.Id = @id";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ResponsavelDto>(query, new { id = id });
 
                 return result.FirstOrDefault();
 

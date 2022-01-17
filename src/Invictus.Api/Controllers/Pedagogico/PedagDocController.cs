@@ -36,6 +36,30 @@ namespace Invictus.Api.Controllers.Pedagogico
         }
 
         [HttpGet]
+        [Route("getcontrato/{matriculaId}")]
+        public async Task<ActionResult> GetContrato(Guid matriculaId)
+        {
+
+            var doc = await _pedagDocQueries.GetContrato(matriculaId);
+
+            var memory = new MemoryStream(doc.dataFile);
+
+            return File(memory, doc.contentArquivo, doc.nome);
+        }
+
+        [HttpGet]
+        [Route("getficha/{matriculaId}")]
+        public async Task<ActionResult> GetFicha(Guid matriculaId)
+        {
+
+            var doc = await _pedagDocQueries.GetFicha(matriculaId);
+
+            var memory = new MemoryStream(doc.dataFile);
+
+            return File(memory, doc.contentArquivo, doc.nome);
+        }
+
+        [HttpGet]
         [Route("lista/{matriculaId}")]
         public async Task<ActionResult> GetMatriculaDocs(Guid matriculaId)
         {

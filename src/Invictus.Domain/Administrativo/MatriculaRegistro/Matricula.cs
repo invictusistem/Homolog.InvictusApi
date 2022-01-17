@@ -35,8 +35,43 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
         public string CPF { get; private set; }
         public string Status { get; private set; }
         public Guid TurmaId { get; private set; }
+        public Guid ColaboradorResponsavelMatricula { get; private set; }
         public DateTime DiaMatricula { get; private set; }
+        public Guid BolsaId { get; private set; }
+        public string Ciencia { get; private set; }
+        public Guid CienciaAlunodId { get; private set; }
 
+
+        public void SetStatus(string status)
+        {
+            Status = StatusMatricula.TryParse(status).DisplayName;
+        }
+
+        public void SetCiencia(string ciencia, string alunoId)
+        {
+            Ciencia = ciencia;
+
+            if(ciencia == "Indicação Aluno")
+            {
+                if(alunoId != "")
+                {
+                    CienciaAlunodId = new Guid(alunoId);
+                }
+            }
+        }
+
+        public void SetBolsaId(string bolsaId)
+        {
+            if (bolsaId != "")
+            {
+                BolsaId = new Guid(bolsaId);
+            }
+        }
+
+        public void SetColaboradorResponsavelMatricula(Guid colaboradorId)
+        {
+            ColaboradorResponsavelMatricula = colaboradorId;
+        }
         public void SetTurmaId(Guid turmaId)
         {
             TurmaId = turmaId;

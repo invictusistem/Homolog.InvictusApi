@@ -47,7 +47,9 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<ITurmaPedagQueries, TurmaPedagQueries>();
 
             //Financeiro
+            services.AddScoped<IBolsasQueries, BolsasQueries > ();
             services.AddScoped<IFinanceiroQueries, FinancQueries>();
+
         }
 
     }
