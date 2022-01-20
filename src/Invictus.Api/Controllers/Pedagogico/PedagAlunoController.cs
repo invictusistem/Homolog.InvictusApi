@@ -86,6 +86,16 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { alunos = alunos });
         }
 
+        [HttpGet]
+        [Route("nota/{matriculaId}")]
+        public async Task<IActionResult> GetNotas(Guid matriculaId)
+        {
+            var notas = await _pedagTurmaQueries.GetNotaAluno(matriculaId);
+
+            return Ok(new { notas = notas });
+        }
+
+
         [HttpPut]
         [Route("responsavel")]
         public async Task<IActionResult> EditResponsavel([FromBody] ResponsavelDto responsavel)

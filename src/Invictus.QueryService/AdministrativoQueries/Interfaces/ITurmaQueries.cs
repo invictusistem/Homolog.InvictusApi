@@ -22,6 +22,8 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<List<MateriaView>> GetMateriasLiberadas(Guid turmaId, Guid professorId);
         Task<TurmaMateriasDto> GetTurmaMateria(Guid turmaMateriaId);
         Task<TurmaProfessoresDto> GetTurmaProfessor(Guid professorId, Guid turmaId);
-        Task<IEnumerable<TurmaViewModel>> GetTurmasPedagViewModel();
+        Task<IEnumerable<TurmaDiarioClasseViewModel>> GetTurmasPedagViewModel();
+        Task<IEnumerable<ListaPresencaDto>> GetInfoDiaPresencaLista(Guid calendarioId);
+        Task<IEnumerable<ListaPresencaDto>> GetListaPresencas(Guid calendarioId);
     }
 }

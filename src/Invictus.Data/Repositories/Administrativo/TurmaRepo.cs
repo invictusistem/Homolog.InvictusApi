@@ -78,5 +78,10 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             _db.TurmasMaterias.UpdateRange(turmasMaterias);
         }
+
+        public async Task SaveListPresencas(IEnumerable<Presenca> presencas)
+        {
+            await _db.Presencas.AddRangeAsync(presencas);
+        }
     }
 }

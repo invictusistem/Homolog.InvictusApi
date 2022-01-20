@@ -49,6 +49,79 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<ListPresencaViewModel> GetInfoDiaPresencaLista(Guid turmaId, Guid calendarioId)
+        {
+            var listaPresencaViewModel = new ListPresencaViewModel();
+
+            //Guid materiaId, = 
+
+            var query = @"select * from calendarios where calendarios.id = @calendarioId ";
+
+            var queryOne = @"select 
+                        Calendarios.id,
+                        Calendarios.DiaAula,
+                        UnidadesSalas.Titulo, 
+                        MateriasTemplate.nome as descricao,
+                        Colaboradores.nome
+                        from Professores 
+                        inner join UnidadesSalas on Calendarios.SalaId = Salas.Id
+                        inner join MateriasTemplate on Calendarios.MateriaId = Materias.id
+                        inner join Professores on Calendarios.ProfessorId = Professores.Id
+                        where Calendarios.id = @calendarioId ";
+
+            var queryTwo = @"select
+                            Aluno.Id as alunoId,
+                            Aluno.Nome,
+                            LivroPresencas.Id,
+                            LivroPresencas.CalendarioId,
+                            LivroPresencas.IsPresent
+                            from LivroPresencas
+                            right join Aluno on LivroPresencas.AlunoId = Aluno.Id
+                            inner join Matriculados on Aluno.Id = Matriculados.AlunoId
+                            where Matriculados.TurmaId = @turmaId";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                //Guid materiaId = 
+
+                var infoDia = await connection.QuerySingleAsync<InfoDia>(queryOne, new { calendarioId = calendarioId });
+
+                var listaPresenca = await connection.QueryAsync<ListaPresencaDto>(queryTwo, new { turmaId = turmaId });
+
+                listaPresencaViewModel.infos = infoDia;
+                listaPresencaViewModel.listaPresencas.AddRange(listaPresenca);
+
+                foreach (var item in listaPresencaViewModel.listaPresencas)
+                {
+                    //item.calendarioId = calendarioId;
+                }
+                //var listaPresenca = 
+
+                return listaPresencaViewModel;
+
+            }
+        }
+
+        public async Task<IEnumerable<TurmaNotasViewModel>> GetNotaAluno(Guid matriculaId)
+        {
+            var query = @"select * from turmasNotas where TurmasNotas.MatriculaId = @matriculaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var notas = await connection.QueryAsync<TurmaNotasViewModel>(query, new { matriculaId = matriculaId });
+
+                return notas;
+
+            }
+        }
+
         public async Task<IEnumerable<TurmaNotasViewModel>> GetNotasFromTurma(Guid turmaId, Guid materiaId)
         {
             var query = @"select 

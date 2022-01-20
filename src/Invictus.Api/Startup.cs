@@ -82,7 +82,7 @@ namespace Invictus.Api
                 opts.Password.RequireDigit = false;
                 opts.Password.RequireLowercase = true;
                 opts.Password.RequireUppercase = true;
-                opts.Password.RequireNonAlphanumeric = true;
+                opts.Password.RequireNonAlphanumeric = false;
             })
                 .AddRoles<IdentityRole>()
                 .AddErrorDescriber<IdentityMensagensPortugues>()

@@ -30,5 +30,15 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             await _db.Calendarios.AddRangeAsync(calendarios);
         }
+
+        public async Task UpdateCalendario(Calendario calend)
+        {
+            await _db.Calendarios.SingleUpdateAsync(calend);
+        }
+
+        public void UpdateCalendarios(List<Calendario> calendarios)
+        {
+             _db.Calendarios.UpdateRange(calendarios);
+        }
     }
 }

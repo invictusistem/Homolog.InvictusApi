@@ -178,6 +178,54 @@ namespace Invictus.Api.Controllers
             return CustomResponse();
         }
 
+        [HttpPut]
+        [Route("troca-senha")]
+        public async Task<IActionResult> changePassword(TrocaSenha usermodel)
+        {
+
+
+            var user = await _userManager.FindByEmailAsync(usermodel.Email);
+
+            //temp
+            //user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, "Abc*123456");
+            //var resultado123 = await _userManager.UpdateAsync(user);
+            //return Ok();
+            //
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user, usermodel.Senha, false, true);
+
+            if (!result.Succeeded)
+            {
+                AdicionarErroProcessamento("Usuário ou senha incorretos.");
+                return CustomResponse();
+            }
+
+            //var passwordValidator = new PasswordValidator<IdentityUser>();
+            //var validateSenha = await passwordValidator.ValidateAsync(_userManager, user, usermodel.SenhaConfirmacao);
+
+            //if (!validateSenha.Succeeded)
+            //{
+            //    AdicionarErroProcessamento("A senha deve conter letras maiúsculas e minúsculas.");
+            //    return CustomResponse();
+            //}
+
+
+
+
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, usermodel.SenhaConfirmacao);
+
+            var resultado = await _userManager.UpdateAsync(user);
+            if (!resultado.Succeeded)
+            {
+                return BadRequest();
+            }
+            return Ok();
+        }
+
         private async Task<IEnumerable<AutorizacaoDto>> GetAutorizacoes(string email)
         {
             var colaborador = await _colaboradorQueries.GetColaboradoresByEmail(email);

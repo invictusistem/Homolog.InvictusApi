@@ -4,6 +4,7 @@ using Invictus.Application.Extensions;
 using Invictus.Core;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.Calendarios.Interfaces;
 using Invictus.Domain.Administrativo.TurmaAggregate;
@@ -13,6 +14,8 @@ using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +35,10 @@ namespace Invictus.Application.AdmApplication
         private readonly IMapper _mapper;
         private readonly ITurmaRepo _turmaRepo;
         private readonly ITurmaNotasRepo _notasRepo;
+        private readonly InvictusDbContext _db;
         public TurmaApplication(IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser, ITurmaQueries turmaQueries,
             IPacoteQueries pacoteQueries,IMapper mapper,ITurmaRepo turmaRepo, IParametrosQueries paramQueries,
-            ICalendarioRepo calendarioRepo, ITurmaNotasRepo notasRepo)
+            ICalendarioRepo calendarioRepo, ITurmaNotasRepo notasRepo, InvictusDbContext db)
         {
             _unidadeQueries = unidadeQueries;
             _aspNetUser = aspNetUser;
@@ -45,6 +49,7 @@ namespace Invictus.Application.AdmApplication
             _paramQueries = paramQueries;
             _calendarioRepo = calendarioRepo;
             _notasRepo = notasRepo;
+            _db = db;
         }
         public async Task CreateTurma(CreateTurmaCommand command)
         {
@@ -218,6 +223,10 @@ namespace Invictus.Application.AdmApplication
 
         public async Task SetMateriaProfessor(Guid turmaId, Guid professorId, IEnumerable<MateriaView> profsMatCommand)
         {
+
+            // TODO CALENDARIO
+            // tirar tudo dele
+            // colocar onde está true
             foreach (var item in profsMatCommand)
             {
                 var turmaMatDto = await _turmaQueries.GetTurmaMateria(item.id);
@@ -226,11 +235,26 @@ namespace Invictus.Application.AdmApplication
                 if (item.isProfessor)
                 {
                     turmaMat.AddProfessorNaMateria(professorId);
+                    // colocar no calendario
+                    var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.MateriaId == turmaMatDto.materiaId).ToListAsync();
+
+                    calendarios.ForEach(c => c.SetProfessorId(professorId));
+
+                    _calendarioRepo.UpdateCalendarios(calendarios);
                 }
                 else
                 {
                     turmaMat.RemoveProfessorDaMateria();
+                    var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.MateriaId == turmaMatDto.materiaId).ToListAsync();
+                    
+                    calendarios.ForEach(c => c.RemoveProfessorDaTurma());
+
+                    _calendarioRepo.UpdateCalendarios(calendarios);
+
+                    // rmover do calendario
                 }
+
+                
 
                 await _turmaRepo.UpdateMateriaDaTurma(turmaMat);
 
@@ -251,6 +275,26 @@ namespace Invictus.Application.AdmApplication
             var turmasMateriasDto = await _turmaQueries.GetTurmaMateriasFromProfessorId(professorId, turmaId);
 
             var turmasMaterias = _mapper.Map<List<TurmaMaterias>>(turmasMateriasDto);
+
+            // puxar calendarios da turma e materia do professor
+            var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.ProfessorId == professorId).ToListAsync();
+            // filtrar por materias, se TODAS as datas ja passaram, incluindo hoje, nao tirar prof
+            // se metade passou e outra metade nao.. nao tirar prof
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            var calendDistinct = calendarios.DistinctBy(c => c.MateriaId);
+            foreach (var cal in calendDistinct)
+            {
+                var filtro = calendarios.Where(c => c.DiaAula <= hoje & c.MateriaId == cal.MateriaId);
+
+                if (!filtro.Any())
+                {
+                    calendarios.Where(c => c.MateriaId == cal.MateriaId).ForEach(c => c.RemoveProfessorDaTurma());
+                }
+            }
+
+            _calendarioRepo.UpdateCalendarios(calendarios);
+            _calendarioRepo.Commit();
 
             if(turmasMaterias.Count() > 0)
             {

@@ -85,6 +85,11 @@ string horaFinal,
         {
             HoraFinal = fim;
         }
+
+        public void RemoveProfessorDaTurma()
+        {
+            ProfessorId = new Guid("00000000-0000-0000-0000-000000000000");
+        }
         public void SetProfessorId(Guid profId)
         {
             ProfessorId = profId;
@@ -100,16 +105,13 @@ string horaFinal,
 
         public void IniciarAula()
         {
+            DateAulaIniciada = DateTime.Now;
             AulaIniciada = true;
         }
 
         public void ConcluirAula()
         {
             AulaConcluida = true;
-        }
-        public void SetDataInicioAula()
-        {
-            DateAulaIniciada = DateTime.Now;
         }
 
         public void SetDataConclusaoAula()

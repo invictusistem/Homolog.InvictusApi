@@ -1,5 +1,8 @@
-﻿using Dapper;
+﻿using AutoMapper;
+using Dapper;
 using Invictus.Core.Interfaces;
+using Invictus.Domain.Administrativo.TurmaAggregate;
+using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -18,12 +21,16 @@ namespace Invictus.QueryService.AdministrativoQueries
         private readonly IConfiguration _config;
         private readonly IAspNetUser _aspUser;
         private readonly IUnidadeQueries _unidadeQueries;
+        private readonly IMapper _mapper;
+        private readonly ITurmaRepo _turmaRepo;
         public TurmaQueries(IConfiguration config, IAspNetUser aspUser,
-            IUnidadeQueries unidadeQueries)
+            IUnidadeQueries unidadeQueries, IMapper mapper, ITurmaRepo turmaRepo)
         {
             _config = config;
             _aspUser = aspUser;
             _unidadeQueries = unidadeQueries;
+            _mapper = mapper;
+            _turmaRepo = turmaRepo;
         }
         public async Task<int> CountTurmas(Guid unidadeId)
         {
@@ -40,6 +47,56 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 return count;
             }
+        }
+        public async Task<IEnumerable<ListaPresencaDto>> GetListaPresencas(Guid calendarioId)
+        {
+            string query = @"SELECT * FROM TurmasPresencas WHERE TurmasPresencas.CalendarioId = @calendarioId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<ListaPresencaDto>(query, new { calendarioId = calendarioId });
+
+                connection.Close();
+
+                return results;
+            }
+        }
+
+        public async Task<IEnumerable<ListaPresencaDto>> GetInfoDiaPresencaLista(Guid calendarioId)
+        {
+            // verificar se ja tem na lista presença pelo calendarioId
+            var lista = await GetListaPresencas(calendarioId);
+            // se nao tiver, criar 
+            if (!lista.Any())
+            {
+                var alunos = new List<AlunoDto>();
+                var listaPresenca = new List<ListaPresencaDto>();
+
+                foreach (var aluno in alunos)
+                {
+                    listaPresenca.Add(new ListaPresencaDto()
+                    {
+                        nome = aluno.nome,
+                        calendarioId = calendarioId,
+                        isPresent = false,
+                        isPresentToString = "F",
+                        alunoId = aluno.id
+                    });
+                }
+
+                var presencas = _mapper.Map<IEnumerable<Presenca>>(listaPresenca);
+
+                await _turmaRepo.SaveListPresencas(presencas);
+
+                _turmaRepo.Commit();
+
+                lista = listaPresenca;
+            }
+
+            return lista;
         }
 
         public async Task<IEnumerable<TurmaMateriasDto>> GetMateriasDaTurma(Guid turmaId)
@@ -90,7 +147,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             StringBuilder query = new StringBuilder();
             query.Append("select TurmasMaterias.id, TurmasMaterias.nome, TurmasMaterias.ProfessorId from TurmasMaterias where ");
             query.Append(" TurmasMaterias.MateriaId in ( select ProfessoresMaterias.PacoteMateriaId from ProfessoresMaterias where ");
-            query.Append(" ProfessoresMaterias.ProfessorId = '"+ professorId +"' ) and TurmasMaterias.TurmaId = '"+ turmaId + "' ");
+            query.Append(" ProfessoresMaterias.ProfessorId = '" + professorId + "' ) and TurmasMaterias.TurmaId = '" + turmaId + "' ");
             query.Append(" and TurmasMaterias.ProfessorId = '00000000-0000-0000-0000-000000000000' OR TurmasMaterias.ProfessorId = '" + professorId + "' ");
 
             //string guid = "00000000-0000-0000-0000-000000000000";
@@ -113,9 +170,9 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
                 IEnumerable<MateriaView> results = new List<MateriaView>();
-               
-                    results = await connection.QueryAsync<MateriaView>(query.ToString());
-               
+
+                results = await connection.QueryAsync<MateriaView>(query.ToString());
+
                 connection.Close();
 
                 foreach (var mat in results)
@@ -133,7 +190,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return results.ToList();
             }
 
-            
+
         }
 
         public async Task<IEnumerable<ProfessorTurmaView>> GetProfessoresDaTurma(Guid turmaId)
@@ -156,7 +213,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 var alunoDictionary = new Dictionary<Guid, ProfessorTurmaView>();
 
-                var results = connection.Query< ProfessorTurmaView, MateriaProfessorView, ProfessorTurmaView > (query,
+                var results = connection.Query<ProfessorTurmaView, MateriaProfessorView, ProfessorTurmaView>(query,
                     (profDto, materiaDto) =>
                     {
                         ProfessorTurmaView profEntry;
@@ -180,7 +237,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 return results;
             }
-            
+
         }
 
         public async Task<TurmaDto> GetTurma(Guid turmaId)
@@ -241,7 +298,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 return results;
             }
-            
+
         }
 
         public async Task<IEnumerable<TurmaMateriasDto>> GetTurmaMateriasFromProfessorId(Guid professorId, Guid turmaId)
@@ -258,7 +315,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return result;
-            }           
+            }
         }
 
         public async Task<TurmaProfessoresDto> GetTurmaProfessor(Guid professorId, Guid turmaId)
@@ -371,7 +428,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<TurmaViewModel>> GetTurmasPedagViewModel()
+        public async Task<IEnumerable<TurmaDiarioClasseViewModel>> GetTurmasPedagViewModel()
         {
             var unidadeSigla = _aspUser.ObterUnidadeDoUsuario();
 
@@ -382,6 +439,11 @@ namespace Invictus.QueryService.AdministrativoQueries
                         FROM Turmas WHERE Turmas.UnidadeId = @unidadeId 
                         AND Turmas.statusAndamento <> 'Aguardando início'  ";
 
+            var dateNow = DateTime.Now;
+            var query2 = @"select id from calendarios 
+                        where Calendarios.DiaAula = '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
+                        and Calendarios.TurmaId = @turmaId ";
+
             //var query2 = @"select 
             //                DiaAula, 
             //                HoraInicial, 
@@ -391,58 +453,44 @@ namespace Invictus.QueryService.AdministrativoQueries
             //                order by DiaAula asc";
 
             var DataPesquisa = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
-           
+
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
-               
-                var results = await connection.QueryAsync<TurmaViewModel>(query, new { unidadeId = unidade.id });
 
-                //foreach (var item in results)
-                //{
-                //    var dateNow = DateTime.Now;
+                var turmas = await connection.QueryAsync<TurmaDiarioClasseViewModel>(query, new { unidadeId = unidade.id });
 
-                //    var result = await connection.QueryAsync<Result>(query2, new { turmaId = item.id, DataPesquisa = DataPesquisa });
+                // traz Id do calendario se tiver aula no DIa
+                foreach (var turma in turmas)
+                {
 
+                    var calendario = await connection.QueryAsync<CalendarioDto>(query2, new { turmaId = turma.id });
 
-                //    var quantasAulasNoDia = result.Where(d => d.DiaAula == DataPesquisa).Count();
+                    // confirmar se tem o guid e pegar o default
+                    if (calendario.Any())
+                    {
+                        turma.calendarioId = calendario.Select(c => c.id).First();
+                        //TEMP
+                        turma.podeIniciarAula = true;
+                    }
+                    else
+                    {
+                        turma.podeIniciarAula = false;
+                    }
 
-                //    if (quantasAulasNoDia == 0)
-                //    {
-                //        item.podeIniciar = false;
+                    /*
+                     TODO HORARIO
+                     TODO AUTORIZAÇÃO
+                     
+                     */
 
-                //    }
-                //    else if (quantasAulasNoDia == 1)
-                //    {
+                }
 
-                //        var agora = DateTime.Now;
-                //        var timespantest = new TimeSpan(0, 10, 0);
+                
 
-                //        var timespan1 = result.ToArray()[0].HoraInicial;
-                //        var timespan2 = result.ToArray()[0].HoraFinal;
-                //        var horaMinuto1 = timespan1.Split(":");
-                //        var horaMinuto2 = timespan2.Split(":");
-                //        var horaInicio = new DateTime(result.ToArray()[0].DiaAula.Year, result.ToArray()[0].DiaAula.Month, result.ToArray()[0].DiaAula.Day, Convert.ToInt32(horaMinuto1[0]), Convert.ToInt32(horaMinuto1[1]), 0).Subtract(timespantest);
-                      
-                //        var horaFim = new DateTime(result.ToArray()[0].DiaAula.Year, result.ToArray()[0].DiaAula.Month, result.ToArray()[0].DiaAula.Day, Convert.ToInt32(horaMinuto2[0]), Convert.ToInt32(horaMinuto2[1]), 0);
-
-                //        if (agora >= horaInicio && agora <= horaFim)
-                //        {
-                //            item.podeIniciar = true;
-                //        }
-                //        else
-                //        {
-                //            item.podeIniciar = false;
-                //        }
-
-
-                //    }
-
-                //}
-
-                return results;
+                return turmas;
 
             }
 

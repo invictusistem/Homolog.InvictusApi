@@ -16,6 +16,7 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate.Interfaces
         Task AddProfsNaTurma(IEnumerable<TurmaProfessor> professores);
         Task UpdateMateriaDaTurma(TurmaMaterias turmaMateria);
         Task RemoverProfessorDaTurma(TurmaProfessor professor);
+        Task SaveListPresencas(IEnumerable<Presenca> presencas);
         void AtualizarTurmasMaterias(IEnumerable<TurmaMaterias> turmasMaterias);
         void Commit();
     }

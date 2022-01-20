@@ -102,6 +102,9 @@ namespace Invictus.Application.AutoMapper
                 .ConstructUsing(t => new Turma(t.descricao, t.totalAlunos, t.minimoAlunos, t.unidadeId, t.salaId, t.pacoteId, t.typePacoteId,
                 new Previsao(t.previsaoAtual, t.previsaoTerminoAtual, t.previsaoInfo, t.dataCriacao)));
 
+            CreateMap<ListaPresencaDto, Presenca>()
+                .ConstructUsing(p => new Presenca(p.calendarioId, p.isPresent, p.alunoId, p.isPresentToString));
+
             CreateMap<AnotacaoDto, AlunoAnotacao>();
 
             CreateMap<AlunoDocumentoDto, AlunoDocumento>();

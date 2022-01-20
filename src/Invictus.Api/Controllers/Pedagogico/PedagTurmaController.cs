@@ -1,4 +1,5 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.PedagApplication.Interfaces;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
@@ -18,17 +19,19 @@ namespace Invictus.Api.Controllers.Pedagogico
     {
         private readonly IProfessorQueries _profQueries;
         private readonly ITurmaApplication _turmaApp;
+        private readonly IPedagogicoApplication _pedagApp;
         private readonly ITurmaQueries _turmaQueries;
-        private readonly ICalendarioQueries _calendarioQueries;
+        private readonly ICalendarioQueries _calendarioQueries; 
         private readonly ITurmaPedagQueries _turmaPedagQueries;
         public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries,
-            ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries)
+            ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries, IPedagogicoApplication pedagApp)
         {
             _profQueries = profQueries;
             _turmaApp = turmaApp;
             _turmaQueries = turmaQueries;
             _calendarioQueries = calendarioQueries;
             _turmaPedagQueries = turmaPedagQueries;
+            _pedagApp = pedagApp;
         }
 
         [HttpGet]
@@ -73,7 +76,6 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("Professores")]
         public async Task<IActionResult> SaveProfsInTurma([FromBody] SaveProfsCommand command)
         {
-
             await _turmaApp.AddProfessoresNaTurma(command);
 
             return Ok();
@@ -87,6 +89,23 @@ namespace Invictus.Api.Controllers.Pedagogico
             var matsView = await _turmaQueries.GetMateriasLiberadas(turmaId, professorId);//.AddProfesso resNaTurma(command);
 
             return Ok(new { matsView = matsView });
+        }
+
+        [HttpGet]
+        [Route("presenca-lista/{calendarioId}")]
+        public async Task<ActionResult> GetPresencaLista(Guid calendarioId)
+        {
+
+            var presencas = await _turmaQueries.GetInfoDiaPresencaLista(calendarioId);//.GetInfoDiaPresencaLista
+            //var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 3, 0, 0);
+            ////var calendar = await _context.Calendarios.Where(c => c.DiaAula == hoje).SingleOrDefaultAsync();
+            //var calendar = await _context.Calendarios.Where(c => c.DiaAula == hoje).FirstOrDefaultAsync();
+            //if (calendar == null) return Ok();
+            //var notas = await _pedagogicoQuery.GetInfoDiaPresencaLista(calendar.MateriaId, turmaId, calendar.Id);
+
+            //return Ok(new { infos = notas.infos, lista = notas.listaPresencas });
+
+            return Ok(new { presencas = presencas });
         }
 
         [HttpPut]
@@ -103,6 +122,16 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> PutNotaAlunos([FromBody] List<TurmaNotasDto> notas)
         {
             await _turmaApp.UpdateNotas(notas);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("calendario/{calendarioId}")]
+        public async Task<IActionResult> IniciarAula(Guid calendarioId)
+        {
+            // TODO REVERIFICAR SE PODE INICIAR! SE TA NOA HORA CERTA E SE É AUTORIZADO
+            await _pedagApp.IniciarAula(calendarioId);
 
             return Ok();
         }

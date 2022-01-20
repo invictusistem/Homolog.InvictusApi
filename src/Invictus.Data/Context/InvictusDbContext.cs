@@ -59,6 +59,7 @@ namespace Invictus.Data.Context
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Responsavel> Responsaveis { get; set; }
         public DbSet<Horario> Horarios { get; set; }
+        public DbSet<Presenca> Presencas { get; set; }
         public DbSet<Previsoes> Previsoes { get; set; }
         public DbSet<Turma> Turmas { get; set; }
         public DbSet<TurmaMaterias> TurmasMaterias { get; set; }

@@ -214,10 +214,10 @@ namespace Invictus.Api.Controllers
             {
                 RequiredLength = 8,
                 //RequiredUniqueChars = 4,
-                RequireDigit = false,
+              //  RequireDigit = false,
                 RequireLowercase = true,
                 RequireUppercase = true,
-                RequireNonAlphanumeric = true,
+              //  RequireNonAlphanumeric = true,
 
             };
 

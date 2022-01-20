@@ -314,15 +314,17 @@ namespace Invictus.QueryService.AdministrativoQueries
                 if (claimUnidades.Count() > 1)
                 {
                     // setUni com acessos
-                    foreach (var item in acessosView.Where(a => a.unidadeId != colaborador.unidadeId))
+                    foreach (var acesso in acessosView)
                     {
-                        var temUnidade = unidadesSemDefault.Where(u => u.id == item.unidadeId);
-                        if(temUnidade.Count() != 0)
+
+                        foreach (var claim in claimUnidades)
                         {
-                            item.acesso = true;
+                            if(acesso.sigla == claim)
+                            {
+                                acesso.acesso = true;
+                            }
                         }
                     }
-
                 }
 
                 return acessosView;

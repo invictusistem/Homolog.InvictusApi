@@ -14,5 +14,8 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
         Task<TurmaDto> GetTurmaByMatriculaId(Guid matriculaId);
         Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId);
         Task<IEnumerable<TurmaNotasViewModel>> GetNotasFromTurma(Guid turmaId, Guid materiaId);
+        Task<IEnumerable<TurmaNotasViewModel>> GetNotaAluno(Guid matriculaId);
+        Task<ListPresencaViewModel> GetInfoDiaPresencaLista(Guid turmaId, Guid calendarioId);
+
     }
 }

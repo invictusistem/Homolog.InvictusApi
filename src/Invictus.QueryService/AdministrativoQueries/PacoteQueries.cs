@@ -127,7 +127,8 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<PacoteDto>> GetPacotes(Guid typePacoteId, Guid unidadeId)
         {
-            var query = @"SELECT * FROM Pacotes WHERE Pacotes.TypePacoteId = @typePacoteId AND  Pacotes.UnidadeId = @unidadeId";
+            //var query = @"SELECT * FROM Pacotes WHERE Pacotes.TypePacoteId = @typePacoteId AND  Pacotes.UnidadeId = @unidadeId";
+            var query = @"SELECT * FROM Pacotes WHERE Pacotes.TypePacoteId = @typePacoteId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

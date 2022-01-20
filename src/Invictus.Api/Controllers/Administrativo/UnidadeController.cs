@@ -52,6 +52,16 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("sigla/{sigla}")]
+        public async Task<IActionResult> GetSalas(string sigla)
+        {
+            var unidade = await _unidadeQuery.GetUnidadeBySigla(sigla);//.CreateUnidade(command);
+            
+
+            return Ok(new { unidade = unidade });
+        }
+
+        [HttpGet]
         [Route("sala/{salaId}")]
         public async Task<IActionResult> GetSala(Guid salaId)
         {

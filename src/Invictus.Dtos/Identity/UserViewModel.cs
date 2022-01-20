@@ -4,6 +4,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Invictus.Dtos.Identity
 {
+
+    public class TrocaSenha
+    {   
+        public string Email { get; set; }
+        public string Senha { get; set; }
+        public string SenhaConfirmacao { get; set; }
+    }
     public class UserLogin
     {
         [Required(ErrorMessage = "O campo {0} é obrigatório!")]

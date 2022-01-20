@@ -47,6 +47,7 @@ namespace Invictus.Data.Mapping.AdmMappings
             modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
             modelBuilder.ApplyConfiguration(new ResponsavelDbMapping());
             modelBuilder.ApplyConfiguration(new HorariosDbMapping());
+            modelBuilder.ApplyConfiguration(new PresencaDbMapping());
             modelBuilder.ApplyConfiguration(new PrevisoesDbMapping());
             modelBuilder.ApplyConfiguration(new TurmaDbMaping());
             modelBuilder.ApplyConfiguration(new TurmaMateriaDbMapping());
