@@ -591,6 +591,24 @@ namespace Invictus.Api.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("salvarteste")]
+        public IActionResult EditTurmaMaterias([FromBody] Testando testa)
+        {
+            var pacoteMaterias = _db.Materias.Where(p => p.PacoteId == new Guid("3B1F2590-897F-4107-80FA-08D9AF7EA64A"));
+
+            var pacote = _db.Pacotes.Find(new Guid("3B1F2590-897F-4107-80FA-08D9AF7EA64A"));
+
+            var horas = 0;
+
+            foreach (var mats in pacoteMaterias)
+            {
+                horas += mats.CargaHoraria;
+            }
+
+            return Ok();
+        }
     }
 
     public class Testando

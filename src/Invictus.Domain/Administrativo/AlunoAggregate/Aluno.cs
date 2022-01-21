@@ -99,10 +99,16 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
         //public bool TemRespMenor { get; private set; }
         //public bool TemRespFin { get; private set; }
         public DateTime DataCadastro { get; private set; }
+        public Guid ColaboradorRespCadastroId { get; private set; }
         public bool Ativo { get; private set; }
         public Guid UnidadeId { get; private set; }
         
         public AlunoEndereco Endereco { get; set; }
+
+        public void SetColaboradorResponsavelPeloCadastro(Guid colaboradorId)
+        {
+            ColaboradorRespCadastroId = colaboradorId;
+        }
         public void AtivarAluno()
         {
             Ativo = true;

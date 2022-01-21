@@ -85,7 +85,9 @@ namespace Invictus.Api.Controllers
 
             var docs = await _docQueries.GetAll();
 
-            return Ok(new { pacote = pacote, materias = materias, docs = docs });
+            var typePacote = await _typeQueries.GetTypePacote(pacote.typePacoteId);
+
+            return Ok(new { pacote = pacote, materias = materias, docs = docs, typePacote = typePacote });
         }
 
         [HttpPost]

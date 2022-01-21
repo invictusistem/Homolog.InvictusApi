@@ -342,9 +342,11 @@ namespace Invictus.Application.AdmApplication
             var turmaX = await _turmaQueries.GetTurma(turmaId);
             var boletos = new List<Boleto>();
 
+            var boletosOderByDate = boletosResponse.OrderBy(b => b.vencimento).ToList();
+
             for (int i = 1; i <= comand.plano.infoParcelas.Count(); i++)
             {
-                var boletoResp = boletosResponse[i - 1];//.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
+                var boletoResp = boletosOderByDate[i - 1];//.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
 
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletoResp);
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletosResponse[i - 1]);
@@ -353,14 +355,20 @@ namespace Invictus.Application.AdmApplication
                     boletoResp.linkBoleto, boletoResp.linkGrupo, boletoResp.linhaDigitavel, boletoResp.pedido_numero, boletoResp.banco_numero,
                     boletoResp.token_facilitador, boletoResp.credencial);
 
+                
+
                 var parc = i.ToString();
 
                 var parcela = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();//.FirstOrDefault();
 
                 //var dataVencimento = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).Select(i => i.vencimento).FirstOrDefault();
 
-                boletos.Add(new Boleto(parcela.vencimento, parcela.valor, 0, 0, "", "",
-                    comand.plano.bonusPontualidade.ToString(), "", StatusPagamento.EmAberto, turmaX.unidadeId, infoFin.Id, boleto));
+                var boletoNew = new Boleto(parcela.vencimento, parcela.valor, 0, 0, "", "",
+                    comand.plano.bonusPontualidade.ToString(), "", StatusPagamento.EmAberto, turmaX.unidadeId, infoFin.Id, boleto);
+                string historico = i + "/" + boletosOderByDate.Count() + " MENSALIDADE";
+                boletoNew.SetHistorico(historico);
+
+                boletos.Add(boletoNew);
 
             }
 

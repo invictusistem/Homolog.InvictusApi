@@ -47,13 +47,13 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
             Status = StatusMatricula.TryParse(status).DisplayName;
         }
 
-        public void SetCiencia(string ciencia, string alunoId)
+        public void SetCiencia(string ciencia, string alunoId = null)
         {
             Ciencia = ciencia;
 
             if(ciencia == "Indicação Aluno")
             {
-                if(alunoId != "")
+                if(!String.IsNullOrEmpty(alunoId))
                 {
                     CienciaAlunodId = new Guid(alunoId);
                 }

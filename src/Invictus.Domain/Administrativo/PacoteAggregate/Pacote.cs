@@ -66,6 +66,11 @@ namespace Invictus.Domain.Administrativo.PacoteAggregate
 
             TotalHoras = total;
         }
+
+        public void SetCargaHoraria(int horas)
+        {
+            TotalHoras = horas;
+        }
     }
 
 }

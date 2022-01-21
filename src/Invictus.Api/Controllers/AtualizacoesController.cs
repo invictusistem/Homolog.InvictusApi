@@ -64,6 +64,8 @@ namespace Invictus.Api.Controllers
             // verificar pagamento confirmação de  matricula
 
             /// TUDO loggs do q fez (log do dia) salvar json? melhor talvez
+            /// 
+            //procurar documento vencido
 
             return Ok();
         }

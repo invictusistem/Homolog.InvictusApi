@@ -10,5 +10,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     public interface ITypePacoteQueries
     {
         Task<IEnumerable<TypePacoteDto>> GetTypePacotes();
+        Task<TypePacoteDto> GetTypePacote(Guid typePacoteId);
     }
 }

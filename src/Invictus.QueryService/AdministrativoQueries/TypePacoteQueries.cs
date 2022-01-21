@@ -19,6 +19,23 @@ namespace Invictus.QueryService.AdministrativoQueries
             _config = config;
         }
 
+        public async Task<TypePacoteDto> GetTypePacote(Guid typePacoteId)
+        {
+            var query = "SELECT * FROM TypePacote WHERE TypePacote.id = @typePacoteId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var resultado = await connection.QuerySingleAsync<TypePacoteDto>(query, new { typePacoteId  = typePacoteId });
+
+                connection.Close();
+
+                return resultado;
+            }
+        }
+
         public async Task<IEnumerable<TypePacoteDto>> GetTypePacotes()
         {
             var query = "SELECT * FROM TypePacote";

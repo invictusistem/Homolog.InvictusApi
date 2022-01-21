@@ -112,7 +112,7 @@ namespace Invictus.Api.Controllers
 
             var user = new IdentityUser
             {
-                UserName = RemoveDiacritics(primeiroNome[0]),
+                UserName = colaborador.email,
                 Email = colaborador.email,
                 EmailConfirmed = true
             };
@@ -129,7 +129,7 @@ namespace Invictus.Api.Controllers
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", perfilAtivo.ToString()));
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Unidade", unidadeSigla));
 
-                await _userApplication.CriarAcessoInicial(colaboradorId, unidadeSigla, unidade.id);
+                //await _userApplication.CriarAcessoInicial(colaboradorId, unidadeSigla, unidade.id);
 
             }
             else
@@ -140,8 +140,13 @@ namespace Invictus.Api.Controllers
 
 
             var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
-            await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
+            try
+            {
+                await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
+            }catch(Exception ex)
+            {
 
+            }
             return NoContent();
         }
 

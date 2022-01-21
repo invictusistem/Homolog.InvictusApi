@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Interfaces;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.AlunoAggregate.Interface;
 using Invictus.Dtos.AdmDtos;
@@ -13,11 +14,13 @@ namespace Invictus.Application.AdmApplication
         private readonly IMapper _mapper;
         private readonly IAlunoRepo _alunoRepo;
         private readonly IUnidadeQueries _unidadeQueries;
-        public AlunoApplication(IMapper mapper, IAlunoRepo alunoRepo, IUnidadeQueries unidadeQueries)
+        private readonly IAspNetUser _aspNetUser;
+        public AlunoApplication(IMapper mapper, IAlunoRepo alunoRepo, IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser)
         {
             _mapper = mapper;
             _alunoRepo = alunoRepo;
             _unidadeQueries = unidadeQueries;
+            _aspNetUser = aspNetUser;
         }
 
         public async Task EditAluno(AlunoDto editedAluno)
@@ -35,6 +38,9 @@ namespace Invictus.Application.AdmApplication
             newAluno.unidadeId = unidade.id;
 
             var aluno = _mapper.Map<Aluno>(newAluno);
+
+            var colaboradorId =  _aspNetUser.ObterUsuarioId();
+            aluno.SetColaboradorResponsavelPeloCadastro(colaboradorId);
 
             aluno.SetDataCadastro();
             

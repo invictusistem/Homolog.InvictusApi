@@ -164,7 +164,7 @@ namespace Invictus.Application.AdmApplication
 
                     var retorno = response.Content.ReadAsStringAsync().Result;
 
-                    
+
 
                     //var boletoLog = new LogBoletos(Guid.NewGuid(), retorno, DateTime.Now);
 
@@ -172,7 +172,10 @@ namespace Invictus.Application.AdmApplication
 
                     //_db.SaveChanges();
 
-                    boletosResponse.Add(JsonSerializer.Deserialize<BoletoLoteResponse>(retorno));
+                    var boletoResp = JsonSerializer.Deserialize<BoletoLoteResponse>(retorno);
+                    boletoResp.vencimento = boletos[i].vencimento;
+
+                    boletosResponse.Add(boletoResp);
 
                     _logger.LogInformation($"Boleto {i + 1} create at {DateTime.UtcNow.TimeOfDay}");
 

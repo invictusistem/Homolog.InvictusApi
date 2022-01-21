@@ -260,8 +260,12 @@ namespace Invictus.Api.Controllers
 
             //}
 
+            var colaborador = await _colaboradorQueries.GetColaboradoresByEmail(user.Email);
 
-            claims.Add(new Claim("Nome", user.UserName));
+            var primeiroNome = colaborador.nome.Split(" ");
+
+            claims.Add(new Claim("UnidadeId", siglaUnidade.id.ToString()));
+            claims.Add(new Claim("Nome", primeiroNome[0]));
 
             var autorizacoes = await GetAutorizacoes(user.Email);
 
@@ -269,7 +273,7 @@ namespace Invictus.Api.Controllers
 
             claims.Add(new Claim("UnidadesAutorizadas", autorizacoesSerialize));
 
-            var colaborador = await _colaboradorQueries.GetColaboradoresByEmail(user.Email);
+            
 
             claims.Add(new Claim("usuarioId", colaborador.id.ToString()));
 

@@ -68,6 +68,11 @@ namespace Invictus.Domain.Financeiro
             SubConta = subConta;
         }
 
+        public void SetHistorico(string historico)
+        {
+            Historico = historico;
+        }
+
         #region EF
         
         public Boleto() { }

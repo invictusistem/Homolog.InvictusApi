@@ -23,5 +23,7 @@ namespace Invictus.Dtos.Financeiro
         public string banco_numero { get; set; }
         public string token_facilitador { get; set; }
         public string credencial { get; set; }
+        [JsonIgnore]
+        public DateTime vencimento { get; set; }
     }
 }
