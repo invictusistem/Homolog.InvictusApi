@@ -49,14 +49,22 @@ namespace Invictus.QueryService.Utilitarios
             }
 
             if (!String.IsNullOrEmpty(email))
-            {
+            {   
+
                 var query = @"select alunos.email from alunos where alunos.email = @email";
+                var query2 = @"select colaboradores.email from colaboradores where colaboradores.email = @email";
+                var query3 = @"select professores.email from professores where professores.email = @email";
+                // var query4 = @"select fornecedores.email from fornecedores where fornecedores.email = @email";
                 await using (var connection = new SqlConnection(
                         _config.GetConnectionString("InvictusConnection")))
                 {
                     connection.Open();
                     var result = await connection.QueryAsync<string>(query, new { email = email });
-                    if (result.Count() > 0) _inconsistencies.Add("Já existe aluno com o E-mail cadastrado.");
+                    var result2 = await connection.QueryAsync<string>(query2, new { email = email });
+                    var result3 = await connection.QueryAsync<string>(query3, new { email = email });
+                    // var result4 = await connection.QueryAsync<string>(query4, new { email = email });
+
+                    if (result.Count() > 0 || result2.Count() > 0 || result3.Count() > 0) _inconsistencies.Add("Por favor, escolha outro e-mail.");
                 }
             }
 

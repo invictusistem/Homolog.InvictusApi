@@ -14,6 +14,7 @@ using Invictus.Data.Mapping.AdmMappings.ProfessorMapping;
 using Invictus.Data.Mapping.AdmMappings.ResponsavelMapping;
 using Invictus.Data.Mapping.AdmMappings.TurmaAggregateMapping;
 using Invictus.Data.Mapping.AdmMappings.UnidadeMapping;
+using Invictus.Domain.Administrativo.Logs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Invictus.Data.Mapping.AdmMappings
@@ -36,6 +37,8 @@ namespace Invictus.Data.Mapping.AdmMappings
             modelBuilder.ApplyConfiguration(new MatriculaDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentaoExigenciaDbMapping());
             modelBuilder.ApplyConfiguration(new LogBoletoDbMapping());
+            modelBuilder.ApplyConfiguration(new LogLoginDbMapping());
+            modelBuilder.ApplyConfiguration(new LogMatriculasDbMapping());
             modelBuilder.ApplyConfiguration(new MateriaDbMapping());
             modelBuilder.ApplyConfiguration(new PacoteDbMapping());
             modelBuilder.ApplyConfiguration(new ParametrosKeyDbMapping());

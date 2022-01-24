@@ -3,6 +3,7 @@ using DinkToPdf.Contracts;
 using Invictus.Api.Helpers;
 using Invictus.Api.HuSignalR;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.ReportService.Interfaces;
 using Invictus.BackgroundTasks;
 using Invictus.Core.Enums;
 using Invictus.Data.Context;
@@ -31,6 +32,7 @@ namespace Invictus.Api.Controllers
         public UserManager<IdentityUser> UserManager { get; set; }
         private IHubContext<ChartHub> _hub;
         private readonly IRelatorioApp _relatorioApp;
+        private readonly IPDFDesigns _pdfDesign;
         public RoleManager<IdentityRole> RoleManager { get; set; }
         private IConverter _converter;
         private readonly ITemplate _template;
@@ -45,14 +47,12 @@ namespace Invictus.Api.Controllers
            BackgroundWorkerQueue backgroundWorkerQueue,
            ILogger<TestController> logger,
             IServiceScopeFactory serviceScopeFactory,
-            // IHostedService demoService,
-            //IBackgroundTaskQueue backgroundTaskQueue,
-
             InvictusDbContext db,
             ITemplate template,
             UserManager<IdentityUser> userMgr,
             IConverter converter,
-            RoleManager<IdentityRole> roleMgr)
+            RoleManager<IdentityRole> roleMgr,
+            IPDFDesigns pdfDesign)
         {
             _relatorioApp = relatorioApp;
             _hub = hub;
@@ -64,8 +64,40 @@ namespace Invictus.Api.Controllers
             _backgroundWorkerQueue = backgroundWorkerQueue;
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
-            // _demoService = demoService;
-            //_backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
+            _pdfDesign = pdfDesign;
+        }
+
+        [HttpGet]
+        [Route("pendencia")]
+        public IActionResult GetPendencia()
+        {
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PDF Report"
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = _pdfDesign.GetPendenciaDocs(""),//
+                WebSettings = { DefaultEncoding = "utf-8"},
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
+            };
+
+
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            var file = _converter.Convert(pdf);
+
+
+            return File(file, "application/pdf");
 
         }
 

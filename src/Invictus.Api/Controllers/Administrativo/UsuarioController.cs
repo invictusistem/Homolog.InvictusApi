@@ -28,9 +28,10 @@ namespace Invictus.Api.Controllers
         private readonly IAspNetUser _aspUser;
         private readonly IEmailSender _email;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
         public UsuarioController(IColaboradorQueries colaboradorQueries, UserManager<IdentityUser> userManager, IAspNetUser aspUser,
             IEmailSender email, IUsuariosQueries userQueries,
-            IUsuarioApplication userApplication, IUnidadeQueries unidadeQueries)
+            IUsuarioApplication userApplication, IUnidadeQueries unidadeQueries, SignInManager<IdentityUser> signInManager)
         {
             _colaboradorQueries = colaboradorQueries;
             _userManager = userManager;
@@ -39,6 +40,7 @@ namespace Invictus.Api.Controllers
             _userQueries = userQueries;
             _userApplication = userApplication;
             _unidadeQueries = unidadeQueries;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -139,15 +141,70 @@ namespace Invictus.Api.Controllers
 
 
 
-            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha+"<br> :)";
+            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + colaborador.email + "<br>Senha: " + senha + "<br> :)";
             try
             {
                 await _email.SendEmailAsync(colaborador.email, "Invictus Login", mensagem);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
             return NoContent();
+        }
+
+        [HttpPut]
+        [Route("aluno-acesso/{email}/{acesso}")]
+        public async Task<ActionResult> EditarAcessoAluno(string email, bool acesso)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            var claims = await _userManager.GetClaimsAsync(user);
+
+            var claim = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
+
+            await _userManager.RemoveClaimAsync(user, claim);
+
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", acesso.ToString()));
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("envio-acesso/{email}")]
+        public async Task<IActionResult> changePassword(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var senha = GenerateRandomPassword();  
+
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, senha);
+
+            var resultado = await _userManager.UpdateAsync(user);
+            if (!resultado.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + user.UserName + "<br>Senha: " + senha + "<br> :)";
+            try
+            {
+                await _email.SendEmailAsync(user.Email, "Invictus Login", mensagem);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+
+            return Ok();
+            
         }
 
         [HttpPut]
@@ -219,10 +276,10 @@ namespace Invictus.Api.Controllers
             {
                 RequiredLength = 8,
                 //RequiredUniqueChars = 4,
-              //  RequireDigit = false,
+                //  RequireDigit = false,
                 RequireLowercase = true,
                 RequireUppercase = true,
-              //  RequireNonAlphanumeric = true,
+                //  RequireNonAlphanumeric = true,
 
             };
 

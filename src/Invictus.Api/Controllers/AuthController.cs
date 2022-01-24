@@ -1,5 +1,7 @@
 ﻿using Invictus.Api.Configurations;
 using Invictus.Api.Helpers;
+using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Dtos;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.Identity;
@@ -31,12 +33,14 @@ namespace Invictus.Api.Controllers
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly IColaboradorQueries _colaboradorQueries;
         private readonly IAutorizacaoQueries _autorizacoesQueries;
+        private readonly InvictusDbContext _db;
         public AuthController(SignInManager<IdentityUser> signInManager,
                             UserManager<IdentityUser> userManager,
                             IOptions<AppSettings> appSettings,
                             IUnidadeQueries unidadeQueries,
                             IAutorizacaoQueries autorizacoesQueries,
-                            IColaboradorQueries colaboradorQueries)
+                            IColaboradorQueries colaboradorQueries,
+                            InvictusDbContext db)
         {
             _colaboradorQueries = colaboradorQueries;
             _signInManager = signInManager;
@@ -44,6 +48,7 @@ namespace Invictus.Api.Controllers
             _appSettings = appSettings.Value;
             _unidadeQueries = unidadeQueries;
             _autorizacoesQueries = autorizacoesQueries;
+            _db = db;
         }
 
         [HttpPost("registrar")]
@@ -118,6 +123,13 @@ namespace Invictus.Api.Controllers
                  trazer a lista de claims, excluindo a que foi SLELECIONADA
                 entao pegar, dar um FORECH CASO o resultado seja maior que 0
                  */
+
+                //var role = userRoles.Where()
+
+                if(userRoles[0] == "Aluno")
+                {
+                    return BadRequest();
+                }
 
                 var ativo = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
 
@@ -240,6 +252,11 @@ namespace Invictus.Api.Controllers
             var claims = await _userManager.GetClaimsAsync(user);
             var userRoles = await _userManager.GetRolesAsync(user);
 
+            if(userRoles[0] == "Aluno")
+            {
+                throw new NotImplementedException();
+            }
+
             var siglaUnidade = await _unidadeQueries.GetUnidadeById(unidadeId);   //"ALC";
             /*
              trazer a lista de claims, excluindo a que foi SLELECIONADA
@@ -325,6 +342,18 @@ namespace Invictus.Api.Controllers
                     Claims = claims.Select(c => new UserClaim { Type = c.Type, Value = c.Value })
                 }
             };
+            // log login
+
+            var logLogin = new LogLogin(colaborador.id,colaborador.email, DateTime.Now);
+            await _db.AddAsync(logLogin);
+            try
+            {
+                _db.SaveChanges();
+
+            }catch(Exception ex)
+            {
+
+            }
 
             return response;
         }

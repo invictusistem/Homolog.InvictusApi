@@ -40,7 +40,12 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
         public Guid BolsaId { get; private set; }
         public string Ciencia { get; private set; }
         public Guid CienciaAlunodId { get; private set; }
+        public bool MatriculaConfirmada { get; private set; }
 
+        public void SetConfirmacaoMatricula(bool confirmada)
+        {
+            MatriculaConfirmada = confirmada;
+        }
 
         public void SetStatus(string status)
         {
@@ -81,13 +86,14 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
             DiaMatricula = DateTime.Now;
         }
 
-        public void SetNumeroMatricula(int totalAlunosMatriculados)
+        public string SetNumeroMatricula(int totalAlunosMatriculados)
         {
+            var anoAtual = DateTime.Now.Year;
             var atual = totalAlunosMatriculados + 1;
             var totalChars = 8;
             var totalLength = Convert.ToString(atual).Length;
 
-            string matr = "";
+            string matr = anoAtual.ToString();
             for (int i = 0; i < totalChars - totalLength; i++)
             {
                 matr += "0";
@@ -96,6 +102,8 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
             matr += Convert.ToString(atual);
 
             NumeroMatricula = matr;
+
+            return NumeroMatricula;
 
         }
 

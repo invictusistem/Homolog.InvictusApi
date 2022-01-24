@@ -12,9 +12,12 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     public interface IAlunoQueries
     {
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosView(int itemsPerPage, int currentPage, string paramsJson);
+        Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetSomenteMatriculadosView(int itemsPerPage, int currentPage, string paramsJson);
         Task<IEnumerable<AlunoDto>> FindAlunoByCPForEmailorRG(string cpf, string rg, string email);
         Task<IEnumerable<AlunoDto>> SearchPerCPF(string cpf);
         Task<DateTime> GetIdadeAluno(Guid alunoId);
         Task<AlunoDto> GetAlunoById(Guid alunoId);
+
+        Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId);
     }
 }

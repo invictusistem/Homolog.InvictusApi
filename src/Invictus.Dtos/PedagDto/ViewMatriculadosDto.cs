@@ -12,9 +12,17 @@ namespace Invictus.Dtos.PedagDto
         public string numeroMatricula { get; set; }
         public string cpf { get; set; }
         public string rg { get; set; }
+        public string email { get; set; }
         public string nome { get; set; }
         public Guid matriculaId { get; set; }
+        public DateTime nascimento { get; set; }
+        public DateTime dataCadastro { get; set; }
         public string sigla { get; set; }
         public bool ativo { get; set; }
+        public bool acessoSistema { get; set; }
+        public bool MatriculaConfirmada { get; set; }
+        public string turmaDescricao { get; set; }
+        public string turmaIdentificador { get; set; }
+
     }
 }

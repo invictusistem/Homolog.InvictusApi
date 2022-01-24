@@ -1,4 +1,5 @@
-﻿using Invictus.Domain.Administrativo.ContratoAggregate;
+﻿using Invictus.Application.ReportService.Interfaces;
+using Invictus.Domain.Administrativo.ContratoAggregate;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,7 @@ using System.Threading.Tasks;
 
 namespace Invictus.Application.ReportService
 {
-    public interface IPDFDesigns
-    {
-        string GetHTMLString();
-        string GetContratoHTMLString(List<Conteudo> conteudos);
-    }
+    
     public class PDFDesigns : IPDFDesigns
     {
         private IWebHostEnvironment _webHostEnvironment;
@@ -238,6 +235,55 @@ namespace Invictus.Application.ReportService
 
 
             return sb.ToString();
+        }
+
+        public string GetPendenciaDocs(string nomeCompleto)
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "logo4a.png");//_webHostEnvironment.WebRootPath + "\\logo4a.png";
+            //htmlDoc.AppendLine($"<img src=\"{path}\" />");
+            //htmlDoc.AppendLine("</td>");
+            var sb = new StringBuilder();
+            sb.AppendLine(@"<html><head></head><body>");
+            sb.AppendLine(@"
+<div style='position: relative;'>
+
+   
+    <div style='font-size: 1.2em; font-weight: 600; text-align: center; vertical-align: middle;' >TERMO DE PENDÊNCIA DE DOCUMENTOS</div>
+
+
+               <br>
+           
+               <div style='margin-top: 50px;' >
+                Eu, "+ nomeCompleto + @", matriculado(a) no curso de Enfermagem, nesta Instituição de Ensino, declaro estar ciente da Pendência dos documentos abaixo para regularização da minha matrícula e me responsabilizo pela entrega dos mesmos no prazo de 45 dias.
+          </div>
+          
+              <br>
+          
+                  <div> DOCUMENTOS PENDENTES:</div>
+             
+                     <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX RG</div>
+        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CPF</div>
+        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CERTIDÃO NASCIMENTO OU CASAMENTO</div>
+        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX COREN</div>
+        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) OUTROS _______________________________________________________</div>
+        
+
+</div>"
+                          );
+
+            sb.AppendLine(@"<br><br><br><br><br><br><br>
+
+<div style='text-align: center;' > ____________________________________________________________<br>
+             <div style='font-weight: bold;' >" + nomeCompleto + @"</div><div style='font-weight: bold;' >CPF:</div></div>
+    
+
+        </div>");
+
+            sb.AppendLine(@" </body></html>");
+
+            return sb.ToString();
+
+
         }
     }
 }

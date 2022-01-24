@@ -1,5 +1,6 @@
 ﻿
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.ReportService.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,10 +18,12 @@ namespace Invictus.Api.Controllers.Pedagogico
     {
         private readonly IPedagDocApp _pedagDocApp;
         private readonly IPedagDocsQueries _pedagDocQueries;
-        public PedagDocController(IPedagDocApp pedagDocApp, IPedagDocsQueries pedagDocQueries)
+        private readonly IReportServices _reportService;
+        public PedagDocController(IPedagDocApp pedagDocApp, IPedagDocsQueries pedagDocQueries, IReportServices reportService)
         {
             _pedagDocApp = pedagDocApp;
             _pedagDocQueries = pedagDocQueries;
+            _reportService = reportService;
         }
 
         [HttpGet]
@@ -57,6 +60,17 @@ namespace Invictus.Api.Controllers.Pedagogico
             var memory = new MemoryStream(doc.dataFile);
 
             return File(memory, doc.contentArquivo, doc.nome);
+        }
+
+        [HttpGet]
+        [Route("getpendencia/{matriculaId}")]
+        public async Task<ActionResult> GetPendencia(Guid matriculaId)
+        {
+            var doc = await _reportService.GeneratePendenciaDocs(matriculaId);
+
+            var memory = new MemoryStream(doc);
+
+            return File(memory, "application/pdf", "lista_pendencia.pdf");
         }
 
         [HttpGet]

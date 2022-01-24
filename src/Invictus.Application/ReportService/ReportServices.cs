@@ -15,10 +15,15 @@ namespace Invictus.Application.ReportService
     {
         private IConverter _converter;
         private readonly IContratoQueries _contratoQueries;
-        public ReportServices(IConverter converter, IContratoQueries contratoQueries)
+        private readonly IAlunoQueries _alunoQueries;
+        private readonly IPDFDesigns _pdfDesign;
+        public ReportServices(IConverter converter, IContratoQueries contratoQueries, IAlunoQueries alunoQueries,
+            IPDFDesigns pdfDesign)
         {
             _converter = converter;
             _contratoQueries = contratoQueries;
+            _alunoQueries = alunoQueries;
+            _pdfDesign = pdfDesign;
         }
         public async Task<byte[]> GenerateContrato(GenerateContratoDTO info, Guid typePacoteId)
         {
@@ -74,6 +79,40 @@ namespace Invictus.Application.ReportService
             };
 
             
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            var file = _converter.Convert(pdf);
+
+
+
+            return file;// File(file, "application/pdf");
+        }
+
+        public async Task<byte[]> GeneratePendenciaDocs(Guid matriculaId)
+        {
+            var aluno = await _alunoQueries.GetAlunoByMatriculaId(matriculaId);
+
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PDF Report"
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = _pdfDesign.GetPendenciaDocs(aluno.nome),//
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
+            };
+
+
             var pdf = new HtmlToPdfDocument()
             {
                 GlobalSettings = globalSettings,

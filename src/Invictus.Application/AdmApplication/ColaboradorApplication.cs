@@ -29,7 +29,7 @@ namespace Invictus.Application.AdmApplication
             var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(editedColaborador);
 
             colaborador.TratarEmail(colaborador.Email);
-
+            // if ativo = false, colocar a claim como false tb
             await _colaboradorRepo.EditColaborador(colaborador);
 
             _colaboradorRepo.Commit();

@@ -145,7 +145,7 @@ WHERE Alunos.nome = 'Mario Gomes'
         {
 
             StringBuilder query = new StringBuilder();
-            query.Append("select alunos.id, matriculas.numeromatricula, alunos.cpf, alunos.rg, alunos.nome, alunos.ativo, matriculas.id as matriculaId, unidades.sigla ");
+            query.Append("select alunos.id, matriculas.numeromatricula, alunos.cpf, alunos.rg, alunos.nascimento, alunos.dataCadastro, alunos.nome, alunos.ativo, matriculas.id as matriculaId, unidades.sigla ");
             query.Append("from alunos full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
             if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
             if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
@@ -236,6 +236,115 @@ WHERE Alunos.nome = 'Mario Gomes'
 
                 return results;
 
+            }
+        }
+
+        public async Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId)
+        {
+            var query = @"select* from alunos Where alunos.id = (
+                        select matriculas.alunoId from matriculas where matriculas.id = @matriculaId 
+                        )";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QuerySingleAsync<AlunoDto>(query, new { matriculaId = matriculaId });
+
+                connection.Close();
+
+                return results;
+
+            }
+        }
+
+        public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetSomenteMatriculadosView(int itemsPerPage, int currentPage, string paramsJson)
+        {
+            var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+            var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
+
+            var alunos = await GetMatriculadosByFilter(itemsPerPage, currentPage, param, unidade.id);
+
+            var alunosCount = await CountMatriculadosByFilter(itemsPerPage, currentPage, param, unidade.id);
+
+            var paginatedItems = new PaginatedItemsViewModel<ViewMatriculadosDto>(currentPage, itemsPerPage, alunosCount, alunos.ToList());
+
+            return paginatedItems;
+        }
+
+        private async Task<int> CountMatriculadosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("select Count(*) ");
+            queryCount.Append("from Matriculas left join alunos on Matriculas.AlunoId = Alunos.Id left join Unidades on alunos.UnidadeId = Unidades.Id where ");
+            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Alunos.Ativo = 'True' "); } else { queryCount.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString());
+
+                connection.Close();
+
+                return countItems;
+
+            }
+        }
+
+        public async Task<IEnumerable<ViewMatriculadosDto>> GetMatriculadosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"select 
+                        alunos.nome, 
+                        alunos.CPF, 
+                        alunos.email,
+                        matriculas.NumeroMatricula,
+                        matriculas.id as matriculaId, 
+                        Matriculas.MatriculaConfirmada,
+                        Turmas.Descricao as turmaDescricao,
+                        turmas.Identificador as turmaIdentificador, 
+                        Unidades.Sigla, 
+                        AspNetUserClaims.claimValue as acessoSistema ");
+
+            query.Append(@"from Matriculas 
+                        left join alunos on Matriculas.AlunoId = Alunos.Id 
+                        left join Turmas on Matriculas.turmaId = Turmas.id 
+                        left join Unidades on alunos.UnidadeId = Unidades.Id 
+                        left join AspNetUsers on Alunos.Email = AspNetUsers.Email
+                        left join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId where  ");
+
+            query.Append(" AspNetUserClaims.ClaimType = 'IsActive' AND ");
+            if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Alunos.Ativo = 'True' "); } else { query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
+            query.Append(" ORDER BY Alunos.Nome ");
+            query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<ViewMatriculadosDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+
+                if (results.Count() > 0)
+                    results = BindCPF(results.ToList());
+
+                connection.Close();
+
+                return results;
             }
         }
     }

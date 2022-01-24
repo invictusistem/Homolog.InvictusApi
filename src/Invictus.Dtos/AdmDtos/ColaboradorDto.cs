@@ -22,7 +22,7 @@ namespace Invictus.Dtos.AdmDtos
         public Guid unidadeId { get; set; }
         public string numero { get; set; }
         //public string perfil { get; set; }
-       // public bool perfilAtivo { get; set; }
+        // public bool perfilAtivo { get; set; }
         public bool ativo { get; set; }
         public string cep { get; set; }
         public string logradouro { get; set; }
@@ -30,5 +30,7 @@ namespace Invictus.Dtos.AdmDtos
         public string bairro { get; set; }
         public string cidade { get; set; }
         public string uf { get; set; }
+        public DateTime dataCriacao { get; set; }
+       // public string qualquerCoisa { get; set; }
     }
 }

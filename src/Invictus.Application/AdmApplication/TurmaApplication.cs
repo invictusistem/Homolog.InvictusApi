@@ -90,17 +90,17 @@ namespace Invictus.Application.AdmApplication
 
 
             // pegar feriados
-            var feriadosValues = await _paramQueries.GetParamValue("Feriados");
-            var feriados = new List<DateTime>();
-            foreach (var item in feriadosValues)
-            {
-                var data = item.value.Split("/");
-                var dia = Convert.ToInt32(data[0]);
-                var mes = Convert.ToInt32(data[1]);
+           // var feriadosValues = await _paramQueries.GetParamValue("Feriados");
+           // var feriados = new List<DateTime>();
+            //foreach (var item in feriadosValues)
+            //{
+            //    var data = item.value.Split("/");
+            //    var dia = Convert.ToInt32(data[0]);
+            //    var mes = Convert.ToInt32(data[1]);
 
-                feriados.Add(new DateTime(1900, mes, dia));
+            //    feriados.Add(new DateTime(1900, mes, dia));
 
-            }
+            //}
 
             
 
@@ -128,10 +128,10 @@ namespace Invictus.Application.AdmApplication
                 i++;
             }
 
-            foreach (var item in feriados)
-            {
-                calendarios.RemoveAll(c => c.DiaAula.Day == item.Day & c.DiaAula.Month == item.Month);
-            }
+            //foreach (var item in feriados)
+            //{
+            //    calendarios.RemoveAll(c => c.DiaAula.Day == item.Day & c.DiaAula.Month == item.Month);
+            //}
             
 
             var pacotesMaterias = await _pacoteQueries.GetMateriasPacote(command.pacoteId);

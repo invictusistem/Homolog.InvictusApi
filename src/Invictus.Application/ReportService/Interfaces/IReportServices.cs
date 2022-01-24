@@ -10,5 +10,6 @@ namespace Invictus.Application.ReportService.Interfaces
     {
         Task<byte[]> GenerateFichaMatricula(GenerateFichaMatriculaDTO infos);
         Task<byte[]> GenerateContrato(GenerateContratoDTO info, Guid typePacoteId);
+        Task<byte[]> GeneratePendenciaDocs(Guid matriculaId);
     }
 }

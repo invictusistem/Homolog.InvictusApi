@@ -262,6 +262,10 @@ namespace Invictus.QueryService.AdministrativoQueries
             var query = @"select * from Turmas inner join TurmasPrevisoes on turmas.id = TurmasPrevisoes.turmaid 
                         where Turmas.id = @turmaId ";
 
+            var query2 = @"SELECT COUNT(*) FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
+
+            var query3 = @" SELECT UnidadesSalas.Capacidade FROM UnidadesSalas WHERE UnidadesSalas.Id = @salaId ";
+
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
@@ -277,6 +281,12 @@ namespace Invictus.QueryService.AdministrativoQueries
                         splitOn: "Id");
 
                 connection.Close();
+
+                foreach (var turma in results)
+                {
+                    turma.totalAlunos = await connection.QuerySingleAsync<int>(query2, new { turmaId = turma.id });
+                    turma.vagas = await connection.QuerySingleAsync<int>(query3, new { salaId = turma.salaId });
+                }
 
                 return results;//.OrderBy(d => d.prevInicio);
 
@@ -525,6 +535,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Turmas.TotalAlunos, 
                         Turmas.PrevisaoInfo, 
                         Turmas.PrevisaoAtual, 
+                        Turmas.minimoAlunos, 
                         Turmas.PrevisaoTerminoAtual, 
                         UnidadesSalas.Capacidade as Vagas 
                         From Turmas 
@@ -532,12 +543,22 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Where Turmas.UnidadeId = @unidadeId   
                         Order BY Turmas.Identificador ";
 
+            string query2 = @"SELECT COUNT(*) FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
+
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
                 var results = await connection.QueryAsync<TurmaViewModel>(query, new { unidadeId = unidadeId });
+
+                if (results.Any())
+                {
+                    foreach (var turma in results)
+                    {
+                        turma.totalAlunos = await connection.QuerySingleAsync<int>(query2, new { turmaId = turma.id });
+                    }
+                }
 
                 connection.Close();
 

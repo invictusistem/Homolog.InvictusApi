@@ -39,6 +39,18 @@ namespace Invictus.Api.Controllers.Administrativo
         }
 
         [HttpGet]
+        [Route("matriculados")]
+        public async Task<IActionResult> GetMatriculadosByFilter([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        {
+            // TODO? trazer unidade tb
+            var results = await _alunoQueries.GetSomenteMatriculadosView(itemsPerPage, currentPage, paramsJson);
+
+            if (results.Data.Count() == 0) return NotFound();
+
+            return Ok(results);
+        }
+
+        [HttpGet]
         [Route("{cpf}")]
         public async Task<IActionResult> PesquisarAluno(string cpf)
         {

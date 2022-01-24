@@ -23,12 +23,15 @@ using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Domain.Pedagogico.Responsaveis.Interfaces;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Invictus.Application.AdmApplication
@@ -54,6 +57,7 @@ namespace Invictus.Application.AdmApplication
         private readonly IReportServices _reportService;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly ILogger<MatriculaApplication> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly BackgroundWorkerQueue _backgroundWorkerQueue;
         private readonly InvictusDbContext _db;
         private Guid _turmaId;
@@ -68,12 +72,13 @@ namespace Invictus.Application.AdmApplication
         private Turma _turma;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         public int _qntBolatos;
+        public string _numeroMatricula;
         public MatriculaApplication(IPlanoPagamentoQueries planoQueries, IAlunoQueries alunoQueries, ITurmaQueries turmaQueries, IMapper mapper,
             IPacoteQueries pacoteQueries, ITurmaRepo turmaRepo, IMatriculaRepo matRepo, IAlunoRepo alunoRepo, ITurmaNotasRepo turmaNotasRepo,
             IMatriculaQueries matQueries, IRespRepo respRepo, IAspNetUser aspNetUser, IAlunoPedagRepo alunoPedagRepo,
             IBoletoService boletoService, IDebitosRepos debitoRepos, BackgroundWorkerQueue backgroundWorkerQueue, ILogger<MatriculaApplication> logger,
             InvictusDbContext db, IServiceScopeFactory serviceScopeFactory, IColaboradorQueries colabQueries,
-            IReportServices reportService, IUnidadeQueries unidadeQueries)
+            IReportServices reportService, IUnidadeQueries unidadeQueries, UserManager<IdentityUser> userManager)
         {
             _colabQueries = colabQueries;
             _planoQueries = planoQueries;
@@ -107,12 +112,19 @@ namespace Invictus.Application.AdmApplication
             _logger = logger;
             _db = db;
             _serviceScopeFactory = serviceScopeFactory;
+            _userManager = userManager;
         }
 
         public void AddParams(Guid turmaId, Guid alunoId, MatriculaCommand command) { _turmaId = turmaId; _alunoId = alunoId; _command = command; }
 
         public async Task<Guid> Matricular()
         {
+
+            // verificar confirmação matrícula
+            // acima, gerr apenas a primeira parcela
+            // paa a primeira, gerar as demais parcela
+
+
             await VerificarResponsaveis();
 
             await AdicionarAlunoNaTurma();
@@ -152,8 +164,11 @@ namespace Invictus.Application.AdmApplication
             await _turmaRepo.Edit(_turma);
             _matRepo.Commit();
 
+            await GenerateAlunoLogin();
+
             return _newMatriculaId;
         }
+        
 
         private async Task VerificarResponsaveis()
         {
@@ -184,19 +199,29 @@ namespace Invictus.Application.AdmApplication
         }
 
         private async Task CreateMatriculaDoAluno()
-        {    
+        {
+
+            var qntMatriculasNaBase = _db.LogMatriculas.Where(l => l.DataCriacao.Year == DateTime.Now.Year).Count();
+
+
+
             var aluno = await _alunoQueries.GetAlunoById(_alunoId);
             var status = SetMatriculaStatus(_command.plano.confirmacaoPagmMat);
             var newMatricula = new Matricula(_alunoId, aluno.nome, aluno.cpf, status, _turmaId);
             newMatricula.SetDiaMatricula();
-            var totalMatriculados = await _matQueries.TotalMatriculados();
-            newMatricula.SetNumeroMatricula(totalMatriculados);
+            // var totalMatriculados = await _matQueries.TotalMatriculados();
+            _numeroMatricula = newMatricula.SetNumeroMatricula(qntMatriculasNaBase);
             var colabId = _aspNetUser.ObterUsuarioId();
             newMatricula.SetColaboradorResponsavelMatricula(colabId);
             newMatricula.SetCiencia(_command.plano.ciencia, _command.plano.cienciaAlunoId);
             newMatricula.SetBolsaId(_command.plano.bolsaId);
+            newMatricula.SetConfirmacaoMatricula(!_command.plano.confirmacaoPagmMat);
+
             await _matRepo.Save(newMatricula);//  newMatricula.Repo
             _newMatriculaId = newMatricula.Id;
+            var commandJson = JsonConvert.SerializeObject(_command);
+            await _db.LogMatriculas.AddAsync(new LogMatriculas(_newMatriculaId, colabId, DateTime.Now, commandJson));
+            
         }
 
         private async Task CreatePlanoDePagamentoDoAluno()
@@ -504,6 +529,95 @@ namespace Invictus.Application.AdmApplication
             doc.SetDocClassificacao(ClassificacaoDoc.Outros);
 
             await _alunoRepo.SaveAlunoDoc(doc);
+        }
+
+        private async Task GenerateAlunoLogin()
+        {
+            //var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);// _context.Colaboradores.Find(id);
+            var aluno = await _alunoQueries.GetAlunoByMatriculaId(_newMatriculaId);
+
+            //var primeiroNome = colaborador.nome.Split(" ");
+
+
+            if (!String.IsNullOrEmpty(aluno.email))
+            {
+
+                var usuario = await _userManager.FindByEmailAsync(aluno.email);
+
+                if (usuario == null)
+                {
+                    var user = new IdentityUser
+                    {
+                        UserName = _numeroMatricula,
+                        Email = aluno.email,
+                        EmailConfirmed = true
+                    };
+
+                    var senha = GenerateRandomPassword();
+
+                    var result = await _userManager.CreateAsync(user, senha);
+
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(user, "Aluno");
+                        await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", false.ToString()));
+                    }
+
+                }
+
+
+            }
+
+        }
+
+        private string GenerateRandomPassword(PasswordOptions opts = null)
+        {
+            if (opts == null) opts = new PasswordOptions()
+            {
+                RequiredLength = 8,
+                //RequiredUniqueChars = 4,
+                //  RequireDigit = false,
+                RequireLowercase = true,
+                RequireUppercase = true,
+                //  RequireNonAlphanumeric = true,
+
+            };
+
+            string[] randomChars = new[] {
+            "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
+            "abcdefghijkmnopqrstuvwxyz",    // lowercase
+            "0123456789",                   // digits
+            "!@$?_-"                        // non-alphanumeric
+        };
+
+            Random rand = new Random(Environment.TickCount);
+            List<char> chars = new List<char>();
+
+            if (opts.RequireUppercase)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[0][rand.Next(0, randomChars[0].Length)]);
+
+            if (opts.RequireLowercase)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[1][rand.Next(0, randomChars[1].Length)]);
+
+            if (opts.RequireDigit)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[2][rand.Next(0, randomChars[2].Length)]);
+
+            if (opts.RequireNonAlphanumeric)
+                chars.Insert(rand.Next(0, chars.Count),
+                    randomChars[3][rand.Next(0, randomChars[3].Length)]);
+
+            for (int i = chars.Count; i < opts.RequiredLength
+                || chars.Distinct().Count() < opts.RequiredUniqueChars; i++)
+            {
+                string rcs = randomChars[rand.Next(0, randomChars.Length)];
+                chars.Insert(rand.Next(0, chars.Count),
+                    rcs[rand.Next(0, rcs.Length)]);
+            }
+
+            return new string(chars.ToArray());
         }
     }
 }

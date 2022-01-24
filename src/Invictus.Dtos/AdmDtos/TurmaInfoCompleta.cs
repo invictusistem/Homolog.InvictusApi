@@ -23,6 +23,7 @@ namespace Invictus.Dtos.AdmDtos
         public string previsaoInfo { get; set; }
         public DateTime dataCriacao { get; set; }
         public PrevisoesDto previsoes { get; set; }
+        public int vagas { get; set; }
     }
 
     public class PrevisoesDto
