@@ -82,17 +82,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         private async Task<int> CountProfessoresByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
-            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
-
-            //StringBuilder query = new StringBuilder();
-            //query.Append("SELECT * from Professores where ");
-            //if (param.nome != "") query.Append("LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            //if (param.email != "") query.Append("AND LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            //if (param.cpf != "") query.Append("AND LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            //query.Append("AND Professores.UnidadeId = " + unidade.id);
-            //if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
-            //query.Append(" ORDER BY Professores.Nome ");
-            //query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());           
 
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append("SELECT Count(*) from Professores where ");
@@ -109,10 +99,6 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Open();
 
                 var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidade.id });
-
-                //var results = await connection.QueryAsync<ProfessorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
-
-                //var paginatedItems = new PaginatedItemsViewModel<ProfessorDto>(currentPage, itemsPerPage, countItems, results.ToList());
 
                 connection.Close();
 

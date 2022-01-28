@@ -18,6 +18,7 @@ using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Administrativo.UnidadeAuth;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
+using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
@@ -81,6 +82,7 @@ namespace Invictus.Data.Context
 
         public DbSet<Boleto> Boletos { get; set; }
         public DbSet<Bolsa> Bolsas { get; set; }
+        public DbSet<Fornecedor> Fornecedors { get; set; }
         public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
         
 

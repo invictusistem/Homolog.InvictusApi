@@ -14,6 +14,7 @@ namespace Invictus.Data.Mapping.FinanceiroMappings
             modelBuilder.ApplyConfiguration(new BoletoDbMapping());
             modelBuilder.ApplyConfiguration(new InformacaoDebitoDbMapping());
             modelBuilder.ApplyConfiguration(new BolsaDbMapping());
+            modelBuilder.ApplyConfiguration(new FornecedorDbMapping());
 
 
         }

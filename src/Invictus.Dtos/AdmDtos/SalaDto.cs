@@ -14,6 +14,7 @@ namespace Invictus.Dtos.AdmDtos
         public string comentarios { get; set; }
         public int capacidade { get; set; }
         public bool ativo { get; set; }
+        public DateTime dataCriacao { get; set; }
         public Guid unidadeId { get; set; }
     }
 }

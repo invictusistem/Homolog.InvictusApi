@@ -21,6 +21,7 @@ using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAggregate.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAuth.Interfaces;
 using Invictus.Domain.Financeiro.Bolsas.Interfaces;
+using Invictus.Domain.Financeiro.Fornecedores.Interfaces;
 using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Domain.Padagogico.AlunoAggregate.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
@@ -64,6 +65,7 @@ namespace Invictus.IoC
             services.AddScoped<IRespRepo, RespRepo>();
             // Financ
             services.AddScoped<IBolsaRepo, BolsaRepo>();
+            services.AddScoped<IFornecedorRepo, FornecedorRepo>();
             services.AddTransient<IDebitosRepos, InfoFinancRepo>();
 
 

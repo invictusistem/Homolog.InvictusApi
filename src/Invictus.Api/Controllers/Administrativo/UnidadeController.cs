@@ -39,7 +39,16 @@ namespace Invictus.Api.Controllers
             return Ok(new { unidades = unidades });
         }
 
-        
+        [HttpGet]
+        [Route("{unidadeId}")]
+        public async Task<IActionResult> GetUnidade(Guid unidadeId)
+        {
+            var unidade = await _unidadeQuery.GetUnidadeById(unidadeId);
+
+            return Ok(new { unidade = unidade });
+        }
+
+
         [HttpGet]
         [Route("salas/{unidadeId}")]
         public async Task<IActionResult> GetSalas(Guid unidadeId)

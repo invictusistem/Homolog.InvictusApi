@@ -44,6 +44,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IPDFDesigns, PDFDesigns>();
             // Financ
             services.AddScoped<IBolsasApp, BolsasApp>();
+            services.AddScoped<IFornecedorApp, FornecedorApp>();
         }
     }
 }
