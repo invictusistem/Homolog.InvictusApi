@@ -29,8 +29,7 @@ namespace Invictus.Api.Controllers.Administrativo
         [HttpGet]
         [Route("pesquisar")]
         public async Task<IActionResult> GetAlunoByFilter([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
-        {
-            // TODO? trazer unidade tb
+        {            
             var results = await _alunoQueries.GetMatriculadosView(itemsPerPage, currentPage, paramsJson);
 
             if (results.Data.Count() == 0) return NotFound();

@@ -57,14 +57,14 @@ namespace Invictus.Api.Controllers
         public async Task<IActionResult> SaveColaborador([FromBody] ColaboradorDto newColaborador)
         {
 
-            //var msg = await _utils.ValidaDocumentosColaborador(newColaborador.cpf, null, newColaborador.email);
-            //if (msg.Count() > 0) return Conflict(new { msg = msg });
+            var msg = await _utils.ValidaDocumentosColaborador(newColaborador.cpf, null, newColaborador.email);
+            if (msg.Count() > 0) return Conflict(new { msg = msg });
 
-            //await _colaboradorApplication.SaveColaborador(newColaborador);
+            await _colaboradorApplication.SaveColaborador(newColaborador);
 
-            //return NoContent();
+            return NoContent();
 
-            return BadRequest();
+            //return BadRequest();
         }
 
         [HttpPut]
