@@ -23,8 +23,10 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly ITurmaQueries _turmaQueries;
         private readonly ICalendarioQueries _calendarioQueries; 
         private readonly ITurmaPedagQueries _turmaPedagQueries;
+        private readonly IUnidadeQueries _unidadeQueries;
         public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries,
-            ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries, IPedagogicoApplication pedagApp)
+            ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries, IPedagogicoApplication pedagApp,
+            IUnidadeQueries unidadeQueries)
         {
             _profQueries = profQueries;
             _turmaApp = turmaApp;
@@ -32,6 +34,7 @@ namespace Invictus.Api.Controllers.Pedagogico
             _calendarioQueries = calendarioQueries;
             _turmaPedagQueries = turmaPedagQueries;
             _pedagApp = pedagApp;
+            _unidadeQueries = unidadeQueries;
         }
 
         [HttpGet]
@@ -52,6 +55,31 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             return Ok(new { calends = calends });
         }
+
+        [HttpGet]
+        [Route("aula/{calendarioId}")]
+        public async Task<ActionResult> GetCalendario(Guid calendarioId)
+        {
+            var aula = await _calendarioQueries.GetAulaViewModel(calendarioId);
+
+            return Ok(new { aula = aula });
+        }
+
+        [HttpGet]
+        [Route("aula-edit/{calendarioId}")]
+        public async Task<ActionResult> GetAulaEditViewModel(Guid calendarioId)
+        {
+            var aula = await _calendarioQueries.GetAulaViewModel(calendarioId);
+
+            var profsDisponiveis = await _profQueries.GetProfessoresDisponiveisByFilter(aula.diaDaSemana, aula.unidadeId, aula.materiaId);
+            
+            var materias = await _turmaQueries.GetMateriasDaTurma(aula.turmaId);
+
+            var salas = await _unidadeQueries.GetSalas(aula.unidadeId);
+
+            return Ok(new { aula = aula, profsDisponiveis = profsDisponiveis, materias = materias, salas = salas });
+        }
+
 
         [HttpGet]
         [Route("professores/{turmaId}")]

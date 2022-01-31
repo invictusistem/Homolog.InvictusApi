@@ -14,6 +14,7 @@ namespace Invictus.Dtos.PedagDto
         public string rg { get; set; }
         public string email { get; set; }
         public string nome { get; set; }
+        public string status { get; set; }
         public Guid matriculaId { get; set; }
         public DateTime nascimento { get; set; }
         public DateTime dataCadastro { get; set; }

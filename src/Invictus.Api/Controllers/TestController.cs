@@ -10,6 +10,7 @@ using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.PacoteAggregate;
+using Invictus.Domain.Administrativo.TurmaAggregate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -83,7 +84,7 @@ namespace Invictus.Api.Controllers
             {
                 PagesCount = true,
                 HtmlContent = _pdfDesign.GetPendenciaDocs(""),//
-                WebSettings = { DefaultEncoding = "utf-8"},
+                WebSettings = { DefaultEncoding = "utf-8" },
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
             };
@@ -131,7 +132,7 @@ namespace Invictus.Api.Controllers
                     Objects = { objectSettings }
                 };
                 var file = _converter.Convert(pdf);
-               
+
 
 
                 return File(file, "application/pdf");
@@ -146,7 +147,7 @@ namespace Invictus.Api.Controllers
             }
         }
 
-            [HttpGet]
+        [HttpGet]
         [Route("export-dk-pdf")]
         public IActionResult ExportPDF()
         {
@@ -207,7 +208,7 @@ namespace Invictus.Api.Controllers
 
 
                 return File(file, "application/pdf");
-                
+
 
 
 
@@ -242,18 +243,18 @@ namespace Invictus.Api.Controllers
             _db.Boletos.UpdateRange(boletos);
 
             _db.SaveChanges();
-          //  decimal valor1 = 0;
-          //  decimal valor2 = 45;
-          //  decimal valor3 = 35.5m;
+            //  decimal valor1 = 0;
+            //  decimal valor2 = 45;
+            //  decimal valor3 = 35.5m;
 
-          //  decimal valor4 = 35.5m;
-          //  NumberFormatInfo nfi = new System.Globalization.NumberFormatInfo();
-          //  nfi.NumberDecimalSeparator = ".";
-          ////  Console.Write(a.ToString(nfi));
-          //  string a = valor1.ToString(nfi);
-          //  string b = valor2.ToString(nfi);
-          //  string c = valor3.ToString(nfi);
-          //  string d = valor4.ToString(nfi);
+            //  decimal valor4 = 35.5m;
+            //  NumberFormatInfo nfi = new System.Globalization.NumberFormatInfo();
+            //  nfi.NumberDecimalSeparator = ".";
+            ////  Console.Write(a.ToString(nfi));
+            //  string a = valor1.ToString(nfi);
+            //  string b = valor2.ToString(nfi);
+            //  string c = valor3.ToString(nfi);
+            //  string d = valor4.ToString(nfi);
 
 
 
@@ -319,6 +320,34 @@ namespace Invictus.Api.Controllers
         [HttpGet]
         public IActionResult GetInfo()
         {
+
+
+            var turmasMaterias = _db.TurmasMaterias.Where(t => t.TurmaId == new Guid("3237628F-F130-459E-85F9-664FE75306CE")).ToList();
+            var turma = _db.Turmas.Where(t => t.Id == new Guid("3237628F-F130-459E-85F9-664FE75306CE")).FirstOrDefault();
+
+            var materiasdDoPacote = _db.Materias.Where(p => p.PacoteId == new Guid("3b1f2590-897f-4107-80fa-08d9af7ea64a")).ToList();
+
+            var turmasParaAddNaTurma = new List<TurmaMaterias>();
+
+            foreach (var mat in materiasdDoPacote)
+            {
+                var contem = turmasMaterias.Where(t => t.MateriaId == mat.Id).FirstOrDefault();
+
+                if (contem == null)
+                {
+                    var mats = new TurmaMaterias(mat.Nome, null, ModalidadeCurso.TryParse(mat.Modalidade), mat.CargaHoraria, true, new Guid("8E7B9DA4-783A-4EBA-B56E-A84C60AEADE1"),
+                        turma.Id, mat.Id);
+
+                    turmasParaAddNaTurma.Add(mats);
+                }
+            }
+
+            _db.TurmasMaterias.AddRange(turmasMaterias);
+
+            _db.SaveChanges();
+           
+
+            /*
             var pacoteDocs = _db.DocumentacoesExigencias.Where(d => d.PacoteId == new Guid("3b1f2590-897f-4107-80fa-08d9af7ea64a"));
 
             var aphEnfermagem = new Guid("08f55f62-cab5-4008-c364-08d9b478a235");
@@ -339,7 +368,7 @@ namespace Invictus.Api.Controllers
             _db.SaveChanges();
 
             var x = pacoteDocs;
-
+            */
             /*
             var colabList = new List<Colaborador>();
 

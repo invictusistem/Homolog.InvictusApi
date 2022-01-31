@@ -16,5 +16,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<UnidadeDto>> GetProfessoresUnidadesDisponiveis(Guid professorId);
         Task<IEnumerable<DisponibilidadeView>> GetProfessorDisponibilidade(Guid professorId);
         Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId);
+        Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId);
     }
 }

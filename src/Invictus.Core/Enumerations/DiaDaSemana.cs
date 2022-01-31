@@ -144,5 +144,46 @@ namespace Invictus.Core.Enumerations
 
             throw new NotImplementedException();
         }
+
+        public static string TryParsToDisponibilidadeTable(string day)
+        {
+            if (day == "Segunda-feira")
+            {
+                return "Segunda";
+
+            }
+            else if (day == "Terça-feira")
+            {
+                return "Terca";
+
+            }
+            else if (day == "Quarta-feira")
+            {
+                return "Quarta";
+
+            }
+            else if (day == "Quinta-feira")
+            {
+                return "Quinta";
+
+            }
+            else if (day == "Sexta-feira")
+            {
+                return "Sexta";
+
+            }
+            else if (day == "Sábado")
+            {
+                return "Sabado";
+
+            }
+            else if (day == "Domingo")
+            {
+                return "Domingo";
+
+            }
+
+            throw new NotImplementedException();
+        }
     }
 }

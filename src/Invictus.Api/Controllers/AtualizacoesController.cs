@@ -67,6 +67,8 @@ namespace Invictus.Api.Controllers
             /// 
             //procurar documento vencido
 
+            // habilitar edição de notas dos alunos depois da última aula
+
             return Ok();
         }
 

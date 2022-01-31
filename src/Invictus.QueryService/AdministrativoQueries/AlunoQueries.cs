@@ -310,6 +310,7 @@ WHERE Alunos.nome = 'Mario Gomes'
                         alunos.email,
                         matriculas.NumeroMatricula,
                         matriculas.id as matriculaId, 
+                        matriculas.status, 
                         Matriculas.MatriculaConfirmada,
                         Turmas.Descricao as turmaDescricao,
                         turmas.Identificador as turmaIdentificador, 

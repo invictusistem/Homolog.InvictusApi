@@ -202,6 +202,34 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId)
+        {
+            var diaSemana = DiaDaSemana.TryParsToDisponibilidadeTable(diaDaSemana);
+            string query = @"select 
+                            Professores.Id,
+                            professores.Nome
+                            from professores 
+                            inner join professoresDisponibilidades on Professores.Id = professoresDisponibilidades.PessoaId
+                            inner join ProfessoresMaterias on Professores.Id = ProfessoresMaterias.ProfessorId
+                            WHERE professoresDisponibilidades."+ diaSemana + @" = 'True' 
+                            and Professores.Ativo = 'True'
+                            AND professoresDisponibilidades.UnidadeId = @unidadeId
+                            and ProfessoresMaterias.PacoteMateriaId = @materiaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ProfessorDto>(query, new { diaDaSemana = diaDaSemana, unidadeId = unidadeId, materiaId = materiaId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+
         #region GetProfDisponiveis
         public async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId)
         {
@@ -331,6 +359,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+       
 
         #endregion
 

@@ -173,7 +173,8 @@ namespace Invictus.Api.Controllers
         [HttpPut]
         [Route("envio-acesso/{email}")]
         public async Task<IActionResult> changePassword(string email)
-        {
+        {  
+
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
@@ -181,7 +182,7 @@ namespace Invictus.Api.Controllers
                 return NotFound();
             }
 
-            var senha = GenerateRandomPassword();  
+            var senha = GenerateRandomPassword();
 
             user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, senha);
 
@@ -192,19 +193,11 @@ namespace Invictus.Api.Controllers
             }
 
             var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br>Login: " + user.UserName + "<br>Senha: " + senha + "<br> :)";
-            try
-            {
-                await _email.SendEmailAsync(user.Email, "Invictus Login", mensagem);
-            }
-            catch (Exception ex)
-            {
 
-            }
-
-
+            await _email.SendEmailAsync(user.Email, "Invictus Login", mensagem);
 
             return Ok();
-            
+
         }
 
         [HttpPut]
