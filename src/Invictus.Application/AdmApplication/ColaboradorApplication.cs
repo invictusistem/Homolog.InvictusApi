@@ -29,15 +29,17 @@ namespace Invictus.Application.AdmApplication
             var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(editedColaborador);
 
             colaborador.TratarEmail(colaborador.Email);
-            // if ativo = false, colocar a claim como false tb
+            
             await _colaboradorRepo.EditColaborador(colaborador);
+
+            // IF ATIVAR == false => DESABILITAR acesso
 
             _colaboradorRepo.Commit();
         }
 
         public async Task SaveColaborador(ColaboradorDto newColaborador)
         {
-            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();// _context.Unidades.Where(u => u.Sigla == unidade).Select(s => s.Id).SingleOrDefault();
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
 
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
 

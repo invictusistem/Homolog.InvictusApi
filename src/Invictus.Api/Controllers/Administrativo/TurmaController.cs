@@ -120,6 +120,17 @@ namespace Invictus.Api.Controllers
             if (materias.Count() == 0) return NotFound();
 
             return Ok(new { materias = materias });
+        }
+
+        [HttpGet]
+        [Route("materias-notas/{turmaId}")]
+        public async Task<IActionResult> GetNotas(Guid turmaId)
+        {
+            var materias = await _turmaQueries.GetMateriasDoProfessorLiberadasParaNotas(turmaId);
+
+            if (!materias.Any()) return NotFound();
+
+            return Ok(new { materias = materias });
 
         }
 

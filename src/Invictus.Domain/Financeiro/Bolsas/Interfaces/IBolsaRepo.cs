@@ -9,6 +9,7 @@ namespace Invictus.Domain.Financeiro.Bolsas.Interfaces
     public interface IBolsaRepo : IDisposable
     {
         Task SaveBolsa(Bolsa bolsa);
+        Task EditBolsa(Bolsa bolsa);
         void Commit();
     }
 }

@@ -1,4 +1,5 @@
-﻿using DinkToPdf;
+﻿using AutoMapper;
+using DinkToPdf;
 using DinkToPdf.Contracts;
 using Invictus.Api.Helpers;
 using Invictus.Api.HuSignalR;
@@ -8,9 +9,12 @@ using Invictus.BackgroundTasks;
 using Invictus.Core.Enums;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.AlunoAggregate;
+using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
+using Invictus.Dtos.AdmDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -32,6 +36,7 @@ namespace Invictus.Api.Controllers
     {
         public UserManager<IdentityUser> UserManager { get; set; }
         private IHubContext<ChartHub> _hub;
+        private IMapper _mapper;
         private readonly IRelatorioApp _relatorioApp;
         private readonly IPDFDesigns _pdfDesign;
         public RoleManager<IdentityRole> RoleManager { get; set; }
@@ -52,11 +57,13 @@ namespace Invictus.Api.Controllers
             ITemplate template,
             UserManager<IdentityUser> userMgr,
             IConverter converter,
+            IMapper mapper,
             RoleManager<IdentityRole> roleMgr,
             IPDFDesigns pdfDesign)
         {
             _relatorioApp = relatorioApp;
             _hub = hub;
+            _mapper = mapper;
             UserManager = userMgr;
             RoleManager = roleMgr;
             _converter = converter;
@@ -67,6 +74,32 @@ namespace Invictus.Api.Controllers
             _logger = logger;
             _pdfDesign = pdfDesign;
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("calendario/{calendarioId}")]
+        public IActionResult UpdateCalendario(Guid calendarioId)
+        {
+            var calend = _db.Calendarios.Find(calendarioId);
+
+
+            return Ok(new { calend = calend });
+
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("calendario")]        
+        public IActionResult UpdateCalendario([FromBody] CalendarioDto calendDto)
+        {
+            var calend = _mapper.Map<Calendario>(calendDto);
+
+            _db.Calendarios.Update(calend);
+            _db.SaveChanges();
+            return Ok();
+
+        }
+
 
         [HttpGet]
         [Route("pendencia")]

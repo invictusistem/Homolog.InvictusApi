@@ -35,6 +35,15 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpGet]
+        [Route("GetById/{bolsaId}")]
+        public async Task<IActionResult> GetBolsa(Guid bolsaId)
+        {
+            var bolsa = await _bolsasQueries.GetBolsa(bolsaId);
+
+            return Ok(new { bolsa = bolsa });
+        }
+
+        [HttpGet]
         [Route("senha/{bolsaId}")]
         public async Task<IActionResult> GetSenha(Guid bolsaId)
         {
@@ -61,6 +70,14 @@ namespace Invictus.Api.Controllers.Financeiro
             var senha = await _bolsaApp.SaveBolsa(bolsa);
 
             return Ok(new { senha = senha });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> EditBolsa([FromBody] BolsaDto bolsa)
+        {
+            await _bolsaApp.EditBolsa(bolsa);
+
+            return Ok();
         }
 
     }

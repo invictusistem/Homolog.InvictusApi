@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -36,20 +37,65 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasTemplateList()
+        public async Task<PaginatedItemsViewModel<MateriaTemplateDto>> GetMateriasTemplateList(int itemsPerPage, int currentPage)
         {
-            var query = @"SELECT * FROM MateriasTemplate";
+            // var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+
+            var materias = await GetMaterias(itemsPerPage, currentPage);
+
+            var materiasCount = await CountGetMaterias();
+
+            var paginatedItems = new PaginatedItemsViewModel<MateriaTemplateDto>(currentPage, itemsPerPage, materiasCount, materias.ToList());
+
+            return paginatedItems;
+
+        }
+
+        private async Task<int> CountGetMaterias()
+        {     
+            var query = @"SELECT Count(*) FROM MateriasTemplate";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var resultado = await connection.QueryAsync<MateriaTemplateDto>(query);
+                var count = await connection.QuerySingleAsync<int>(query);
 
                 connection.Close();
 
-                return resultado;
+                return count;
+            }
+        }
+
+        private async Task<IEnumerable<MateriaTemplateDto>> GetMaterias(int itemsPerPage, int currentPage)
+        {
+
+            //StringBuilder query = new StringBuilder();
+            //query.Append("SELECT * from Professores where ");
+
+            //if (param.nome != "") query.Append("LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            //if (param.email != "") query.Append("LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            //if (param.cpf != "") query.Append("LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            //query.Append("Professores.UnidadeId = '" + unidade.id + "'");
+            //if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
+            //query.Append(" ORDER BY Professores.Nome ");
+            //query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+
+            var query = @"SELECT * FROM MateriasTemplate ORDER BY MateriasTemplate.Nome  
+            OFFSET(@currentPage - 1) * @itemsPerPage  ROWS FETCH NEXT @itemsPerPage ROWS ONLY";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var resultado = await connection.QueryAsync<MateriaTemplateDto>(query, new { itemsPerPage = itemsPerPage, currentPage = currentPage });
+
+                connection.Close();
+
+                return resultado.OrderBy(r => r.nome);
             }
         }
 
@@ -67,6 +113,23 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return resultado;
+            }
+        }
+
+        public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasByListIds(List<Guid> listGuidMaterias)
+        {
+            var query = @"SELECT * FROM MateriasTemplate WHERE MateriasTemplate.id in (@listGuidMaterias)";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var resultado = await connection.QueryAsync<MateriaTemplateDto>(query, new { listGuidMaterias = listGuidMaterias });
+
+                connection.Close();
+
+                return resultado.OrderBy(r => r.nome);
             }
         }
     }

@@ -43,7 +43,7 @@ namespace Invictus.Data.Repositories.Administrativo
 
         public async Task RemoveProfessorMateria(Guid profMateriaId)
         {
-            await _db.MateriasHabilitadas.DeleteByKeyAsync(profMateriaId);//.AddAsync(profMateria);
+            await _db.MateriasHabilitadas.DeleteByKeyAsync(profMateriaId);
         }
 
         public async Task AddDisponibilidade(Disponibilidade disponibilidade)

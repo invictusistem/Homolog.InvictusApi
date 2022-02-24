@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Core.Enumerations;
+using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
@@ -82,7 +83,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         private async Task<int> CountProfessoresByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
-            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());           
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
 
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append("SELECT Count(*) from Professores where ");
@@ -107,6 +108,68 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<IEnumerable<ProfessorCalendarioViewModel>> GetProfessorCalendario(Guid professorId)
+        {
+            var query = @"select 
+                        calendarios.Id,
+                        calendarios.diaaula,
+                        calendarios.diadasemana,
+                        calendarios.horainicial,
+                        calendarios.horafinal,
+                        calendarios.aulainiciada,
+                        calendarios.aulaconcluida,
+                        calendarios.observacoes,
+                        Turmas.Descricao as Turma,
+                        Unidades.descricao as unidadeDescricao,
+                        Unidadessalas.titulo,
+                        materiastemplate.nome as materiaDescricao,
+                        Professores.Nome as professor 
+                        from calendarios
+                        left join Turmas on Calendarios.TurmaId = Turmas.Id
+                        left join Unidades on Calendarios.UnidadeId = Unidades.Id
+                        left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
+                        left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
+                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        where calendarios.professorId = @professorId  
+                        order by Calendarios.DiaAula asc  ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var results = await connection.QueryAsync<ProfessorCalendarioViewModel>(query, new { professorId = professorId });
+
+                connection.Close();
+                // 2022 01 30
+
+                var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+                foreach (var cal in results)
+                {
+
+                    //Debug.WriteLine(diaSeguinte);
+                    if (cal.diaaula < hoje)
+                    {
+                        cal.podeVerRelatorioAula = true;
+                    }
+                    else if (cal.diaaula == hoje)
+                    {
+                        cal.podeVerRelatorioAula = null;
+                    }
+                    else
+                    {
+                        cal.podeVerRelatorioAula = false;
+                    }
+
+                }
+
+                return results;
+            }
+        }
+
+
         public async Task<ProfessorDto> GetProfessorById(Guid professorId)
         {
             string query = @"SELECT * From Professores WHERE Professores.Id = @professorId";
@@ -129,6 +192,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             string query = @"select 
                             ProfessoresMaterias.id,
                             ProfessoresMaterias.PacoteMateriaId,
+                            ProfessoresMaterias.ProfessorId, 
                             MateriasTemplate.nome,
                             TypePacote.nome as nomePacote
                             from ProfessoresMaterias
@@ -145,7 +209,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 connection.Close();
 
-                return result;
+                return result.OrderBy(r => r.nome);
             }
         }
 
@@ -211,7 +275,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                             from professores 
                             inner join professoresDisponibilidades on Professores.Id = professoresDisponibilidades.PessoaId
                             inner join ProfessoresMaterias on Professores.Id = ProfessoresMaterias.ProfessorId
-                            WHERE professoresDisponibilidades."+ diaSemana + @" = 'True' 
+                            WHERE professoresDisponibilidades." + diaSemana + @" = 'True' 
                             and Professores.Ativo = 'True'
                             AND professoresDisponibilidades.UnidadeId = @unidadeId
                             and ProfessoresMaterias.PacoteMateriaId = @materiaId ";
@@ -278,20 +342,20 @@ namespace Invictus.QueryService.AdministrativoQueries
         }
 
         private async Task<List<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
-        {   
+        {
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
             queryCount.Append("inner join Professores on ProfessoresDisponibilidades.PessoaId = Professores.Id where ");
             queryCount.Append(" ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
             queryCount.Append(" AND Professores.ativo = 'True' ");
             queryCount.Append(" AND ProfessoresDisponibilidades.PessoaId not in ");// (select TurmasMaterias.ProfessorId from TurmasMaterias 
-            queryCount.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId+"') AND ");
+            queryCount.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId + "') AND ");
 
             if (diasSemana.Count() == 1)
             {
                 var stringDiaSemana = ParseDiaSemana(diasSemana[0]);
-                queryCount.Append(" ProfessoresDisponibilidades."+ stringDiaSemana+" = 'True'  ");
-               
+                queryCount.Append(" ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
+
 
             }
             else
@@ -300,7 +364,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 {
                     var stringDiaSemana = ParseDiaSemana(diasSemana[i]);
                     queryCount.Append("ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
-                    if(i != diasSemana.Count() - 1) queryCount.Append(" OR ");
+                    if (i != diasSemana.Count() - 1) queryCount.Append(" OR ");
                     //queryCount.Append(" AND ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
                 }
 
@@ -331,7 +395,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<Guid>(query, new { turmaId  = turmaId });
+                var result = await connection.QueryAsync<Guid>(query, new { turmaId = turmaId });
 
                 connection.Close();
 
@@ -359,7 +423,141 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-       
+        public async Task<MateriaHabilitadaViewModel> GetProfessorMateria(Guid professorMateriaId)
+        {
+            string query = @"select 
+                            ProfessoresMaterias.id,
+                            ProfessoresMaterias.PacoteMateriaId,
+                            ProfessoresMaterias.ProfessorId, 
+                            MateriasTemplate.nome,
+                            TypePacote.nome as nomePacote
+                            from ProfessoresMaterias
+                            inner join MateriasTemplate on ProfessoresMaterias.PacoteMateriaId = MateriasTemplate.id
+                            inner join TypePacote on MateriasTemplate.TypePacoteId = TypePacote.Id
+                            where ProfessoresMaterias.id = @professorMateriaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<MateriaHabilitadaViewModel>(query, new { professorMateriaId = professorMateriaId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+        public async Task<ProfessorRelatorioViewModel> GetReportHoursTeacher(DateTime rangeIni, DateTime rangeFinal, Guid teacherId)
+        {
+            rangeIni = new DateTime(rangeIni.Year, rangeIni.Month, rangeIni.Day, 0, 0, 0, 0);
+            rangeFinal = new DateTime(rangeFinal.Year, rangeFinal.Month, rangeFinal.Day, 0, 0, 0, 0);
+
+            ProfessorRelatorioViewModel report = new ProfessorRelatorioViewModel();
+
+            var query = @"select 
+                        calendarios.Id,
+                        calendarios.diaaula,
+                        calendarios.diadasemana,
+                        calendarios.horainicial,
+                        calendarios.horafinal,
+                        calendarios.aulainiciada,
+                        calendarios.aulaconcluida,
+                        calendarios.dateAulaIniciada,
+                        calendarios.dateAulaConcluida,
+                        calendarios.observacoes,
+                        Turmas.Descricao as Turma,
+                        Unidades.descricao as unidadeDescricao,
+                        Unidadessalas.titulo,
+                        materiastemplate.nome as materiaDescricao,
+                        Professores.Nome as professor 
+                        from calendarios
+                        left join Turmas on Calendarios.TurmaId = Turmas.Id
+                        left join Unidades on Calendarios.UnidadeId = Unidades.Id
+                        left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
+                        left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
+                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        where calendarios.professorId = @teacherId 
+                        AND calendarios.DiaAula >= @rangeIni  
+                        AND calendarios.DiaAula < @rangeFinal
+                        order by Calendarios.DiaAula asc ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                
+                report.calendars = await connection.QueryAsync<ProfessorCalendarioViewModel>(query, new { rangeIni = rangeIni, rangeFinal = rangeFinal, teacherId = teacherId });
+
+                connection.Close();
+
+                if (report.calendars.Any())
+                {
+                    report = CalculateTime(report);
+                }
+
+                return report;
+            }
+        }
+
+        private ProfessorRelatorioViewModel CalculateTime(ProfessorRelatorioViewModel report)
+        {
+            foreach (var calendar in report.calendars)
+            {
+                if (calendar.aulainiciada && calendar.aulaconcluida)
+                {
+                    var horarioInicial = calendar.horainicial.Split(":");
+                    var horarioFinal = calendar.horafinal.Split(":");
+
+                    DateTime dataAulaInicialCompleta = calendar.diaaula.ToCompleteTime(Convert.ToInt32(horarioInicial[0]), Convert.ToInt32(horarioInicial[1]));
+
+                    if (calendar.dateAulaIniciada < dataAulaInicialCompleta)
+                        calendar.dateAulaIniciada = dataAulaInicialCompleta;
+
+                    DateTime dataAulaFinalCompleta = calendar.diaaula.ToCompleteTime(Convert.ToInt32(horarioFinal[0]), Convert.ToInt32(horarioFinal[1]));
+
+                    if (calendar.dateAulaConcluida > dataAulaFinalCompleta)
+                        calendar.dateAulaConcluida = dataAulaFinalCompleta;
+
+                    calendar.totalClassroomMinutes = calendar.diaaula.CalculateTotalMinutes(calendar.dateAulaIniciada, calendar.dateAulaConcluida);
+
+                    report.totalMinutes += calendar.totalClassroomMinutes;
+                }                
+            }
+
+            report.TotalHoursToString = TransformeMinutesInHours(report.totalMinutes);
+
+            return report;
+        }
+
+        private string TransformeMinutesInHours(int totalMinutes)
+        {
+            if (totalMinutes == 0) return "";
+
+            double result = totalMinutes / 60;
+
+            if (result < 1) return "0 horas e "+totalMinutes+" minutos";
+
+            var total = Math.Floor(result) + " horas e ";
+
+            var minutos = totalMinutes - (Math.Floor(result) * 60);
+
+            total += Convert.ToInt32(minutos) + " minutos";
+
+            return total;
+        }
+
+        private DateTime ConstructCompleteHour(DateTime diaAula, string horaInicio, string horaFinal)
+        {
+            int hour = Convert.ToInt32(horaInicio);
+            int minute = Convert.ToInt32(horaFinal);
+
+            DateTime diaAulaCompleta = new DateTime(diaAula.Year, diaAula.Month, diaAula.Day, hour, minute, 0);
+
+            return diaAulaCompleta;
+        }
+
 
         #endregion
 

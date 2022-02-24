@@ -27,6 +27,7 @@ namespace Invictus.Application.AdmApplication
     public class TurmaApplication : ITurmaApplication
     {
         private readonly IUnidadeQueries _unidadeQueries;
+        private readonly ICalendarioQueries _calendarioQueries;
         private readonly IAspNetUser _aspNetUser;
         private readonly ICalendarioRepo _calendarioRepo;
         private readonly ITurmaQueries _turmaQueries;
@@ -37,8 +38,8 @@ namespace Invictus.Application.AdmApplication
         private readonly ITurmaNotasRepo _notasRepo;
         private readonly InvictusDbContext _db;
         public TurmaApplication(IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser, ITurmaQueries turmaQueries,
-            IPacoteQueries pacoteQueries,IMapper mapper,ITurmaRepo turmaRepo, IParametrosQueries paramQueries,
-            ICalendarioRepo calendarioRepo, ITurmaNotasRepo notasRepo, InvictusDbContext db)
+            IPacoteQueries pacoteQueries, IMapper mapper, ITurmaRepo turmaRepo, IParametrosQueries paramQueries,
+            ICalendarioRepo calendarioRepo, ITurmaNotasRepo notasRepo, ICalendarioQueries calendarioQueries, InvictusDbContext db)
         {
             _unidadeQueries = unidadeQueries;
             _aspNetUser = aspNetUser;
@@ -49,6 +50,7 @@ namespace Invictus.Application.AdmApplication
             _paramQueries = paramQueries;
             _calendarioRepo = calendarioRepo;
             _notasRepo = notasRepo;
+            _calendarioQueries = calendarioQueries;
             _db = db;
         }
         public async Task CreateTurma(CreateTurmaCommand command)
@@ -68,19 +70,19 @@ namespace Invictus.Application.AdmApplication
             var turma = new Turma(command.descricao, 0, command.minVagas, unidade.id, sala.id, command.pacoteId, typePacote.typePacoteId, previsao);
             turma.CreateIdentificador(totalTurmas, siglaUnidade);
             turma.SetStatusAndamentoInitial();
-            
+
             // horario da turma
             var horarios = _mapper.Map<IEnumerable<Horario>>(command.diasSemana);
             turma.AddHorarios(horarios);
 
-                       
+
             // materias da turma
             turma.AddMaterias(turmaMaterias);
 
 
 
             await _turmaRepo.Save(turma);
-           // _turmaRepo.Commit();
+            // _turmaRepo.Commit();
 
 
             //Previsoes da turma
@@ -90,8 +92,8 @@ namespace Invictus.Application.AdmApplication
 
 
             // pegar feriados
-           // var feriadosValues = await _paramQueries.GetParamValue("Feriados");
-           // var feriados = new List<DateTime>();
+            // var feriadosValues = await _paramQueries.GetParamValue("Feriados");
+            // var feriados = new List<DateTime>();
             //foreach (var item in feriadosValues)
             //{
             //    var data = item.value.Split("/");
@@ -102,7 +104,7 @@ namespace Invictus.Application.AdmApplication
 
             //}
 
-            
+
 
 
             // CreateCalendarioDaTurma()
@@ -121,9 +123,9 @@ namespace Invictus.Application.AdmApplication
             var i = 0;
             foreach (var dat in todasDatas)
             {  //0 -1 - 2
-                if(i == command.diasSemana.Count()) { i = 0; }
+                if (i == command.diasSemana.Count()) { i = 0; }
 
-                calendarios.Add(new Calendario(dat, DiaDaSemana.TryParse(dat.DayOfWeek).DisplayName,command.diasSemana[i].horarioInicio, command.diasSemana[i].horarioFim, turma.Id, unidade.id, false, false, command.salaId));
+                calendarios.Add(new Calendario(dat, DiaDaSemana.TryParse(dat.DayOfWeek).DisplayName, command.diasSemana[i].horarioInicio, command.diasSemana[i].horarioFim, turma.Id, unidade.id, false, false, command.salaId));
 
                 i++;
             }
@@ -132,7 +134,7 @@ namespace Invictus.Application.AdmApplication
             //{
             //    calendarios.RemoveAll(c => c.DiaAula.Day == item.Day & c.DiaAula.Month == item.Month);
             //}
-            
+
 
             var pacotesMaterias = await _pacoteQueries.GetMateriasPacote(command.pacoteId);
 
@@ -141,47 +143,47 @@ namespace Invictus.Application.AdmApplication
             // set materias!
             //var x = calendarios?[300];
 
-           
+
             //var qntAulas = 0;
-           
+
             //try
             //{
-                var diaCalendario = 0;
-                for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
+            var diaCalendario = 0;
+            for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
+            {
+                double horasTotaisDaMateriaEmMinutos = aulasPresenciais[mat].cargaHoraria * 60;
+
+                while (!DoubleExtensions.NegativeOrZero(horasTotaisDaMateriaEmMinutos))
                 {
-                    double horasTotaisDaMateriaEmMinutos = aulasPresenciais[mat].cargaHoraria * 60;
-
-                    while (!DoubleExtensions.NegativeOrZero(horasTotaisDaMateriaEmMinutos))
-                    {
-                        
-
-                        if (diaCalendario >= calendarios.Count()) return;
-                        calendarios[diaCalendario].SetMateriaId(aulasPresenciais[mat].materiaId);
-
-                        var horaIni = calendarios[diaCalendario].HoraInicial.Split(":");
-                        var horaInicial = new DateTime(2020, 1, 1, Convert.ToInt32(horaIni[0]), Convert.ToInt32(horaIni[1]), 0);
-
-                        var horaFim = calendarios[diaCalendario].HoraFinal.Split(":");
-                        var horaFinal = new DateTime(2020, 1, 1, Convert.ToInt32(horaFim[0]), Convert.ToInt32(horaFim[1]), 0);
-
-                        TimeSpan totalMinutos = horaFinal - horaInicial;
-
-                        double minutos = totalMinutos.TotalMinutes;
-
-                        horasTotaisDaMateriaEmMinutos -= minutos;
-                        
-                        diaCalendario++;
-                    }
 
 
+                    if (diaCalendario >= calendarios.Count()) return;
+                    calendarios[diaCalendario].SetMateriaId(aulasPresenciais[mat].materiaId);
+
+                    var horaIni = calendarios[diaCalendario].HoraInicial.Split(":");
+                    var horaInicial = new DateTime(2020, 1, 1, Convert.ToInt32(horaIni[0]), Convert.ToInt32(horaIni[1]), 0);
+
+                    var horaFim = calendarios[diaCalendario].HoraFinal.Split(":");
+                    var horaFinal = new DateTime(2020, 1, 1, Convert.ToInt32(horaFim[0]), Convert.ToInt32(horaFim[1]), 0);
+
+                    TimeSpan totalMinutos = horaFinal - horaInicial;
+
+                    double minutos = totalMinutos.TotalMinutes;
+
+                    horasTotaisDaMateriaEmMinutos -= minutos;
+
+                    diaCalendario++;
                 }
+
+
+            }
 
             //}catch(Exception ex)
             //{
 
             //}
 
-            
+
 
             await _calendarioRepo.SaveCalendarios(calendarios);
 
@@ -197,7 +199,7 @@ namespace Invictus.Application.AdmApplication
         {
             await _turmaRepo.IniciarTurma(turmaId);
             // deletar calendario e refazer para a proxima data
-           // _turmaRepo.Commit();
+            // _turmaRepo.Commit();
         }
 
         public async Task AdiarInicio(Guid turmaId)
@@ -236,32 +238,29 @@ namespace Invictus.Application.AdmApplication
                 {
                     turmaMat.AddProfessorNaMateria(professorId);
                     // colocar no calendario
-                    var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.MateriaId == turmaMatDto.materiaId).ToListAsync();
+                    var calendarios = _mapper.Map<IEnumerable<Calendario>>(await _calendarioQueries.GetFutureCalendarsByTurmaIdAndMateriaId(turmaMatDto.materiaId, turmaId));
+                    //await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.MateriaId == turmaMatDto.materiaId).ToListAsync();
 
-                    calendarios.ForEach(c => c.SetProfessorId(professorId));
-
-                    _calendarioRepo.UpdateCalendarios(calendarios);
+                    if (calendarios.Any())
+                    {
+                        calendarios.ForEach(c => c.SetProfessorId(professorId));
+                        _calendarioRepo.UpdateCalendarios(calendarios.ToList());
+                    }
                 }
                 else
                 {
                     turmaMat.RemoveProfessorDaMateria();
-                    var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId & c.MateriaId == turmaMatDto.materiaId).ToListAsync();
-                    
-                    calendarios.ForEach(c => c.RemoveProfessorDaTurma());
-
-                    _calendarioRepo.UpdateCalendarios(calendarios);
-
-                    // rmover do calendario
+                    var calendarios = _mapper.Map<IEnumerable<Calendario>>(await _calendarioQueries.GetFutureCalendarsByTurmaIdAndMateriaId(turmaMatDto.materiaId, turmaId));
+                   
+                    if (calendarios.Any())
+                    {
+                        calendarios.ForEach(c => c.RemoveProfessorDaAula());
+                        _calendarioRepo.UpdateCalendarios(calendarios.ToList());
+                    }                    
                 }
-
-                
-
                 await _turmaRepo.UpdateMateriaDaTurma(turmaMat);
-
             }
-
             _turmaRepo.Commit();
-
         }
 
         public async Task RemoverProfessorDaTurma(Guid professorId, Guid turmaId)
@@ -289,14 +288,14 @@ namespace Invictus.Application.AdmApplication
 
                 if (!filtro.Any())
                 {
-                    calendarios.Where(c => c.MateriaId == cal.MateriaId).ForEach(c => c.RemoveProfessorDaTurma());
+                    calendarios.Where(c => c.MateriaId == cal.MateriaId).ForEach(c => c.RemoveProfessorDaAula());
                 }
             }
 
             _calendarioRepo.UpdateCalendarios(calendarios);
             _calendarioRepo.Commit();
 
-            if(turmasMaterias.Count() > 0)
+            if (turmasMaterias.Count() > 0)
             {
                 foreach (var item in turmasMaterias)
                 {
@@ -337,9 +336,9 @@ namespace Invictus.Application.AdmApplication
 
             foreach (var nota in notas)
             {
-                var notasDisc = TurmaNotas.CreateNota(nota.id,nota.avaliacaoUm,nota.segundaChamadaAvaliacaoUm,nota.avaliacaoDois,nota.segundaChamadaAvaliacaoDois,
-                    nota.avaliacaoTres,nota.segundaChamadaAvaliacaoTres,nota.materiaId,nota.materiaDescricao,nota.matriculaId,nota.turmaId,ResultadoNotas.TryParse(nota.resultado));
-                
+                var notasDisc = TurmaNotas.CreateNota(nota.id, nota.avaliacaoUm, nota.segundaChamadaAvaliacaoUm, nota.avaliacaoDois, nota.segundaChamadaAvaliacaoDois,
+                    nota.avaliacaoTres, nota.segundaChamadaAvaliacaoTres, nota.materiaId, nota.materiaDescricao, nota.matriculaId, nota.turmaId, ResultadoNotas.TryParse(nota.resultado));
+
                 notasDisc.VerificarStatusResultado();
 
                 listaNotas.Add(notasDisc);

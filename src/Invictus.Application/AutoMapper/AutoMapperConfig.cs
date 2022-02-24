@@ -3,6 +3,7 @@ using Invictus.Application.AdmApplication;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Enums;
 using Invictus.Domain.Administrativo.AlunoAggregate;
+using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.ContratoAggregate;
 using Invictus.Domain.Administrativo.ContratosAggregate;
@@ -117,6 +118,8 @@ namespace Invictus.Application.AutoMapper
             CreateMap<TurmaNotasDto, TurmaNotas>();
 
             CreateMap<FornecedorDto, Fornecedor>();
+
+            CreateMap<CalendarioDto, Calendario>();
 
             CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
                 .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,

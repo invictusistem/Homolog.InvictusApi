@@ -11,6 +11,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<int> CountTurmas(Guid unidadeId);
         Task<IEnumerable<TurmaMateriasDto>> GetMateriasFromPacotesMaterias(Guid pacoteId);
         Task<IEnumerable<TurmaMateriasDto>> GetTurmaMateriasFromProfessorId(Guid professorId, Guid turmaId);
+        Task<IEnumerable<MateriaTemplateDto>> GetMateriasDoProfessorLiberadasParaNotas(Guid turmaId);
         Task<IEnumerable<TurmaViewModel>> GetTurmas();
         Task<IEnumerable<TurmaInfoCompleta>> GetTurmaInfo(Guid turmaId);
         Task<IEnumerable<TurmaViewModel>> GetTurmasByType(Guid typepacote);
@@ -21,9 +22,12 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<ProfessorTurmaView>> GetProfessoresDaTurma(Guid turmaId);
         Task<List<MateriaView>> GetMateriasLiberadas(Guid turmaId, Guid professorId);
         Task<TurmaMateriasDto> GetTurmaMateria(Guid turmaMateriaId);
+        Task<TurmaMateriasDto> GetTurmaMateriaByTurmaAndMateriaId(Guid materiaId, Guid turmaId);
+        Task<IEnumerable<TurmaMateriasDto>> GetTurmasMateriasByProfessorAndMateriaId(Guid materiaId, Guid professorId);
         Task<TurmaProfessoresDto> GetTurmaProfessor(Guid professorId, Guid turmaId);
         Task<IEnumerable<TurmaDiarioClasseViewModel>> GetTurmasPedagViewModel();
         Task<IEnumerable<ListaPresencaDto>> GetInfoDiaPresencaLista(Guid calendarioId);
         Task<IEnumerable<ListaPresencaDto>> GetListaPresencas(Guid calendarioId);
+        Task<AulaDiarioClasseViewModel> GetPresencaAulaViewModel(Guid calendarioId);
     }
 }

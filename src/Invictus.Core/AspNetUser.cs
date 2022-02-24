@@ -71,5 +71,16 @@ namespace Invictus.Core
             string guid = _accessor.HttpContext.User.FindFirst("usuarioId").Value;
             return new Guid(guid); // usuarioId
         }
+
+        public string ObterRole()
+        {
+            var roles = _accessor.HttpContext.User.Claims;
+
+            //var asd = roles.Select(r => r.
+            var role = roles.ToList()[11];
+            //string role = _accessor.HttpContext.User.FindFirst("role").Value;
+
+            return role.Value;
+        }
     }
 }

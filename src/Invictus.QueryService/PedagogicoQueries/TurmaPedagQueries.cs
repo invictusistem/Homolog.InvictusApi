@@ -125,12 +125,18 @@ namespace Invictus.QueryService.PedagogicoQueries
         public async Task<IEnumerable<TurmaNotasViewModel>> GetNotasFromTurma(Guid turmaId, Guid materiaId)
         {
             var query = @"select 
+                        TurmasMaterias.id  
+                        from TurmasMaterias where
+                        TurmasMaterias.TurmaId = @turmaId AND 
+                        TurmasMaterias.MateriaId = @materiaId ";
+
+            var query2 = @"select 
                         *
                         from TurmasNotas where
                         TurmasNotas.TurmaId = @turmaId AND 
                         TurmasNotas.MateriaId = @materiaId ";
 
-            var query2 = @"select 
+            var query3 = @"select 
                         Alunos.Nome
                         from Alunos
                         inner join Matriculas on Alunos.Id = Matriculas.AlunoId 
@@ -143,13 +149,16 @@ namespace Invictus.QueryService.PedagogicoQueries
             {
                 connection.Open();
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
-                var notas = await connection.QueryAsync<TurmaNotasViewModel>(query, new { turmaId = turmaId, materiaId  = materiaId });
+                var turmaMateriaId = await connection.QuerySingleAsync<Guid>(query, new { turmaId = turmaId, materiaId = materiaId });
+
+                //var matId = await connection.QueryAsync<TurmaNotasViewModel>(query2, new { turmaId = turmaId, materiaId = turmaMateriaId });
+
+                var notas = await connection.QueryAsync<TurmaNotasViewModel>(query2, new { turmaId = turmaId, materiaId  = turmaMateriaId });
 
                 foreach (var item in notas)
                 {
-                    item.nome = await connection.QuerySingleAsync<string>(query2, new { turmaId = turmaId, matriculaId = item.matriculaId });
+                    item.nome = await connection.QuerySingleAsync<string>(query3, new { turmaId = turmaId, matriculaId = item.matriculaId });
                 }
-
 
                 return notas;
 

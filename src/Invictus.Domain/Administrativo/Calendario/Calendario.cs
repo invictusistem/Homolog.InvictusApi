@@ -74,9 +74,20 @@ string horaFinal,
         public bool AulaConcluida { get; private set; }
         public DateTime DateAulaConcluida { get; private set; }
         public string Observacoes { get; private set; }
+        public bool EhSubstituto { get; private set; }
         public Guid SalaId { get; private set; }
         // public virtual Turma Turma { get; private set; }
-
+        public void VerificarSeSubstituto(Guid professorDaMateria, Guid professorPretendido)
+        {
+            if(professorDaMateria == professorPretendido)
+            {
+                EhSubstituto = false;
+            }
+            else
+            {
+                EhSubstituto = true;
+            }
+        }
         public void SetHoraInicial(string inicio)
         {
             HoraInicial = inicio;
@@ -86,13 +97,15 @@ string horaFinal,
             HoraFinal = fim;
         }
 
-        public void RemoveProfessorDaTurma()
+        public void RemoveProfessorDaAula()
         {
             ProfessorId = new Guid("00000000-0000-0000-0000-000000000000");
+            EhSubstituto = false;
         }
         public void SetProfessorId(Guid profId)
         {
             ProfessorId = profId;
+            EhSubstituto = false;
         }
         public void SetMateriaId(Guid id)
         {

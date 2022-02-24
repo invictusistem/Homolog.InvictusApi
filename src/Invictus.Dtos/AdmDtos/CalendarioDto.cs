@@ -23,6 +23,7 @@ namespace Invictus.Dtos.AdmDtos
         public bool aulaConcluida { get; set; }
         public DateTime dateAulaConcluida { get; set; }
         public string observacoes { get; set; }
+        public bool ehSubstituto { get; set; }
         public Guid salaId { get; set; }
     }
 }

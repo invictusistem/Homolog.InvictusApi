@@ -48,6 +48,31 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
+        public async Task<BolsaDto> GetBolsa(Guid bolsaId)
+        {
+            var query = @"SELECT * FROM Bolsas WHERE Bolsas.id = @bolsaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<BolsaDto>(query, new { bolsaId = bolsaId });
+
+                connection.Close();
+
+                //if(result.Any())
+                //{
+                //    result = new List<BolsaDto>();
+                //}
+
+
+                return result;//.FirstOrDefault();
+
+            }
+        }
+
+
         public async Task<IEnumerable<BolsaDto>> GetBolsas(Guid typePacoteId)
         {
             var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();

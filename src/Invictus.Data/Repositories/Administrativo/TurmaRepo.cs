@@ -83,5 +83,10 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             await _db.Presencas.AddRangeAsync(presencas);
         }
+
+        public async Task RemoverProfessoresDaMateria(IEnumerable<TurmaMaterias> turmaMateria)
+        {
+            await _db.TurmasMaterias.BulkDeleteAsync(turmaMateria);
+        }
     }
 }

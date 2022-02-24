@@ -24,13 +24,11 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMaterias()
+        public async Task<IActionResult> GetMaterias([FromQuery] int itemsPerPage, [FromQuery] int currentPage)
         {
+            var results = await _materiaQueries.GetMateriasTemplateList(itemsPerPage, currentPage);
 
-            var results = await _materiaQueries.GetMateriasTemplateList();//.GetProfessores(itemsPerPage, currentPage, paramsJson);
-
-            // var cargos = await _db.Cargos.ToListAsync();
-            if (results.Count() == 0) return NotFound();
+            if (results.Data.Count() == 0) return NotFound();
 
             return Ok(new { results = results });
         }

@@ -7,6 +7,7 @@ using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -21,16 +22,18 @@ namespace Invictus.QueryService.AdministrativoQueries
         private readonly IConfiguration _config;
         private readonly IAspNetUser _aspUser;
         private readonly IUnidadeQueries _unidadeQueries;
+        private readonly IMateriaTemplateQueries _materiaTemplateQueries;
         private readonly IMapper _mapper;
         private readonly ITurmaRepo _turmaRepo;
         public TurmaQueries(IConfiguration config, IAspNetUser aspUser,
-            IUnidadeQueries unidadeQueries, IMapper mapper, ITurmaRepo turmaRepo)
+            IUnidadeQueries unidadeQueries, IMapper mapper, ITurmaRepo turmaRepo, IMateriaTemplateQueries materiaTemplateQueries)
         {
             _config = config;
             _aspUser = aspUser;
             _unidadeQueries = unidadeQueries;
             _mapper = mapper;
             _turmaRepo = turmaRepo;
+            _materiaTemplateQueries = materiaTemplateQueries;
         }
         public async Task<int> CountTurmas(Guid unidadeId)
         {
@@ -144,26 +147,16 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<List<MateriaView>> GetMateriasLiberadas(Guid turmaId, Guid professorId)
         {
-            StringBuilder query = new StringBuilder();
-            query.Append("select TurmasMaterias.id, TurmasMaterias.nome, TurmasMaterias.ProfessorId from TurmasMaterias where ");
-            query.Append(" TurmasMaterias.MateriaId in ( select ProfessoresMaterias.PacoteMateriaId from ProfessoresMaterias where ");
-            query.Append(" ProfessoresMaterias.ProfessorId = '" + professorId + "' ) and TurmasMaterias.TurmaId = '" + turmaId + "' ");
-            query.Append(" and TurmasMaterias.ProfessorId = '00000000-0000-0000-0000-000000000000' OR TurmasMaterias.ProfessorId = '" + professorId + "' ");
+            //StringBuilder query = new StringBuilder();
+            //query.Append("select TurmasMaterias.id, TurmasMaterias.nome, TurmasMaterias.ProfessorId from TurmasMaterias where ");
+            //query.Append(" TurmasMaterias.MateriaId in ( select ProfessoresMaterias.PacoteMateriaId from ProfessoresMaterias where ");
+            //query.Append(" ProfessoresMaterias.ProfessorId = '" + professorId + "' ) and TurmasMaterias.TurmaId = '" + turmaId + "' ");
+            //query.Append(" and TurmasMaterias.ProfessorId = '00000000-0000-0000-0000-000000000000' OR TurmasMaterias.ProfessorId = '" + professorId + "' ");
 
-            //string guid = "00000000-0000-0000-0000-000000000000";
-            //Guid nullGuid = new Guid("00000000-0000-0000-0000-000000000000");
-            //string query = @"select 
-            //                TurmasMaterias.id,
-            //                TurmasMaterias.nome,
-            //                TurmasMaterias.ProfessorId
-            //                from TurmasMaterias 
-            //                where TurmasMaterias.MateriaId in (
-            //                select ProfessoresMaterias.PacoteMateriaId from ProfessoresMaterias 
-            //                where ProfessoresMaterias.ProfessorId = @professorId 
-            //                )
-            //                and TurmasMaterias.TurmaId = @turmaId  
-            //                and TurmasMaterias.ProfessorId = @nullGuid 
-            //                OR TurmasMaterias.ProfessorId = @professorId  ";
+            
+            string query = @"SELECT * FROM TurmasMaterias 
+                            WHERE TurmasMaterias.turmaId = @turmaId
+                            AND TurmasMaterias.ProfessorId in (@professorId,'00000000-0000-0000-0000-000000000000') ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -171,7 +164,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Open();
                 IEnumerable<MateriaView> results = new List<MateriaView>();
 
-                results = await connection.QueryAsync<MateriaView>(query.ToString());
+                results = await connection.QueryAsync<MateriaView>(query, new { professorId = professorId, turmaId = turmaId });
 
                 connection.Close();
 
@@ -566,5 +559,170 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
 
         }
+
+        public async Task<TurmaMateriasDto> GetTurmaMateriaByTurmaAndMateriaId(Guid materiaId, Guid turmaId)
+        {
+            string query = @"SELECT * FROM TurmasMaterias WHERE TurmasMaterias.materiaId = @materiaId AND TurmasMaterias.turmaId = @turmaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<TurmaMateriasDto>(query, new { materiaId = materiaId, turmaId = turmaId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+        public async Task<AulaDiarioClasseViewModel> GetPresencaAulaViewModel(Guid calendarioId)
+        {
+            string queryOne = @"select
+                                Calendarios.id,
+                                Calendarios.DiaAula,
+                                Calendarios.HoraInicial,
+                                Calendarios.HoraFinal,
+                                Calendarios.observacoes,
+                                Turmas.id as turmaId,
+                                Professores.Nome as nome,
+                                MateriasTemplate.nome as materiaDescricao
+                                FROM Calendarios
+                                inner join Turmas on Calendarios.turmaId = Turmas.id 
+                                inner join Professores on Calendarios.ProfessorId = Professores.Id
+                                inner join MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
+                                WHERE Calendarios.Id = @calendarioId ";
+
+            string queryTwo = @"SELECT 
+                                Alunos.id,
+                                Alunos.Nome,
+                                Alunos.NomeSocial
+                                FROM Matriculas
+                                INNER JOIN Alunos on Matriculas.AlunoId = Alunos.Id
+                                WHERE Matriculas.TurmaId = @turmaId";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var infoAula = await connection.QuerySingleAsync<AulaViewModel>(queryOne, new { calendarioId = calendarioId });
+
+                var alunos = await connection.QueryAsync<AlunoDto>(queryTwo, new { turmaId = infoAula.turmaId });
+
+                var presencas = new List<ListaPresencaViewModel>();
+                foreach (var aluno in alunos)
+                {
+                    var presenca = new ListaPresencaViewModel();
+                    presenca.calendarioId = infoAula.id;
+                    presenca.alunoId = aluno.id;
+                    presenca.isPresent = null;
+                    presenca.isPresentToString = null;
+                    presenca.nome = aluno.nome;
+                    presenca.nomeSocial = aluno.nomeSocial;
+                    presencas.Add(presenca);
+                }
+
+                connection.Close();
+
+                var aulaView = new AulaDiarioClasseViewModel();
+                aulaView.aulaViewModel = infoAula;
+                aulaView.listaPresenca = presencas;
+
+                return aulaView;
+            }            
+        }
+
+        public async Task<IEnumerable<TurmaMateriasDto>> GetTurmasMateriasByProfessorAndMateriaId(Guid materiaId, Guid professorId)
+        {
+            string query = @"SELECT * FROM TurmasMaterias WHERE TurmasMaterias.materiaId = @materiaId AND TurmasMaterias.ProfessorId = @professorId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<TurmaMateriasDto>(query, new { materiaId = materiaId, professorId = professorId });
+
+                connection.Close();
+
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasDoProfessorLiberadasParaNotas(Guid turmaId)
+        {
+            var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,0,0,0);
+            var userRole = _aspUser.ObterRole();
+            var listGuidMaterias = new List<Guid>();
+            var calendarios = await GetMatriasConcluidas(turmaId);
+            // TurmaMateriasDto
+            var matsDistinct = calendarios.DistinctBy(c => c.materiaId);
+
+            if (userRole == "MasterAdm")
+            {
+                foreach (var item in matsDistinct)
+                {
+                    var calendFilterByMateria = calendarios.Where(c => c.materiaId == item.materiaId);
+
+                    var matsPendentes = calendFilterByMateria.Where(c => c.diaAula >= dateNow);
+
+                    if (!matsPendentes.Any())
+                        listGuidMaterias.Add(item.materiaId);
+
+                }
+            }
+            else
+            {
+
+            }
+
+            var materias = await _materiaTemplateQueries.GetMateriasByListIds(listGuidMaterias);
+            
+
+            return materias;
+        }
+
+        private async Task<IEnumerable<CalendarioDto>> GetMatriasConcluidas(Guid turmaId)
+        {
+            string query = @"SELECT * FROM Calendarios WHERE Calendarios.turmaId = @turmaId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = turmaId });
+
+                connection.Close();
+
+
+                return result;
+            }
+        }
+    }
+
+    public class AulaDiarioClasseViewModel
+    {
+        public AulaDiarioClasseViewModel()
+        {
+            listaPresenca = new List<ListaPresencaViewModel>();
+        }
+        public AulaViewModel aulaViewModel { get; set; }
+        public List<ListaPresencaViewModel> listaPresenca {get;set;}
+
+    }
+
+    public class ListaPresencaViewModel
+    {
+        public Guid id { get; set; }
+        public string nome { get; set; }
+        public string nomeSocial {get;set;}
+        public Guid calendarioId { get; set; }
+        public bool? isPresent { get; set; }
+        public string isPresentToString { get; set; }
+        public Guid alunoId { get; set; }
     }
 }

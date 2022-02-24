@@ -19,6 +19,7 @@ namespace Invictus.Core.Interfaces
         bool EstaAutenticado();
         bool PossuiRole(string role);
         IEnumerable<Claim> ObterClaims();
+        string ObterRole();
         HttpContext ObterHttpContext();
     }
 }

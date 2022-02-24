@@ -33,6 +33,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                         turmas.Descricao,
                         turmas.Identificador,
                         turmas.unidadeId,
+                        Professores.Id as professorId,
                         Professores.Nome,
                         UnidadesSalas.Titulo,
                         MateriasTemplate.Nome as materiaDescricao,
@@ -63,6 +64,42 @@ namespace Invictus.QueryService.AdministrativoQueries
                 // 2022 01 30
 
                 return result;
+            }
+        }
+
+        public async Task<CalendarioDto> GetCalendarioById(Guid calendarioId)
+        {
+            var query = @"SELECT * FROM Calendarios WHERE Calendarios.Id = @calendarioId";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var results = await connection.QuerySingleAsync<CalendarioDto>(query, new { calendarioId = calendarioId });
+
+                connection.Close();// 2022 01 30
+
+
+                return results;
+            }
+        }
+
+        public async Task<IEnumerable<CalendarioDto>> GetCalendarioByProfessorId(Guid professorId)
+        {
+            var query = @"SELECT * FROM Calendarios WHERE Calendarios.ProfessorId = @professorId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                
+                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId });
+
+                connection.Close();
+
+                return results;
             }
         }
 
@@ -102,13 +139,13 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 foreach (var cal in results)
                 {
-                    
+
                     //Debug.WriteLine(diaSeguinte);
                     if (cal.diaaula < hoje)
                     {
                         cal.podeVerRelatorioAula = true;
                     }
-                    else if(cal.diaaula == hoje)
+                    else if (cal.diaaula == hoje)
                     {
                         cal.podeVerRelatorioAula = null;
                     }
@@ -118,6 +155,123 @@ namespace Invictus.QueryService.AdministrativoQueries
                     }
 
                 }
+
+                return results;
+            }
+        }
+
+        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByProfessorIdAndUnidadeId(Guid unidadeId, Guid professorId)
+        {
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            var query = @"SELECT * FROM Calendarios WHERE Calendarios.ProfessorId = @professorId 
+                        AND Calendarios.UnidadeId = @unidadeId AND Calendarios.DiaAula >= @hoje AND Calendarios.AulaIniciada = 'false' ORDER BY DiaAula";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId, unidadeId = unidadeId, hoje = hoje });
+
+                connection.Close();
+
+                return results;
+            }
+        }
+
+        public async Task<TurmaCalendarioViewModel> GetCalendarioViewModelById(Guid calendarioId)
+        {
+            var query = @"select 
+                        calendarios.Id,
+                        calendarios.diaaula,
+                        calendarios.diadasemana,
+                        calendarios.horainicial,
+                        calendarios.horafinal,
+                        calendarios.aulainiciada,
+                        calendarios.aulaconcluida,
+                        calendarios.observacoes,
+                        Unidadessalas.titulo,
+                        materiastemplate.nome,
+                        Professores.Nome as professor 
+                        from calendarios 
+                        left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
+                        left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
+                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        where Calendarios.id = @calendarioId 
+                        order by Calendarios.DiaAula asc ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var result = await connection.QuerySingleAsync<TurmaCalendarioViewModel>(query, new { calendarioId = calendarioId });
+
+                connection.Close();
+                // 2022 01 30
+
+                var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+                //foreach (var cal in results)
+                //{
+
+                //Debug.WriteLine(diaSeguinte);
+                if (result.diaaula < hoje)
+                {
+                    result.podeVerRelatorioAula = true;
+                }
+                else if (result.diaaula == hoje)
+                {
+                    result.podeVerRelatorioAula = null;
+                }
+                else
+                {
+                    result.podeVerRelatorioAula = false;
+                }
+
+                //}
+
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByProfessorIdAndMateriaId(Guid materiaId, Guid professorId)
+        {
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            var query = @"SELECT * FROM Calendarios WHERE Calendarios.ProfessorId = @professorId 
+                        AND Calendarios.materiaId = @materiaId AND Calendarios.DiaAula >= @hoje AND Calendarios.AulaIniciada = 'false' ORDER BY DiaAula";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId, materiaId = materiaId, hoje = hoje });
+
+                connection.Close();
+
+                return results;
+            }
+        }
+
+        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByTurmaIdAndMateriaId(Guid materiaId, Guid turmaId)
+        {
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            var query = @"SELECT * FROM Calendarios WHERE Calendarios.turmaId = @turmaId 
+                        AND Calendarios.materiaId = @materiaId AND Calendarios.DiaAula >= @hoje AND Calendarios.AulaIniciada = 'false' ORDER BY DiaAula";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = turmaId, materiaId = materiaId, hoje = hoje });
+
+                connection.Close();
 
                 return results;
             }

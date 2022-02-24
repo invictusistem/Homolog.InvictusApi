@@ -1,6 +1,7 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.PedagApplication.Interfaces;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,9 +25,10 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly ICalendarioQueries _calendarioQueries; 
         private readonly ITurmaPedagQueries _turmaPedagQueries;
         private readonly IUnidadeQueries _unidadeQueries;
+        private readonly ICalendarioApp _calendarioApp;
         public PedagTurmaController(IProfessorQueries profQueries, ITurmaApplication turmaApp, ITurmaQueries turmaQueries,
             ICalendarioQueries calendarioQueries, ITurmaPedagQueries turmaPedagQueries, IPedagogicoApplication pedagApp,
-            IUnidadeQueries unidadeQueries)
+            IUnidadeQueries unidadeQueries, ICalendarioApp calendarioApp)
         {
             _profQueries = profQueries;
             _turmaApp = turmaApp;
@@ -35,6 +37,7 @@ namespace Invictus.Api.Controllers.Pedagogico
             _turmaPedagQueries = turmaPedagQueries;
             _pedagApp = pedagApp;
             _unidadeQueries = unidadeQueries;
+            _calendarioApp = calendarioApp;
         }
 
         [HttpGet]
@@ -80,6 +83,19 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { aula = aula, profsDisponiveis = profsDisponiveis, materias = materias, salas = salas });
         }
 
+        [HttpGet]
+        [Route("aula-edit/profs/{calendarioId}/{materiaId}")]
+        public async Task<ActionResult> GetProfsDisponiveis(Guid calendarioId, Guid materiaId)
+        {
+            var aula = await _calendarioQueries.GetAulaViewModel(calendarioId);
+
+            var profsDisponiveis = await _profQueries.GetProfessoresDisponiveisByFilter(aula.diaDaSemana, aula.unidadeId, materiaId);
+
+            if (profsDisponiveis.Count() == 0) return NotFound();
+
+            return Ok(new { profsDisponiveis = profsDisponiveis });
+        }
+
 
         [HttpGet]
         [Route("professores/{turmaId}")]
@@ -98,15 +114,6 @@ namespace Invictus.Api.Controllers.Pedagogico
             var notas = await _turmaPedagQueries.GetNotasFromTurma(turmaId, materiaId);
 
             return Ok(new { notas = notas });
-        }
-
-        [HttpPost]
-        [Route("Professores")]
-        public async Task<IActionResult> SaveProfsInTurma([FromBody] SaveProfsCommand command)
-        {
-            await _turmaApp.AddProfessoresNaTurma(command);
-
-            return Ok();
         }
 
         [HttpGet]
@@ -134,6 +141,49 @@ namespace Invictus.Api.Controllers.Pedagogico
             //return Ok(new { infos = notas.infos, lista = notas.listaPresencas });
 
             return Ok(new { presencas = presencas });
+        }
+
+        [HttpGet]
+        [Route("presenca-diario/{calendarioId}")]
+        public async Task<ActionResult> GetAulaDiarioClasse(Guid calendarioId)
+        {
+            // verificar se pode iniciar aula = pelo turma, dia, horario e quem está iniciando
+
+            var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
+
+            return Ok(new { presencas = presencas });
+        }
+
+        [HttpPost]
+        [Route("presenca-diario/{calendarioId}")]
+        public async Task<ActionResult> SaveDiarioDeClasse([FromBody] AulaDiarioClasseViewModel aulaView, Guid calendarioId)
+        {
+            // verificar se pode iniciar aula = pelo turma, dia, horario e quem está iniciando
+
+            // var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
+            return Ok();
+            //return Ok(new { presencas = presencas });
+        }
+
+        [HttpPost]
+        [Route("Professores")]
+        public async Task<IActionResult> SaveProfsInTurma([FromBody] SaveProfsCommand command)
+        {
+            await _turmaApp.AddProfessoresNaTurma(command);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("calendario/editar/{calendarioId}")]
+        public async Task<IActionResult> EditCalendario([FromBody] AulaViewModel aula, Guid calendarioId)
+        {
+            // await _turmaApp.SetMa teriaProfessor(turmaId, professorId, profsMatCommand);
+
+            var aulaSaved = await _calendarioApp.EditCalendario(aula, calendarioId);
+
+            return Ok(new { aula = aulaSaved });
+            //return Ok();
         }
 
         [HttpPut]

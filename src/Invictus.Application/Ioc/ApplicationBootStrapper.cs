@@ -21,6 +21,7 @@ namespace Invictus.Application.Ioc
             // app application            
             services.AddScoped<IAgendaTriApplication, AgendaTriApplication>();
             services.AddScoped<IAlunoApplication, AlunoApplication>();
+            services.AddScoped<ICalendarioApp, CalendarioApp>();
             services.AddScoped<IColaboradorApplication, ColaboradorApplication>();
             services.AddScoped<IContratoApplication, ContratoApplication>();
             services.AddScoped<IDocTemplateApplication, DocTemplateApplication>();

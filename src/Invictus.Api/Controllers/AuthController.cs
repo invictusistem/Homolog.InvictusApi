@@ -344,7 +344,7 @@ namespace Invictus.Api.Controllers
             };
             // log login
 
-            var logLogin = new LogLogin(colaborador.id,colaborador.email, DateTime.Now);
+            var logLogin = new LogLogin(colaborador.id,colaborador.email, DateTime.Now, siglaUnidade.sigla);
             await _db.AddAsync(logLogin);
             try
             {

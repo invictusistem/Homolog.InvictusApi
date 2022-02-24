@@ -64,7 +64,7 @@ namespace Invictus.Api.Controllers
 
             return NoContent();
 
-            //return BadRequest();
+           
         }
 
         [HttpPut]

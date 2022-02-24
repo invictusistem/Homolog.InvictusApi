@@ -57,6 +57,16 @@ namespace Invictus.Application.FinancApplication
             return bolsa.Senha;
         }
 
+        public async Task EditBolsa(BolsaDto editedBolsa)
+        {
+            var bolsa = _mapper.Map<Bolsa>(editedBolsa);
+
+            await _bolsaRepo.EditBolsa(bolsa);
+
+            _bolsaRepo.Commit();
+
+        }
+
         public string GenerateRandomPassword(PasswordOptions opts = null)
         {
             if (opts == null) opts = new PasswordOptions()
@@ -106,5 +116,7 @@ namespace Invictus.Application.FinancApplication
 
             return new string(chars.ToArray());
         }
+
+        
     }
 }

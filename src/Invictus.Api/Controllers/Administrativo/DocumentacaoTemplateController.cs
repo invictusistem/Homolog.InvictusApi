@@ -30,18 +30,18 @@ namespace Invictus.Api.Controllers
 
             if (docs.Count() == 0) return NotFound();
 
-            return Ok();
+            return Ok(new { docs = docs });
         }
 
         [HttpGet]
         [Route("{documentacaoId}")]
         public async Task<IActionResult> GetById(Guid documentacaoId)
         {
-            var docs = await _docTemplateQueries.GetById(documentacaoId);
+            var doc = await _docTemplateQueries.GetById(documentacaoId);
 
-            if (docs == null) return NotFound();
+            if (doc == null) return NotFound();
 
-            return Ok();
+            return Ok(new { doc = doc });
         }
 
         [HttpPost]

@@ -37,8 +37,7 @@ namespace Invictus.Api.Controllers
         {
 
             var results = await _profQueries.GetProfessores(itemsPerPage, currentPage, paramsJson);
-
-            // var cargos = await _db.Cargos.ToListAsync();
+            
             if (results.Data.Count() == 0) return NotFound();
 
             return Ok(new { results = results });
@@ -53,9 +52,9 @@ namespace Invictus.Api.Controllers
             var profMaterias = await _profQueries.GetProfessoresMaterias(professorId);
             var unidades = await _profQueries.GetProfessoresUnidadesDisponiveis(professorId);
 
-            //await _profApplication.EditProfessor(editedProfessor);
+           
 
-            return Ok(new { typePacotes = typePacotes, unidades = unidades, profMaterias = profMaterias, disponibilidades = disponibilidades });// NoContent();
+            return Ok(new { typePacotes = typePacotes, unidades = unidades, profMaterias = profMaterias, disponibilidades = disponibilidades });
         }
 
         [HttpGet]
@@ -64,7 +63,18 @@ namespace Invictus.Api.Controllers
         {            
             var profMaterias = await _profQueries.GetProfessoresMaterias(professorId);
 
-            return Ok(new { profMaterias = profMaterias });
+            return Ok(new { profMaterias = profMaterias.OrderBy(p => p.nome) });
+        }
+
+        [HttpGet]
+        [Route("calendario-professor/{professorId}")]
+        public async Task<IActionResult> GetCalendarioProfessor(Guid professorId)
+        {
+            var calendario = await _profQueries.GetProfessorCalendario(professorId);
+
+            if (!calendario.Any()) return NotFound();
+
+            return Ok(new { calendario = calendario });
         }
 
         [HttpGet]
@@ -87,6 +97,18 @@ namespace Invictus.Api.Controllers
             return Ok(new { result = result });
         }
 
+        [HttpGet]
+        [Route("{rangeini}/{rangefinal}/{teacherId}")]
+        public async Task<IActionResult> GetReportHousrTeacher(DateTime rangeini, DateTime rangefinal, Guid teacherId)
+        {
+
+            var result = await _profQueries.GetReportHoursTeacher(rangeini, rangefinal, teacherId);
+
+            if (!result.calendars.Any()) return NotFound();
+
+            return Ok(new { result = result });
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveProfessor([FromBody] ProfessorDto newProfessor)
         {
@@ -101,6 +123,7 @@ namespace Invictus.Api.Controllers
         [Route("disponibilidade")]
         public async Task<IActionResult> EditProfessorDisponibilidade([FromBody] DisponibilidadeDto dispo)
         {
+            // remover prof da turma conforme for etc
              await _profApplication.EditDisponibilidade(dispo);
 
             return Ok();
@@ -117,7 +140,7 @@ namespace Invictus.Api.Controllers
         [HttpPost]
         [Route("materia/{profId}/{materiaId}")]
         public async Task<IActionResult> AddProfessorMateria(Guid profId, Guid materiaId)
-        {
+        { // remover da turma conforme for
             await _profApplication.AddProfessorMateria(profId,materiaId);
             //var msg = await _utils.ValidaDocumentosColaborador(newProfessor.cpf, null, newProfessor.email);
             //if (msg.Count() > 0) return Conflict(new { msg = msg });
@@ -139,6 +162,7 @@ namespace Invictus.Api.Controllers
         [Route("materia/{profMateriaId}")]
         public async Task<IActionResult> RemoveMateriaProfessor(Guid profMateriaId)
         {
+            // Remover prof da turma conforme for etc
             await _profApplication.RemoveProfessorMateria(profMateriaId);
 
             return Ok();

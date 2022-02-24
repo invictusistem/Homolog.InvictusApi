@@ -27,6 +27,11 @@ namespace Invictus.Data.Repositories.Financeiro
             _db.DisposeAsync();
         }
 
+        public async Task EditBolsa(Bolsa bolsa)
+        {
+            await _db.Bolsas.SingleUpdateAsync(bolsa);
+        }
+
         public async Task SaveBolsa(Bolsa bolsa)
         {
             await _db.Bolsas.AddAsync(bolsa);

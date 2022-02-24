@@ -4,6 +4,7 @@ using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers.Pedagogico
@@ -93,6 +94,16 @@ namespace Invictus.Api.Controllers.Pedagogico
             var notas = await _pedagTurmaQueries.GetNotaAluno(matriculaId);
 
             return Ok(new { notas = notas });
+        }
+
+        [HttpGet]
+        [Route("certificado/{matriculaId}")]
+        public async Task<IActionResult> GetCertificado(Guid matriculaId)
+        {
+            Thread.Sleep(3000);
+
+
+            return NotFound();
         }
 
 

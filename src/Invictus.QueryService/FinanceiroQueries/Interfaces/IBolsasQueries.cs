@@ -11,6 +11,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
     {
         Task<IEnumerable<BolsaDto>> GetBolsas(Guid typePacoteId);
         Task<string> GetSenha(Guid bolsaId);
+        Task<BolsaDto> GetBolsa(Guid bolsaId);
         Task<BolsaDto> GetBolsa(string senha);
     }
 }
