@@ -443,7 +443,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                         AND Turmas.statusAndamento <> 'Aguardando início'  ";
 
             var dateNow = DateTime.Now;
-            var query2 = @"select id from calendarios 
+            var query2 = @"select id, diaAula, horaInicial, horaFinal from calendarios 
                         where Calendarios.DiaAula = '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
                         and Calendarios.TurmaId = @turmaId ";
 
@@ -476,7 +476,30 @@ namespace Invictus.QueryService.AdministrativoQueries
                     {
                         turma.calendarioId = calendario.Select(c => c.id).First();
                         //TEMP
-                        turma.podeIniciarAula = true;
+
+                        var horaCompletaAula = calendario.Select(c => c.diaAula).First();
+                        var horaInicio = calendario.Select(c => c.horaInicial).First().Split(":");
+                        var horaFinal = calendario.Select(c => c.horaFinal).First().Split(":");
+
+                        horaCompletaAula = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                            Convert.ToInt32(horaInicio[0]), Convert.ToInt32(horaInicio[1]), 0);
+                        
+                        var horaCompletaFinal = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                            Convert.ToInt32(horaFinal[0]), Convert.ToInt32(horaFinal[1]), 0);
+                        var timeSpan = new TimeSpan(0, 15, 0);
+
+                        var iniciar = horaCompletaAula - timeSpan;
+
+                        if (dateNow < horaCompletaFinal & dateNow >= horaCompletaAula - timeSpan)
+                        {
+                            turma.podeIniciarAula = true;
+                        }
+                        else
+                        {
+                            turma.podeIniciarAula = false;
+                        }
+
+                        
                     }
                     else
                     {

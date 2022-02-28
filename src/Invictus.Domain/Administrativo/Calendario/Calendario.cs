@@ -88,6 +88,12 @@ string horaFinal,
                 EhSubstituto = true;
             }
         }
+
+        public void SetDiaDaSemana(DateTime diaAula)
+        {
+            var dayOfWeek = diaAula.DayOfWeek;
+            DiaDaSemana = Invictus.Core.Enumerations.DiaDaSemana.TryParse(dayOfWeek).DisplayName;
+        }
         public void SetHoraInicial(string inicio)
         {
             HoraInicial = inicio;

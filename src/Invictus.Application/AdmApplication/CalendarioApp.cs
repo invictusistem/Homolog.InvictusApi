@@ -37,10 +37,8 @@ namespace Invictus.Application.AdmApplication
 
             var turmasMaterias = await _turmaQueries.GetTurmaMateriaByTurmaAndMateriaId(aula.materiaId, calen.turmaId);
             var calendario = _mapper.Map<Calendario>(calen);
-            
 
-            
-
+            calendario.SetDiaDaSemana(calendario.DiaAula);
 
             // ver se sala é diferente, atualizar
             if(aula.salaId != calendario.SalaId)

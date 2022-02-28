@@ -94,7 +94,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
-                
+
                 var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId });
 
                 connection.Close();
@@ -135,25 +135,67 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
                 // 2022 01 30
 
-                var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                var hoje = DateTime.Now;
+
+                //foreach (var cal in results)
+                //{
+
+                //    //Debug.WriteLine(diaSeguinte);
+                //    if (cal.diaaula < hoje)
+                //    {
+                //        cal.podeVerRelatorioAula = true;
+                //    }
+                //    else if (cal.diaaula == hoje)
+                //    {
+                //        cal.podeVerRelatorioAula = null;
+                //    }
+                //    else
+                //    {
+                //        cal.podeVerRelatorioAula = false;
+                //    }
+
+                //}
 
                 foreach (var cal in results)
                 {
 
-                    //Debug.WriteLine(diaSeguinte);
-                    if (cal.diaaula < hoje)
+                    // var calendario = await connection.QueryAsync<CalendarioDto>(query2, new { turmaId = turma.id });
+
+
+                    //if (calendario.Any())
+                    //{
+                    //    turma.calendarioId = calendario.Select(c => c.id).First();
+
+
+                    var horaCompletaAula = cal.diaaula;
+                    var horaInicio = cal.horainicial.Split(":");// calendario.Select(c => c.horaInicial).First().Split(":");
+                    var horaFinal = cal.horafinal.Split(":");// calendario.Select(c => c.horaFinal).First().Split(":");
+
+                    horaCompletaAula = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                        Convert.ToInt32(horaInicio[0]), Convert.ToInt32(horaInicio[1]), 0);
+
+                    var horaCompletaFinal = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                        Convert.ToInt32(horaFinal[0]), Convert.ToInt32(horaFinal[1]), 0);
+                    var timeSpan = new TimeSpan(0, 15, 0);
+
+                    var iniciar = horaCompletaAula - timeSpan;
+
+                    if (hoje < horaCompletaFinal & hoje >= horaCompletaAula - timeSpan)
                     {
-                        cal.podeVerRelatorioAula = true;
-                    }
-                    else if (cal.diaaula == hoje)
-                    {
+                        //hoje.podeIniciarAula = true;
                         cal.podeVerRelatorioAula = null;
                     }
                     else
                     {
-                        cal.podeVerRelatorioAula = false;
+                        if (hoje < horaCompletaAula - timeSpan)
+                        {
+                            cal.podeVerRelatorioAula = false;
+                        }
+                        else
+                        {
+                            cal.podeVerRelatorioAula = true;
+                        }
                     }
-
                 }
 
                 return results;
