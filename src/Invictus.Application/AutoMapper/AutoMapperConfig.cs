@@ -23,6 +23,7 @@ using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -106,6 +107,9 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<ListaPresencaDto, Presenca>()
                 .ConstructUsing(p => new Presenca(p.calendarioId, p.isPresent, p.alunoId, p.isPresentToString));
+
+            CreateMap<ListaPresencaViewModel, Presenca>()
+                .ConstructUsing(p => new Presenca(p.id, p.calendarioId, p.isPresent, p.alunoId, p.isPresentToString));
 
             CreateMap<AnotacaoDto, AlunoAnotacao>();
 

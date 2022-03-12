@@ -18,7 +18,8 @@ namespace Invictus.Api.Controllers.Administrativo
         {
 
             var mensagem = "Bem-vindo ao sistema Invictus!";
-            return Ok(new { mensagem = mensagem });
+            var horario = DateTime.Now;
+            return Ok(new { mensagem = mensagem, horario = horario });
         }
     }
 }

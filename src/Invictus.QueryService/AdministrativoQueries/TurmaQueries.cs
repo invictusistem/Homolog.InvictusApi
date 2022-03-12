@@ -602,7 +602,15 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<AulaDiarioClasseViewModel> GetPresencaAulaViewModel(Guid calendarioId)
         {
-            string queryOne = @"select
+            // NEW
+            string procurarTurmaPresencaDoDiaQuery = @"SELECT id FROM TurmasPresencas WHERE TurmasPresencas.CalendarioId = @calendarioId ";
+
+            string calendarioDoDiaQuery = @"SELECT id, turmaId FROM Calendarios WHERE Calendarios.Id = @calendarioId";
+
+            string alunosDaTurmaQuerie = @"SELECT alunoId FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
+
+            // OLD
+            string infoAulaQuery = @"select
                                 Calendarios.id,
                                 Calendarios.DiaAula,
                                 Calendarios.HoraInicial,
@@ -617,13 +625,25 @@ namespace Invictus.QueryService.AdministrativoQueries
                                 inner join MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
                                 WHERE Calendarios.Id = @calendarioId ";
 
-            string queryTwo = @"SELECT 
-                                Alunos.id,
-                                Alunos.Nome,
-                                Alunos.NomeSocial
-                                FROM Matriculas
-                                INNER JOIN Alunos on Matriculas.AlunoId = Alunos.Id
-                                WHERE Matriculas.TurmaId = @turmaId";
+            string presencasQuery = @"SELECT 
+                                    TurmasPresencas.Id,
+                                    TurmasPresencas.calendarioId,
+                                    TurmasPresencas.alunoId,
+                                    TurmasPresencas.isPresent,
+                                    TurmasPresencas.isPresentToString,
+                                    Alunos.nome,
+                                    Alunos.nomeSocial
+                                    FROM TurmasPresencas 
+                                    INNER JOIN Alunos ON TurmasPresencas.AlunoId = Alunos.Id
+                                    WHERE TurmasPresencas.CalendarioId = @calendarioId ";
+
+            //string queryTwo = @"SELECT 
+            //                    Alunos.id,
+            //                    Alunos.Nome,
+            //                    Alunos.NomeSocial
+            //                    FROM Matriculas
+            //                    INNER JOIN Alunos on Matriculas.AlunoId = Alunos.Id
+            //                    WHERE Matriculas.TurmaId = @turmaId";
 
 
             await using (var connection = new SqlConnection(
@@ -631,28 +651,51 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var infoAula = await connection.QuerySingleAsync<AulaViewModel>(queryOne, new { calendarioId = calendarioId });
+                var listaPresenca = await connection.QueryAsync<Guid>(procurarTurmaPresencaDoDiaQuery, new { calendarioId = calendarioId });
 
-                var alunos = await connection.QueryAsync<AlunoDto>(queryTwo, new { turmaId = infoAula.turmaId });
-
-                var presencas = new List<ListaPresencaViewModel>();
-                foreach (var aluno in alunos)
+                if (!listaPresenca.Any())
                 {
-                    var presenca = new ListaPresencaViewModel();
-                    presenca.calendarioId = infoAula.id;
-                    presenca.alunoId = aluno.id;
-                    presenca.isPresent = null;
-                    presenca.isPresentToString = null;
-                    presenca.nome = aluno.nome;
-                    presenca.nomeSocial = aluno.nomeSocial;
-                    presencas.Add(presenca);
+                    var calendario = await connection.QuerySingleAsync<CalendarioDto>(calendarioDoDiaQuery, new { calendarioId = calendarioId });
+                    var alunosDaTurma = await connection.QueryAsync<MatriculaDto>(alunosDaTurmaQuerie, new { turmaId = calendario.turmaId });
+                    
+                    var turmaPresencaList = new List<Presenca>();
+                    
+                    foreach (var aluno in alunosDaTurma)
+                    {
+                        var presenca = new Presenca(calendarioId, null, aluno.alunoId, null);
+                        turmaPresencaList.Add(presenca);
+                    }
+
+                    await _turmaRepo.SaveListPresencas(turmaPresencaList);
+                    _turmaRepo.Commit();
+
                 }
 
-                connection.Close();
+                var infoAula = await connection.QuerySingleAsync<AulaViewModel>(infoAulaQuery, new { calendarioId = calendarioId });
+
+                var presencas = await connection.QueryAsync<ListaPresencaViewModel>(presencasQuery, new { calendarioId = calendarioId });
+
+
+                //var alunos = await connection.QueryAsync<AlunoDto>(queryTwo, new { turmaId = infoAula.turmaId });
+
+                //var presencas = new List<ListaPresencaViewModel>();
+                //foreach (var aluno in alunos)
+                //{
+                //    var presenca = new ListaPresencaViewModel();
+                //    presenca.calendarioId = infoAula.id;
+                //    presenca.alunoId = aluno.id;
+                //    presenca.isPresent = null;
+                //    presenca.isPresentToString = null;
+                //    presenca.nome = aluno.nome;
+                //    presenca.nomeSocial = aluno.nomeSocial;
+                //    presencas.Add(presenca);
+                //}
+
+                //connection.Close();
 
                 var aulaView = new AulaDiarioClasseViewModel();
                 aulaView.aulaViewModel = infoAula;
-                aulaView.listaPresenca = presencas;
+                aulaView.listaPresenca = presencas.ToList();
 
                 return aulaView;
             }            

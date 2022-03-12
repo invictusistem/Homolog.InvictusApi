@@ -154,13 +154,35 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { presencas = presencas });
         }
 
+        //[HttpPost]
+        //[Route("presenca-diario/{calendarioId}")]
+        //public async Task<ActionResult> SaveDiarioDeClasse([FromBody] AulaDiarioClasseViewModel aulaView, Guid calendarioId)
+        //{
+        //    // verificar se pode iniciar aula = pelo turma, dia, horario e quem está iniciando
+
+        //    //var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
+        //    retu rn  Ok();
+        //    //return Ok(new { presencas = presencas });
+        //}
+
         [HttpPost]
         [Route("presenca-diario/{calendarioId}")]
-        public async Task<ActionResult> SaveDiarioDeClasse([FromBody] AulaDiarioClasseViewModel aulaView, Guid calendarioId)
+        public async Task<ActionResult> SaveDiarioDeClasse([FromBody] AulaDiarioClasseViewModel saveCommand, Guid calendarioId)
         {
             // verificar se pode iniciar aula = pelo turma, dia, horario e quem está iniciando
+            await _turmaApp.SavePresenca(saveCommand);
+            //var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
+            return Ok();
+            //return Ok(new { presencas = presencas });
+        }
 
-            // var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
+        [HttpPut]
+        [Route("presenca-diario/{calendarioId}")]
+        public async Task<ActionResult> UpdateDiarioDeClasse([FromBody] AulaDiarioClasseViewModel saveCommand, Guid calendarioId)
+        {
+            // verificar se pode iniciar aula = pelo turma, dia, horario e quem está iniciando
+            await _turmaApp.SavePresenca(saveCommand);
+            //var presencas = await _turmaQueries.GetPresencaAulaViewModel(calendarioId);
             return Ok();
             //return Ok(new { presencas = presencas });
         }

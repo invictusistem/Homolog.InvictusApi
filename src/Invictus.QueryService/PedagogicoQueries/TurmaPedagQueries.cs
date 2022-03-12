@@ -110,12 +110,22 @@ namespace Invictus.QueryService.PedagogicoQueries
         {
             var query = @"select * from turmasNotas where TurmasNotas.MatriculaId = @matriculaId ";
 
+            var matriculaQuery = @"SELECT Matriculas.TurmaId FROM Matriculas WHERE Matriculas.Id = @matriculaId ";
+
+            var calendarios = @"select * from calendarios where calendarios.turmaId = @turmaId ";
+
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
-
+                // as notas sao criadas ao matricular o aluno
                 var notas = await connection.QueryAsync<TurmaNotasViewModel>(query, new { matriculaId = matriculaId });
+
+                var matricula = await connection.QuerySingleAsync<MatriculaDto>(matriculaQuery, new { matriculaId = matriculaId });
+
+                var aulas = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = matricula.turmaId });
+
+
 
                 return notas;
 

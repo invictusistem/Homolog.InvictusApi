@@ -21,6 +21,8 @@ namespace Invictus.Dtos.PedagDto
         public string resultado { get; set; }
         public Guid matriculaId { get; set; }
         public Guid turmaId { get; set; }
+        public int percentualPresenca { get; set; }
+        public int qntFaltas { get; set; }
     }
 
     public class TurmaNotasDto

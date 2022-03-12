@@ -71,6 +71,10 @@ namespace Invictus.Api.Controllers
 
             // Docs Vencidos
 
+            // verificar no TurmasPresencas se tem calendario de aula passada que nao foi gerada ListaDePresenca e gerar !?
+
+            // atualizar lista notas diariamente !?
+
             return Ok();
         }
 

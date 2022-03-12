@@ -88,5 +88,10 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             await _db.TurmasMaterias.BulkDeleteAsync(turmaMateria);
         }
+
+        public void UpdatePresencas(IEnumerable<Presenca> presencas)
+        {
+            _db.Presencas.UpdateRange(presencas);
+        }
     }
 }

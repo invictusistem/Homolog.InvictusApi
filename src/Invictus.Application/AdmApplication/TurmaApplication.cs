@@ -13,6 +13,7 @@ using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
@@ -350,6 +351,30 @@ namespace Invictus.Application.AdmApplication
 
             _notasRepo.Commit();
 
+        }
+
+        public async Task SavePresenca(AulaDiarioClasseViewModel saveCommand)
+        {
+            var presencaList = _mapper.Map<List<Presenca>>(saveCommand.listaPresenca);
+
+            foreach (var presenca in presencaList)
+            {
+                presenca.SetPresenca(presenca.IsPresentToString);                
+            }
+           
+            //var calendarioDto = await _calendarioQueries.GetCalendarioById(saveCommand.aulaViewModel.id);// _context.Calendarios.Find(savePresencaCommand.calendarId);
+
+            //var calendario = _mapper.Map<Calendario>(calendarioDto);
+
+            //calendario.SetObservacoes(saveCommand.aulaViewModel.observacoes);
+            //calendario.SetDataConclusaoAula();
+            //calendario.ConcluirAula();
+
+            //await _calendarioRepo.UpdateCalendario(calendario);
+
+            _turmaRepo.UpdatePresencas(presencaList);
+
+            _turmaRepo.Commit();
         }
     }
 }
