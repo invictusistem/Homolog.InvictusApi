@@ -59,6 +59,15 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { calends = calends });
         }
 
+        //[HttpGet]
+        //[Route("calendario/{turmaId}")]
+        //public async Task<ActionResult> GetCalendariosPAGINATORTESTE(Guid turmaId)
+        //{
+        //    var calends = await _calendarioQueries.GetCalendarioByTurmaId(turmaId);
+
+        //    return Ok(new { calends = calends });
+        //}
+
         [HttpGet]
         [Route("aula/{calendarioId}")]
         public async Task<ActionResult> GetCalendario(Guid calendarioId)

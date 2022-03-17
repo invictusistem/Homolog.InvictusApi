@@ -11,15 +11,22 @@ using System.Threading.Tasks;
 
 namespace Invictus.QueryService.Utilitarios
 {
+    public class Validations
+    {
+        public bool cpf { get; set; } = false;
+        public bool rg { get; set; } = false;
+        public bool email { get; set; } = false;
+    }
     public class Utils : IUtils
     {
         private readonly IConfiguration _config;
         private List<string> _inconsistencies;
-
+        private Validations _validations;
         public Utils(IConfiguration config)
         {
             _config = config;
             _inconsistencies = new List<string>();
+            _validations = new Validations();
         }
         public async Task<IEnumerable<string>> ValidaDocumentosAluno(string cpf, string rg, string email)
         {
@@ -32,7 +39,11 @@ namespace Invictus.QueryService.Utilitarios
                 {
                     connection.Open();
                     var result = await connection.QueryAsync<string>(query, new { cpf = cpf });
-                    if (result.Count() > 0) _inconsistencies.Add("Já existe aluno com o CPF cadastrado.");
+                    if (result.Count() > 0)
+                    {
+                        _validations.cpf = true;
+                        _inconsistencies.Add("Já existe aluno com o CPF cadastrado.");
+                    }
                 }
             }
 
@@ -72,7 +83,7 @@ namespace Invictus.QueryService.Utilitarios
         }
 
         public async Task<IEnumerable<string>> ValidaDocumentosColaborador(string cpf, string rg, string email)
-        {
+        {            
             if (!String.IsNullOrEmpty(cpf))
             {
                 var query = @"select colaboradores.cpf from colaboradores where colaboradores.cpf = @cpf";
@@ -85,7 +96,11 @@ namespace Invictus.QueryService.Utilitarios
                     var result = await connection.QueryAsync<string>(query, new { cpf = cpf });
                     var result2 = await connection.QueryAsync<string>(query2, new { cpf = cpf });
                     var result3 = await connection.QueryAsync<string>(query3, new { cpf = cpf });
-                    if (result.Count() > 0 || result2.Count() > 0 || result3.Count() > 0) _inconsistencies.Add("Favor, escolha outro CPF.");
+                    if (result.Count() > 0 || result2.Count() > 0 || result3.Count() > 0)
+                    {
+                        _validations.cpf = true;
+                        _inconsistencies.Add("Favor, escolha outro CPF.");
+                    }
                 }
             }
 
@@ -99,7 +114,11 @@ namespace Invictus.QueryService.Utilitarios
                     connection.Open();
                     var result = await connection.QueryAsync<string>(query, new { rg = rg });
                     var result2 = await connection.QueryAsync<string>(query2, new { rg = rg });
-                    if (result.Count() > 0 || result2.Count() > 0) _inconsistencies.Add("Favor, escolha outro RG.");
+                    if (result.Count() > 0 || result2.Count() > 0)
+                    {
+                        _validations.rg = true;
+                        _inconsistencies.Add("Favor, escolha outro RG.");
+                    }
                 }
             }
 
@@ -115,7 +134,11 @@ namespace Invictus.QueryService.Utilitarios
                     var result = await connection.QueryAsync<string>(query, new { email = email });
                     var result2 = await connection.QueryAsync<string>(query2, new { email = email });
                     var result3 = await connection.QueryAsync<string>(query3, new { email = email });
-                    if (result.Count() > 0 || result2.Count() > 0 || result3.Count() > 0) _inconsistencies.Add("Favor, escolha outro e-mail.");
+                    if (result.Count() > 0 || result2.Count() > 0 || result3.Count() > 0)
+                    {
+                        _validations.email = true;
+                        _inconsistencies.Add("Favor, escolha outro e-mail.");
+                    }
                 }
             }
 

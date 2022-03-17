@@ -147,9 +147,9 @@ namespace Invictus.Application.AdmApplication
 
             //var qntAulas = 0;
 
-            //try
-            //{
-            var diaCalendario = 0;
+            try
+            {
+                var diaCalendario = 0;
             for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
             {
                 double horasTotaisDaMateriaEmMinutos = aulasPresenciais[mat].cargaHoraria * 60;
@@ -179,10 +179,11 @@ namespace Invictus.Application.AdmApplication
 
             }
 
-            //}catch(Exception ex)
-            //{
+            }
+            catch (Exception ex)
+            {
 
-            //}
+            }
 
 
 

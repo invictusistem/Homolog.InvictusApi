@@ -30,5 +30,10 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             _db.Dispose();
         }
+
+        public async Task EditParamValue(ParametrosValue parametro)
+        {
+            await _db.ParametrosValues.SingleUpdateAsync(parametro);
+        }
     }
 }

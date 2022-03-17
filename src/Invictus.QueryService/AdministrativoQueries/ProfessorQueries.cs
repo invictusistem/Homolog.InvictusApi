@@ -6,6 +6,7 @@ using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -343,18 +344,18 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         private async Task<List<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
         {
-            StringBuilder queryCount = new StringBuilder();
-            queryCount.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
-            queryCount.Append("inner join Professores on ProfessoresDisponibilidades.PessoaId = Professores.Id where ");
-            queryCount.Append(" ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
-            queryCount.Append(" AND Professores.ativo = 'True' ");
-            queryCount.Append(" AND ProfessoresDisponibilidades.PessoaId not in ");// (select TurmasMaterias.ProfessorId from TurmasMaterias 
-            queryCount.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId + "') AND ");
+            StringBuilder profsDisponiveis = new StringBuilder();
+            profsDisponiveis.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
+            profsDisponiveis.Append("inner join Professores on ProfessoresDisponibilidades.PessoaId = Professores.Id where ");
+            profsDisponiveis.Append(" ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
+            profsDisponiveis.Append(" AND Professores.ativo = 'True' AND ");
+            //profsDisponiveis.Append(" AND ProfessoresDisponibilidades.PessoaId not in ");
+            //profsDisponiveis.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId + "') AND ");
 
             if (diasSemana.Count() == 1)
             {
                 var stringDiaSemana = ParseDiaSemana(diasSemana[0]);
-                queryCount.Append(" ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
+                profsDisponiveis.Append(" ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
 
 
             }
@@ -363,23 +364,38 @@ namespace Invictus.QueryService.AdministrativoQueries
                 for (int i = 0; i < diasSemana.Count(); i++)
                 {
                     var stringDiaSemana = ParseDiaSemana(diasSemana[i]);
-                    queryCount.Append("ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
-                    if (i != diasSemana.Count() - 1) queryCount.Append(" OR ");
-                    //queryCount.Append(" AND ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
+                    profsDisponiveis.Append("ProfessoresDisponibilidades." + stringDiaSemana + " = 'True'  ");
+                    if (i != diasSemana.Count() - 1) profsDisponiveis.Append(" OR ");
                 }
 
             }
+
+            var profsDaTurma = @"SELECT ProfessorId FROM TurmasProfessores WHERE TurmasProfessores.TurmaId = @turmaId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<ProfessorDto>(queryCount.ToString());
+                var result = await connection.QueryAsync<ProfessorDto>(profsDisponiveis.ToString());
+
+                var professoresTurma = await connection.QueryAsync<Guid>(profsDaTurma, new { turmaId = turmaId });
+
+                var professores = new List<ProfessorDto>();
+
+                foreach (var item in result.DistinctBy(p => p.email))
+                {
+                    var prof = professoresTurma.Where(p => p == item.id).ToList();
+
+                    if(!prof.Any())
+                    {
+                        professores.Add(item);
+                    }
+                }
 
                 connection.Close();
 
-                return result.ToList();
+                return professores.ToList();
             }
         }
 

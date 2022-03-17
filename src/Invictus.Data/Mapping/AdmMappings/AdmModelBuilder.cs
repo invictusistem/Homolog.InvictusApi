@@ -29,6 +29,7 @@ namespace Invictus.Data.Mapping.AdmMappings
             modelBuilder.ApplyConfiguration(new AlunoPlanoPagamentoDbMapping());
             modelBuilder.ApplyConfiguration(new AutorizacaoDbMapping());
             modelBuilder.ApplyConfiguration(new CalendarioDbMapping());
+            modelBuilder.ApplyConfiguration(new AnotacaoColaboradorDbMapping());
             modelBuilder.ApplyConfiguration(new ColaboradorDbMapping());
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());

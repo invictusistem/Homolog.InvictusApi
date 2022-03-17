@@ -621,7 +621,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                                 MateriasTemplate.nome as materiaDescricao
                                 FROM Calendarios
                                 inner join Turmas on Calendarios.turmaId = Turmas.id 
-                                inner join Professores on Calendarios.ProfessorId = Professores.Id
+                                left join Professores on Calendarios.ProfessorId = Professores.Id
                                 inner join MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
                                 WHERE Calendarios.Id = @calendarioId ";
 
@@ -671,7 +671,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 }
 
-                var infoAula = await connection.QuerySingleAsync<AulaViewModel>(infoAulaQuery, new { calendarioId = calendarioId });
+                var infoAula = await connection.QueryAsync<AulaViewModel>(infoAulaQuery, new { calendarioId = calendarioId });
 
                 var presencas = await connection.QueryAsync<ListaPresencaViewModel>(presencasQuery, new { calendarioId = calendarioId });
 
@@ -694,7 +694,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 //connection.Close();
 
                 var aulaView = new AulaDiarioClasseViewModel();
-                aulaView.aulaViewModel = infoAula;
+                aulaView.aulaViewModel = infoAula.FirstOrDefault();
                 aulaView.listaPresenca = presencas.ToList();
 
                 return aulaView;

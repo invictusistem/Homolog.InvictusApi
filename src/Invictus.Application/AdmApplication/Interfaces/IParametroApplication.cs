@@ -10,5 +10,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
     public interface IParametroApplication
     {
         Task SaveCargo(string key, ParametroValueDto paramValue);
+        Task EditCargo(ParametroValueDto paramValue);
     }
 }

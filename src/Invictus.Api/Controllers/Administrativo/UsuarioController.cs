@@ -22,6 +22,7 @@ namespace Invictus.Api.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IColaboradorQueries _colaboradorQueries;
+        private readonly IProfessorQueries _profQueries;
         private readonly IUsuariosQueries _userQueries;
         private readonly IUsuarioApplication _userApplication;
         private readonly IUnidadeQueries _unidadeQueries;
@@ -30,7 +31,7 @@ namespace Invictus.Api.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         public UsuarioController(IColaboradorQueries colaboradorQueries, UserManager<IdentityUser> userManager, IAspNetUser aspUser,
-            IEmailSender email, IUsuariosQueries userQueries,
+            IEmailSender email, IUsuariosQueries userQueries, IProfessorQueries profQueries,
             IUsuarioApplication userApplication, IUnidadeQueries unidadeQueries, SignInManager<IdentityUser> signInManager)
         {
             _colaboradorQueries = colaboradorQueries;
@@ -41,6 +42,7 @@ namespace Invictus.Api.Controllers
             _userApplication = userApplication;
             _unidadeQueries = unidadeQueries;
             _signInManager = signInManager;
+            _profQueries = profQueries;
         }
 
         [HttpGet]
@@ -97,7 +99,15 @@ namespace Invictus.Api.Controllers
                 return BadRequest(new { mensagem = "Não foi encontrado nenhum colaborador com o e-mail cadastrado nesta unidade." });
 
             if (result != null)
-                return Ok(new { result = result });
+            {
+                // pegar perfiz permitidos
+
+                var perfis = _userApplication.GetPerfisAutorizados();
+
+                if (!perfis.Any()) return Unauthorized(new { mensagem = "Você não possui autorização para conceder acessos." });
+
+                return Ok(new { result = result, perfis = perfis });
+            }
 
             return BadRequest();
         }
@@ -108,7 +118,16 @@ namespace Invictus.Api.Controllers
         [Route("{colaboradorId}/")]
         public async Task<ActionResult> ConcederAcesso(Guid colaboradorId, [FromQuery] string perfil, [FromQuery] bool perfilAtivo)
         {
+
             var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);// _context.Colaboradores.Find(id);
+            
+            if(colaborador == null)
+            {
+                var prof = await _profQueries.GetProfessorById(colaboradorId);
+                colaborador.email = prof.email;
+                colaborador.nome = prof.nome;
+            }
+            
 
             var primeiroNome = colaborador.nome.Split(" ");
 
@@ -126,7 +145,7 @@ namespace Invictus.Api.Controllers
             if (result.Succeeded)
             {
                 var unidadeSigla = _aspUser.ObterUnidadeDoUsuario();
-                var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+                //var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
                 await _userManager.AddToRoleAsync(user, perfil);
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", perfilAtivo.ToString()));
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Unidade", unidadeSigla));
@@ -136,7 +155,7 @@ namespace Invictus.Api.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new { msg = "Ocorreu um erro ao conceder o acesso. Procure o administrador do sistema." });
             }
 
 
@@ -148,9 +167,10 @@ namespace Invictus.Api.Controllers
             }
             catch (Exception ex)
             {
-
+                return BadRequest(new { msg = "O acesso foi concedido mas não foi possível enviar o e-mail para o usuário."});
             }
-            return NoContent();
+
+            return Ok();
         }
 
         [HttpPut]

@@ -186,6 +186,10 @@ namespace Invictus.Application.AdmApplication
         {  
             var professor = _mapper.Map<Professor>(editedProfessor);
 
+            professor.SetDataEntrada(editedProfessor.dataEntrada);
+
+            professor.SetDataSaida(editedProfessor.dataSaida);
+
             await _profRepository.EditProfessor(professor);
 
             _profRepository.Save();
@@ -234,6 +238,12 @@ namespace Invictus.Application.AdmApplication
             newProfessor.unidadeId = unidade.id;
 
             var professor = _mapper.Map<Professor>(newProfessor);
+
+            //var sdfd = newProfessor.dataEntrada;
+            //var wewfwf = newProfessor.dataEntrada.Value;
+            professor.SetDataCadastro();
+
+            professor.SetDataEntrada(newProfessor.dataEntrada);
 
             await _profRepository.AddProfessor(professor);
 

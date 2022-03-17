@@ -9,6 +9,7 @@ namespace Invictus.Domain.Administrativo.Parametros.Interfaces
     public interface IParametroRepo : IDisposable
     {
         Task AddParamValue(ParametrosValue parametro);
+        Task EditParamValue(ParametrosValue parametro);
         void Commit();
     }
 }

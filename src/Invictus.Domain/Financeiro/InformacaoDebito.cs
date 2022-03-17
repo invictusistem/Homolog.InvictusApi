@@ -36,10 +36,12 @@ namespace Invictus.Domain.Financeiro
         public string Historico { get; private set; }
         public string StatusPagamento { get; private set; } // Pago, cancelado, em aberto
         public string Origem { get; private set; } // Enum.. se for de curso colocar curso etc...que ai busca débito só do curso etc.. ou só de trans
+        public string Tipo { get; private set; }
         public Guid UnidadeCusto { get; private set; }
         public string SubConta { get; private set; }
         // NEW
         public Guid MatriculaId { get; private set; } // quer saber o curso etc? ver aqui
+        public Guid FornecedorId { get; private set; }
         public DateTime DataCadastro { get; private set; }
         public ICollection<Boleto> Boletos { get; private set; }
        

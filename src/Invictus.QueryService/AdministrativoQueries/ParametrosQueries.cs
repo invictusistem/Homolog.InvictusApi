@@ -37,6 +37,24 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<ParametroValueDto> GetParamKeyById(Guid valueId)
+        {
+            var query = @"SELECT * FROM ParametrosValue WHERE ParametrosValue.id = @valueId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<ParametroValueDto>(query, new { valueId = valueId });
+
+                connection.Close();
+
+                return result;
+
+            }
+        }
+
         public async Task<IEnumerable<ParametroValueDto>> GetParamValue(string key)
         {
             var query = @"SELECT * FROM ParametrosValue WHERE ParametrosValue.ParametrosKeyId = (

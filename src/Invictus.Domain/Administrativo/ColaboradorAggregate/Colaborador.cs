@@ -12,6 +12,9 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate
         public Colaborador(string nome,
                            string email,
                            string cpf,
+                           //string cnpj,
+                           //string telefoneContato,
+                           //string nomeContato,
                            string celular,
                            //string cargo,
                            Guid cargoId,
@@ -23,6 +26,9 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate
             Nome = nome;
             Email = email;
             CPF = cpf;
+            //CNPJ = cnpj;
+            //TelefoneContato = telefoneContato;
+            //NomeContato = nomeContato;
             Celular = celular;
            // Cargo = cargo;
             CargoId = cargoId;
@@ -34,14 +40,36 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate
         public string Nome { get; private set; }
         public string Email { get; private set; }
         public string CPF { get; private set; }
+       // public string CNPJ { get; private set; }
+        //public string TelefoneContato { get; private set; }
+        //public string NomeContato { get; private set; }
         public string Celular { get; private set; }
         //public string Cargo { get; private set; }
         public Guid CargoId { get; private set; }
         public Guid UnidadeId { get; private set; }       
-        public bool Ativo { get; private set; }       
+        public bool Ativo { get; private set; }
+        public bool IsProfessor { get; private set; }
+        public bool IsColaborador { get; private set; }
+        //public DateTime DataEntrada { get; private set; }
+        //public DateTime DataSaida { get; private set; }
         public DateTime DataCriacao { get; private set; }
+
         public ColaboradorEndereco Endereco { get; private set; }
 
+        public void SetColaborador()
+        {
+            IsProfessor = false;
+            IsColaborador = true;
+        }
+        public void SetDataEntrada(DateTime data)
+        {
+            //if(data != DateTime.m)
+        }
+
+        public void SetDataSaida(DateTime data)
+        {
+
+        }
         public void DesativarColaborador()
         {
             Ativo = false;

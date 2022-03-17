@@ -17,6 +17,7 @@ using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Financeiro.Fornecedores;
+using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
@@ -74,7 +75,7 @@ namespace Invictus.Application.AutoMapper
 
 
             CreateMap<ProfessorDto, Professor>()
-                 .ConstructUsing(c => new Professor(c.nome, c.email, c.cpf, c.celular, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                 .ConstructUsing(c => new Professor(c.nome, c.email, c.cpf, c.celular,c.cnpj,c.telefoneContato,c.nomeContato, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ProfessorEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf),
                      new DadosBancarios(c.bancoNumero, c.agencia, c.conta, TipoConta.TryParse(c.tipoConta))));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
@@ -119,11 +120,15 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<TurmaProfessoresDto, TurmaProfessor>();
 
+            CreateMap<ParametroValueDto, ParametrosValue>();
+
             CreateMap<TurmaNotasDto, TurmaNotas>();
 
             CreateMap<FornecedorDto, Fornecedor>();
 
             CreateMap<CalendarioDto, Calendario>();
+
+            CreateMap<EstagioDto, Estagio>();
 
             CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
                 .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,

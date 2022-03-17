@@ -47,6 +47,8 @@ namespace Invictus.Application.AdmApplication
             
             var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(newColaborador);
 
+            colaborador.SetColaborador();
+
             colaborador.TratarEmail(colaborador.Email);
 
             await _colaboradorRepo.AddColaborador(colaborador);

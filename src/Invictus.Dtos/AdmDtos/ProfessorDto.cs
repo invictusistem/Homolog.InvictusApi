@@ -13,6 +13,9 @@ namespace Invictus.Dtos.AdmDtos
         public string email { get; set; }
         public string cpf { get; set; }
         public string celular { get; set; }
+        public string cnpj { get; set; }
+        public string telefoneContato { get; set; }
+        public string nomeContato { get; set; }        
         public Guid unidadeId { get; set; }
         public string numero { get; set; }
         public bool ativo { get; set; }
@@ -22,7 +25,9 @@ namespace Invictus.Dtos.AdmDtos
         public string bairro { get; set; }
         public string cidade { get; set; }
         public string uf { get; set; }
-
+        public DateTime? dataEntrada { get; set; }
+        public DateTime? dataSaida { get; set; }
+        public DateTime dataCriacao { get; set; }
         public string bancoNumero { get; set; }
         public string agencia { get; set; }
         public string conta { get; set; }

@@ -19,6 +19,7 @@ using Invictus.Domain.Administrativo.UnidadeAuth;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Financeiro.Fornecedores;
+using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
@@ -41,6 +42,7 @@ namespace Invictus.Data.Context
         public DbSet<AlunoPlanoPagamento> AlunoPlanos { get; set; }
         public DbSet<Autorizacao> Autorizacoes { get; set; }
         public DbSet<Calendario> Calendarios { get; set; }
+        public DbSet<AnotacaoColaborador> ColaboradoresAnotacoes { get; set; }
         public DbSet<Colaborador> Colaboradores { get; set; }
         public DbSet<Conteudo> Conteudos { get; set; }
         public DbSet<Contrato> Contratos { get; set; }
@@ -72,21 +74,26 @@ namespace Invictus.Data.Context
         public DbSet<Unidade> Unidades { get; set; }
         #endregion
 
-        #region PEDAGOGICO
-        public DbSet<TurmaNotas> TurmasNotas { get; set; }
-        public DbSet<AlunoAnotacao> AlunosAnotacoes { get; set; }
-
-        #endregion
-
         #region FINANC
 
         public DbSet<Boleto> Boletos { get; set; }
         public DbSet<Bolsa> Bolsas { get; set; }
         public DbSet<Fornecedor> Fornecedors { get; set; }
         public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
-        
+
 
         #endregion
+
+        #region PEDAGOGICO
+        public DbSet<AlunoAnotacao> AlunosAnotacoes { get; set; }
+        public DbSet<DocumentoEstagio> DocumentosEstagio { get; set; }
+        public DbSet<Estagio> Estagios { get; set; }
+        public DbSet<MatriculaEstagio> MatriculasEstagios { get; set; }
+        public DbSet<TurmaNotas> TurmasNotas { get; set; }
+
+        #endregion
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

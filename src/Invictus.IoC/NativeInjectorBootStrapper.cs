@@ -24,6 +24,7 @@ using Invictus.Domain.Financeiro.Bolsas.Interfaces;
 using Invictus.Domain.Financeiro.Fornecedores.Interfaces;
 using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Domain.Padagogico.AlunoAggregate.Interfaces;
+using Invictus.Domain.Padagogico.Estagio.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
 using Invictus.Domain.Pedagogico.Responsaveis.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -59,14 +60,15 @@ namespace Invictus.IoC
             services.AddScoped<IAlunoRepo, AlunoRepo>();
             services.AddScoped<IMatriculaRepo, MatriculaRepo>();
             services.AddScoped<ITurmaNotasRepo, TurmaNotasRepo>();
-            services.AddScoped<IAutorizacaoRepo, AutorizacaoRepo>();
-            // Pedag
-            services.AddScoped<IAlunoPedagRepo, AlunoPedagRepo>();
-            services.AddScoped<IRespRepo, RespRepo>();
+            services.AddScoped<IAutorizacaoRepo, AutorizacaoRepo>();            
             // Financ
             services.AddScoped<IBolsaRepo, BolsaRepo>();
             services.AddScoped<IFornecedorRepo, FornecedorRepo>();
             services.AddTransient<IDebitosRepos, InfoFinancRepo>();
+            // Pedag
+            services.AddScoped<IAlunoPedagRepo, AlunoPedagRepo>();
+            services.AddScoped<IEstagioRepo, EstagioRepo>();
+            services.AddScoped<IRespRepo, RespRepo>();
 
 
         }

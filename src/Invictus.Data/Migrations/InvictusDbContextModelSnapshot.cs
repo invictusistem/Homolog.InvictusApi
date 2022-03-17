@@ -243,6 +243,32 @@ namespace Invictus.Data.Migrations
                     b.ToTable("Calendarios");
                 });
 
+            modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.AnotacaoColaborador", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comentario")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Titulo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ColaboradoresAnotacoes");
+                });
+
             modelBuilder.Entity("Invictus.Domain.Administrativo.ColaboradorAggregate.Colaborador", b =>
                 {
                     b.Property<Guid>("Id")
@@ -266,6 +292,12 @@ namespace Invictus.Data.Migrations
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsColaborador")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsProfessor")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
@@ -785,6 +817,9 @@ namespace Invictus.Data.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
+                    b.Property<string>("CNPJ")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CPF")
                         .HasColumnType("nvarchar(11)");
 
@@ -794,10 +829,22 @@ namespace Invictus.Data.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DataEntrada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataSaida")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeContato")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelefoneContato")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UnidadeId")
@@ -1301,6 +1348,9 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("SubConta")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Tipo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("UnidadeCusto")
                         .HasColumnType("uniqueidentifier");
 
@@ -1311,6 +1361,125 @@ namespace Invictus.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InformacoesDebitos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.DocumentoEstagio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Analisado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ContentArquivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("DataFile")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MatriculaEstagioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoArquivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Validado")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatriculaEstagioId");
+
+                    b.ToTable("EstagioDocumentos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.Estagio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Bairro")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CNPJ")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Logradouro")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Numero")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SupervisorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UF")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Vagas")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Estagios");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.MatriculaEstagio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AlunoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EstagioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NumeroMatricula")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstagiosMatriculas");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Padagogico.NotasTurmas.TurmaNotas", b =>
@@ -1848,6 +2017,17 @@ namespace Invictus.Data.Migrations
                     b.Navigation("InformacaoDebito");
                 });
 
+            modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.DocumentoEstagio", b =>
+                {
+                    b.HasOne("Invictus.Domain.Padagogico.Estagio.MatriculaEstagio", "MatriculaEstagio")
+                        .WithMany("Documentos")
+                        .HasForeignKey("MatriculaEstagioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MatriculaEstagio");
+                });
+
             modelBuilder.Entity("Invictus.Domain.Pedagogico.Responsaveis.Responsavel", b =>
                 {
                     b.OwnsOne("Invictus.Domain.Pedagogico.Responsaveis.ResponsavelEndereco", "Endereco", b1 =>
@@ -1931,6 +2111,11 @@ namespace Invictus.Data.Migrations
             modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>
                 {
                     b.Navigation("Boletos");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.MatriculaEstagio", b =>
+                {
+                    b.Navigation("Documentos");
                 });
 #pragma warning restore 612, 618
         }

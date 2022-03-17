@@ -29,9 +29,9 @@ namespace Invictus.Application.AdmApplication
         {
             List<AlunoExcelDto> alunosDto = new List<AlunoExcelDto>();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            var unidadeALCId = new Guid("3ded5a63-cc31-4e96-981e-4a7aacc4c76c");
+            var unidadeALCId = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
             //using (var stream = new MemoryStream())
-            using (var stream = File.Open("ALCANTARA - ENF01.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 01.xlsx", FileMode.Open, FileAccess.Read))
             {
                 //file.CopyTo(stream);
                 stream.Position = 1;
@@ -45,7 +45,8 @@ namespace Invictus.Application.AdmApplication
 
                         var naturalidade = reader?.GetValue(14)?.ToString().Split(" - ");
                         var endereco = reader?.GetValue(5)?.ToString().Split(",");
-
+                        var testar = reader?.GetValue(1)?.ToString();
+                        var tertarNomePai = reader?.GetValue(15)?.ToString();
                         alunosDto.Add(new AlunoExcelDto()
                         {
                             Nome = reader?.GetValue(1)?.ToString(),
@@ -121,11 +122,11 @@ namespace Invictus.Application.AdmApplication
                 var lead = _mapper.Map<Aluno>(item);
                 /// lead.SetDateAndResponsavelInLead(user.Email + "/" + user.UserName);
 
-                var endereco = new AlunoEndereco(item.Bairro.ToUpper(), item.CEP, item.Complemento.ToUpper(),
-                    item.Logradouro.ToUpper(), item.Numero.ToUpper(), item.Cidade.ToUpper(), item.UF.ToUpper());
+                var endereco = new AlunoEndereco(item.Bairro?.ToUpper(), item.CEP, item.Complemento?.ToUpper(),
+                    item.Logradouro?.ToUpper(), item.Numero?.ToUpper(), item.Cidade?.ToUpper(), item.UF?.ToUpper());
 
-                var alunoAdd = new Aluno(item.Nome.ToUpper(), null, item.CPF, item.RG,
-                item.NomePai, item.NomeMae, item.Nascimento, item.Naturalidade.ToUpper(), item.NaturalidadeUF.ToUpper(), item.Email, null,
+                var alunoAdd = new Aluno(item.Nome?.ToUpper(), null, item.CPF, item.RG,
+                item.NomePai, item.NomeMae, item.Nascimento, item.Naturalidade?.ToUpper(), item.NaturalidadeUF?.ToUpper(), item.Email, null,
                    null, item.TelCelular, item.TelResidencial, item.TelWhatsapp, endereco);
 
                 alunoAdd.SetUnidadeId(unidadeALCId);

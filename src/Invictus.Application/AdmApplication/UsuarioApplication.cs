@@ -1,4 +1,5 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAuth;
 using Invictus.Domain.Administrativo.UnidadeAuth.Interfaces;
 using Invictus.Dtos.AdmDtos;
@@ -16,13 +17,16 @@ namespace Invictus.Application.AdmApplication
     public class UsuarioApplication : IUsuarioApplication
     {
         private readonly IAutorizacaoRepo _autoRepo;
+        private readonly IAspNetUser _aspNetUser;
         private readonly IColaboradorQueries _colabQueries;
         private readonly UserManager<IdentityUser> _userManager;
-        public UsuarioApplication(IAutorizacaoRepo autoRepo, UserManager<IdentityUser> userManager, IColaboradorQueries colabQueries)
+        public UsuarioApplication(IAutorizacaoRepo autoRepo, UserManager<IdentityUser> userManager, IColaboradorQueries colabQueries,
+            IAspNetUser aspNetUser)
         {
             _autoRepo = autoRepo;
             _userManager = userManager;
             _colabQueries = colabQueries;
+            _aspNetUser = aspNetUser;
         }
 
         private List<char> chars = new List<char>();
@@ -122,6 +126,56 @@ namespace Invictus.Application.AdmApplication
                 }
             }
            
+        }
+
+        public IEnumerable<string> GetPerfisAutorizados()
+        {
+            var perfis = new List<string>();
+            var role = _aspNetUser.ObterRole();
+            /*
+            MasterAdm
+ Professor
+Aluno
+Administrador
+SuperAdm
+            */
+
+            if (role == "SuperAdm") // apenas para Dev = acesso total
+            {
+                perfis.Add("SuperAdm");
+                perfis.Add("MasterAdm");
+                perfis.Add("Administrador");
+                perfis.Add("Professor");
+            }
+
+            if (role == "MasterAdm")
+            {
+               // perfis.Add("SuperAdm");
+                perfis.Add("MasterAdm");
+                perfis.Add("Administrador");
+                perfis.Add("Professor");
+            }            
+
+            if (role == "Administrador")
+            {
+                //perfis.Add("SuperAdm");
+                //perfis.Add("MasterAdm");
+                perfis.Add("Administrador");
+                perfis.Add("Professor");
+            }
+
+            if (role == "Professor")
+            {
+                //perfis.Add("SuperAdm");
+                //perfis.Add("MasterAdm");
+                //perfis.Add("Administrador");
+                //perfis.Add("Professor");
+            }
+
+            
+
+            
+            return perfis;
         }
     }
 }

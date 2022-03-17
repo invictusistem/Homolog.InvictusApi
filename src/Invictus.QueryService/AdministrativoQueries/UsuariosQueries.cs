@@ -217,7 +217,7 @@ namespace Invictus.QueryService.AdministrativoQueries
         {
             //var siglaUnidade = 
             //    EnvironmentVariableTarget unidade = 
-            var query = @"SELECT  
+            var colaboradorQuey = @"SELECT  
                         colaboradores.id,
                         colaboradores.email,
                         colaboradores.nome,
@@ -226,17 +226,41 @@ namespace Invictus.QueryService.AdministrativoQueries
                         inner join ParametrosValue on Colaboradores.CargoId = ParametrosValue.Id
                         where colaboradores.email = @email ";
 
+            var professorQuery = @"SELECT  
+                        professores.id,
+                        professores.email,
+                        professores.nome
+                        from professores 
+                        where professores.email = @email ";
+
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var result = await connection.QuerySingleAsync<CreateUsuarioView>(query, new { email = email });
+                var colaborador = await connection.QueryAsync<CreateUsuarioView>(colaboradorQuey, new { email = email });
 
                 connection.Close();
 
-                return result;
+                if (colaborador.Any())
+                {
+                    colaborador.First().isProfessor = false;
+                    return colaborador.First();
+                }
 
+                var professor = await connection.QueryAsync<CreateUsuarioView>(professorQuery, new { email = email });
+
+                connection.Close();
+
+                if (professor.Any())
+                {
+                    professor.First().cargo = "Professor";
+                    professor.First().isProfessor = true;
+                    return professor.First();
+
+                }
+
+                throw new NotImplementedException();
             }
         }
 

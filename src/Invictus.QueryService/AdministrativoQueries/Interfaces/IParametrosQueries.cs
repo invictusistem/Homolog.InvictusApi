@@ -11,5 +11,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<ParametrosKeyDto> GetParamKey(string value);
         Task<IEnumerable<ParametroValueDto>> GetParamValue(string key);
+        Task<ParametroValueDto> GetParamKeyById(Guid valueId);
     }
 }
