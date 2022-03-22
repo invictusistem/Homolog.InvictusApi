@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220318020320_update32")]
+    partial class update32
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -451,29 +453,6 @@ namespace Invictus.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LogMatriculas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Logs.LogTurmas", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreateTurmaCommandJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("GuidColaborador")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TurmaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LogTurmas");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Models.AgendaTrimestre", b =>

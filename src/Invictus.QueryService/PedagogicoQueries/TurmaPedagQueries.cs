@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Invictus.Core.Extensions;
+using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -16,9 +18,13 @@ namespace Invictus.QueryService.PedagogicoQueries
     public class TurmaPedagQueries : ITurmaPedagQueries
     {
         private readonly IConfiguration _config;
-        public TurmaPedagQueries(IConfiguration config)
+        private readonly IAspNetUser _aspNetUser;
+        private readonly IUnidadeQueries _unidade;
+        public TurmaPedagQueries(IConfiguration config, IAspNetUser aspNetUser, IUnidadeQueries unidade)
         {
             _config = config;
+            _aspNetUser = aspNetUser;
+            _unidade = unidade;
         }
 
         public async Task<IEnumerable<AlunoDto>> GetAlunosDaTurma(Guid turmaId)
@@ -110,9 +116,11 @@ namespace Invictus.QueryService.PedagogicoQueries
         {
             var query = @"select * from turmasNotas where TurmasNotas.MatriculaId = @matriculaId ";
 
-            var matriculaQuery = @"SELECT Matriculas.TurmaId FROM Matriculas WHERE Matriculas.Id = @matriculaId ";
+            var matriculaQuery = @"SELECT Matriculas.TurmaId, matriculas.alunoId FROM Matriculas WHERE Matriculas.Id = @matriculaId ";
 
-            var calendarios = @"select * from calendarios where calendarios.turmaId = @turmaId ";
+            var calendariosQuery = @"select * from calendarios where calendarios.turmaId = @turmaId ";
+
+            var presencasQuery = @"SELECT * FROM TurmasPresencas WHERE calendarios.turmaId = @turmaId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -123,7 +131,9 @@ namespace Invictus.QueryService.PedagogicoQueries
 
                 var matricula = await connection.QuerySingleAsync<MatriculaDto>(matriculaQuery, new { matriculaId = matriculaId });
 
-                var aulas = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = matricula.turmaId });
+                // var aulas = await connection.QueryAsync<CalendarioDto>(calendarios, new { turmaId = matricula.turmaId });
+
+                //var presencas = await connection.QueryAsync<Calenda rioDto>(presencasQuery, new { turmaId = matricula.turmaId });
 
 
 
@@ -198,6 +208,66 @@ namespace Invictus.QueryService.PedagogicoQueries
                 connection.Open();
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
                 var turma = await connection.QuerySingleAsync<TurmaDto>(query, new { matriculaId = matriculaId });
+
+                return turma;
+
+            }
+        }
+
+        public async Task<string> VerificarSeAlunoDisponivelParaTransfInterna(string cpf)
+        {
+            var mensagem = "";
+
+            var unidadeAtual = _aspNetUser.ObterUnidadeDoUsuario();
+
+            var mats = await GetMatriculasDeOutraUnidade(cpf);
+            //var unidadeAtual = await _context.Unidades.Where(u => u.Sigla == unidade).FirstOrDefaultAsync();
+            //var aluno = 
+
+            ////var materias = await _pedagogicoQuery.GetNotaAlunos(turmaId);
+            //var aluno = await _context.Alunos.Where(aluno => aluno.CPF == CPF).SingleOrDefaultAsync();
+
+
+            //if (aluno == null) { return NotFound(new { message = "Nenhum Aluno foi localizado com este CPF." }); }
+
+            //if (aluno != null)
+            //{
+            //    // bool daMesmaUnidade = aluno.UnidadeCadastrada == unidade;
+            //    bool daMesmaUnidade = aluno.UnidadeCadastrada == unidadeAtual.Id;
+            //    if (daMesmaUnidade)
+            //    {
+            //        return Conflict(new { message = "O Aluno já está matriculado/cadastrado nesta unidade." });
+
+            //    }
+
+            //}
+
+            return "";
+        }
+
+        public async Task<MatriculaDto> GetMatriculasDeOutraUnidade(string cpf)
+        {
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            var unidade = await _unidade.GetUnidadeBySigla(unidadeSigla);
+
+            var query = @"SELECT 
+                        Alunos.CPF, 
+                        Alunos.Nome,
+                        Matriculas.TurmaId,
+                        Turmas.UnidadeId
+                        FROM Alunos 
+                        INNER JOIN Matriculas on Alunos.id = Matriculas.AlunoId
+                        INNER JOIN Turmas on Matriculas.TurmaId = Turmas.Id
+                        WHERE Alunos.CPF = @cpf 
+                        AND Turmas.UnidadeId != @unidadeId ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount);
+                var turma = await connection.QuerySingleAsync<MatriculaDto>(query, new { cpf = cpf, unidadeId = unidade.id });
 
                 return turma;
 

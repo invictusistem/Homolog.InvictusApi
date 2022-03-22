@@ -14,6 +14,7 @@ using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.PedagDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
@@ -46,6 +48,7 @@ namespace Invictus.Api.Controllers
         private readonly BackgroundWorkerQueue _backgroundWorkerQueue;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<TestController> _logger;
+        private readonly IMatriculaApplication _matriculaApplication;
 
         public TestController(
             IRelatorioApp relatorioApp,
@@ -59,7 +62,8 @@ namespace Invictus.Api.Controllers
             IConverter converter,
             IMapper mapper,
             RoleManager<IdentityRole> roleMgr,
-            IPDFDesigns pdfDesign)
+            IPDFDesigns pdfDesign,
+            IMatriculaApplication matriculaApplication)
         {
             _relatorioApp = relatorioApp;
             _hub = hub;
@@ -73,6 +77,7 @@ namespace Invictus.Api.Controllers
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
             _pdfDesign = pdfDesign;
+            _matriculaApplication = matriculaApplication;
         }
 
         [HttpGet]
@@ -105,33 +110,35 @@ namespace Invictus.Api.Controllers
         [Route("pendencia")]
         public IActionResult GetPendencia()
         {
-            var globalSettings = new GlobalSettings
-            {
-                ColorMode = ColorMode.Color,
-                Orientation = Orientation.Portrait,
-                PaperSize = PaperKind.A4,
-                Margins = new MarginSettings { Top = 10 },
-                DocumentTitle = "PDF Report"
-            };
-            var objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = _pdfDesign.GetPendenciaDocs(""),//
-                WebSettings = { DefaultEncoding = "utf-8" },
-                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
-                FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
-            };
+            //var globalSettings = new GlobalSettings
+            //{
+            //    ColorMode = ColorMode.Color,
+            //    Orientation = Orientation.Portrait,
+            //    PaperSize = PaperKind.A4,
+            //    Margins = new MarginSettings { Top = 10 },
+            //    DocumentTitle = "PDF Report"
+            //};
+            //var objectSettings = new ObjectSettings
+            //{
+            //    PagesCount = true,
+            //    HtmlContent = _pdfDesign.GetPendenciaDocs(""),//
+            //    WebSettings = { DefaultEncoding = "utf-8" },
+            //    HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+            //    FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
+            //};
 
 
-            var pdf = new HtmlToPdfDocument()
-            {
-                GlobalSettings = globalSettings,
-                Objects = { objectSettings }
-            };
-            var file = _converter.Convert(pdf);
+            //var pdf = new HtmlToPdfDocument()
+            //{
+            //    GlobalSettings = globalSettings,
+            //    Objects = { objectSettings }
+            //};
+            //var file = _converter.Convert(pdf);
 
 
-            return File(file, "application/pdf");
+            //return File(file, "application/pdf");
+
+            return Ok();
 
         }
 
@@ -346,6 +353,35 @@ namespace Invictus.Api.Controllers
         {
             _relatorioApp.ReadAndSaveExcel();
             return "invictus Ok";
+        }
+
+        [HttpGet]
+        [Route("delete-registros")]
+        public string DeleteExcel()
+        {
+            _relatorioApp.DeleteExcel();
+            return "invictus Ok";
+        }
+
+        [HttpGet]
+        [Route("matricular-registros")]
+        public IActionResult MatriculaExcel()
+        {
+            var commands = _relatorioApp.MatriculaExcel();
+            return Ok(new { commands = commands });
+        }
+
+        [HttpPost]
+        [Route("matricular-final-registros/{turmaId}/{alunoId}")]
+        public async Task<IActionResult> MatriculaFinalExcel(Guid turmaId, Guid alunoId, [FromBody] MatriculaCommand command)
+        {
+
+            //Thread.Sleep(1000);
+            //Console.WriteLine(alunoId);
+            _matriculaApplication.AddParams(turmaId, alunoId, command);
+            var matriculaId = await _matriculaApplication.Matricular();
+            //var ids = _relatorioApp.MatriculaExcel();
+            return Ok(new { alunoId = alunoId });
         }
 
 
@@ -644,7 +680,7 @@ namespace Invictus.Api.Controllers
         }
 
         //[HttpGet]
-        //[Route("addrole")]
+        //[Route("add-role")]
         //public async Task<ActionResult> AddRole()
         //{
         //    //var email = "invictus@teste.com";

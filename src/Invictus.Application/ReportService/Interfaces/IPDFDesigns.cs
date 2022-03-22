@@ -11,6 +11,6 @@ namespace Invictus.Application.ReportService.Interfaces
     {
         string GetHTMLString();
         string GetContratoHTMLString(List<Conteudo> conteudos);
-        string GetPendenciaDocs(string nomeCompleto);
+        string GetPendenciaDocs(Guid matriculaId);
     }
 }

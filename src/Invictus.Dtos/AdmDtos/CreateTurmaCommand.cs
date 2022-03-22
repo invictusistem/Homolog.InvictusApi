@@ -26,5 +26,6 @@ namespace Invictus.Dtos.AdmDtos
         public string diaSemana {get;set; }
         public string horarioInicio { get;set; }
         public string horarioFim { get; set; }
+        public int totalMinutos { get; set; }
     }
 }

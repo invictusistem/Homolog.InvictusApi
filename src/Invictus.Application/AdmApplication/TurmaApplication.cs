@@ -3,10 +3,12 @@ using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.Extensions;
 using Invictus.Core;
 using Invictus.Core.Enumerations;
+using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.Calendarios.Interfaces;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas;
@@ -17,6 +19,7 @@ using Invictus.QueryService.AdministrativoQueries;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,18 +57,35 @@ namespace Invictus.Application.AdmApplication
             _calendarioQueries = calendarioQueries;
             _db = db;
         }
+
+        private DateTime SetPrimeiroDiaDaAula(DateTime dia, string diaSemana)
+        {
+
+            if (dia.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(diaSemana))
+            {
+                return dia.AddDays(-1);
+            }
+
+            while (dia.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(diaSemana))
+            {
+                dia.AddDays(+1);
+            }
+
+            dia.AddDays(-1);
+
+            return dia;
+        }
+
         public async Task CreateTurma(CreateTurmaCommand command)
         {
-            //var diasQnt = command.diasSemana.Count();
+            command.diasSemana = SetMinutosTotaisDaAula(command.diasSemana);
             var sala = await _unidadeQueries.GetSala(command.salaId);
             var siglaUnidade = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(siglaUnidade);
-            var totalTurmas = await _turmaQueries.CountTurmas(unidade.id);
+            var totalTurmas = _db.LogTurmas.Count();// await _turmaQueries.CountTurmas(unidade.id);
             var typePacote = await _pacoteQueries.GetPacoteById(command.pacoteId);
             var materias = await _turmaQueries.GetMateriasFromPacotesMaterias(command.pacoteId);
             var turmaMaterias = _mapper.Map<IEnumerable<TurmaMaterias>>(materias);
-
-
 
             var previsao = new Previsao(command.prevInicio_1, command.prevTermino_1, "1ª previsão", DateTime.Now);
             var turma = new Turma(command.descricao, 0, command.minVagas, unidade.id, sala.id, command.pacoteId, typePacote.typePacoteId, previsao);
@@ -76,19 +96,13 @@ namespace Invictus.Application.AdmApplication
             var horarios = _mapper.Map<IEnumerable<Horario>>(command.diasSemana);
             turma.AddHorarios(horarios);
 
-
             // materias da turma
             turma.AddMaterias(turmaMaterias);
 
-
-
-            await _turmaRepo.Save(turma);
-            // _turmaRepo.Commit();
-
-
-            //Previsoes da turma
             var previ = new Previsoes(command.prevInicio_1, command.prevInicio_2, command.prevInicio_3,
                 command.prevTermino_1, command.prevTermino_2, command.prevTermino_3, turma.Id);
+
+            await _turmaRepo.Save(turma);
             await _turmaRepo.SavePrevisoes(previ);
 
 
@@ -105,10 +119,158 @@ namespace Invictus.Application.AdmApplication
 
             //}
 
+            // NEW 
+            var calendarios = new List<Calendario>();
+            var pacotesMaterias = await _pacoteQueries.GetMateriasPresenciaisPacote(command.pacoteId);
+            foreach (var pacote in pacotesMaterias)
+            {
+                pacote.SetQntAulas(command.diasSemana);
+            }
+
+            var qntDiasSemana = 0;/// command.diasSemana.Count();
+            foreach (var pacote in pacotesMaterias)
+            {
+                for (int i = 0; i < pacote.qntAulas; i++)
+                {
+                    if (calendarios.Count() == 0)
+                    {
+                        var dia = SetPrimeiroDiaDaAula(command.prevInicio_1, command.diasSemana[0].diaSemana);
+                        var calend = new Calendario(dia.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana)),
+                                        command.diasSemana[0].diaSemana,
+                                        command.diasSemana[0].horarioInicio,
+                                        command.diasSemana[0].horarioFim,
+                                        turma.Id,
+                                        unidade.id,
+                                        false,
+                                        false,
+                                        command.salaId);
+                        calend.SetMateriaId(pacote.materiaId);
+
+                        calendarios.Add(calend);
+                        
+
+                        if (command.diasSemana.Count() == 1)
+                        {
+                            qntDiasSemana = 0;
+                        }
+                        else // exemplo 2 entao count == 2 e index == 1
+                        {
+                            qntDiasSemana++;
+
+                            if(qntDiasSemana == command.diasSemana.Count())
+                            {
+                                qntDiasSemana = 0;
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        var ultimoDia = calendarios.Last();
+                        var dia = calendarios.Last().DiaAula.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[qntDiasSemana].diaSemana));
+                        
+                        var calend = new Calendario(dia,
+                                        command.diasSemana[qntDiasSemana].diaSemana,
+                                        command.diasSemana[qntDiasSemana].horarioInicio,
+                                        command.diasSemana[qntDiasSemana].horarioFim,
+                                        turma.Id,
+                                        unidade.id,
+                                        false,
+                                        false,
+                                        command.salaId);
+                        calend.SetMateriaId(pacote.materiaId);
+
+                        calendarios.Add(calend);
+                        
+                        if (command.diasSemana.Count() == 1)
+                        {
+                            qntDiasSemana = 0;
+                        }
+                        else // exemplo 2 entao count == 2 e index == 1
+                        {
+                            qntDiasSemana++;
+
+                            if (qntDiasSemana == command.diasSemana.Count())
+                            {
+                                qntDiasSemana = 0;
+                            }
+
+                        }
+                    }
+
+
+                    // ser qndDiasSemana
+                }
+
+            }
+
+            await _calendarioRepo.SaveCalendarios(calendarios);
+
+            _turmaRepo.Commit();
+
+
+            var colab = _aspNetUser.ObterUsuarioId();
+            var commandJson = JsonConvert.SerializeObject(command);
+            var log = new LogTurmas(turma.Id, colab, DateTime.Now, commandJson);
+
+            _db.LogTurmas.Add(log);
+            _db.SaveChanges();
+            
+
+            // setando o primeiro dia do calendario
+
+            //if(command.prevInicio_1.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana))
+            //{
+            //    calendarios.Add(new CalendarioDto() { diaAula = command.prevInicio_1 });
+            //}
+            //else
+            //{
+            //    var diaInicial = command.prevInicio_1.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana));
+            //    calendarios.Add(new CalendarioDto() { diaAula = command.prevInicio_1 });
+            //}
+
+            //calendarios.Add(command.prevInicio_1.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana)));
+
+            //var startDay = command.prevInicio_1.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana);
+            //calendarios.
+
+            //var AulaAtual = Guid.NewGuid();
+            //var diaInicial = command.prevInicio_1.AddDays(-1);
+            //var totalMinutes = 0;
+            //for (int dias = 0; dias < pacotesMaterias.Count(); dias++)
+            //{
+            //    while (totalMinutes > 0)
+            //    {
+
+
+            //    }
+
+            //    foreach (var diaSemana in command.diasSemana)
+            //    {
+            //        if (calendarios.Count() == 0)
+            //        {
+            //            calendarios.Add(new CalendarioDto()
+            //            {
+            //                diaAula = diaInicial.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(diaSemana.diaSemana)),
+            //                diaDaSemana = "x",
+            //                materiaId = AulaAtual,
+            //                horaInicial = "x",
+            //                horaFinal = "x"
+            //            });
+            //        }
+            //    }
 
 
 
+
+            //    //var dia = calendarios.Last();
+
+            //}
+
+
+            // OLD
             // CreateCalendarioDaTurma()
+            /*
             var datas = command.prevInicio_1.EachDay(command.prevTermino_3);
             var datasFiltradas = new List<DateTime>();
             foreach (var dia in command.diasSemana)
@@ -123,7 +285,7 @@ namespace Invictus.Application.AdmApplication
 
             var i = 0;
             foreach (var dat in todasDatas)
-            {  //0 -1 - 2
+            {  
                 if (i == command.diasSemana.Count()) { i = 0; }
 
                 calendarios.Add(new Calendario(dat, DiaDaSemana.TryParse(dat.DayOfWeek).DisplayName, command.diasSemana[i].horarioInicio, command.diasSemana[i].horarioFim, turma.Id, unidade.id, false, false, command.salaId));
@@ -140,24 +302,14 @@ namespace Invictus.Application.AdmApplication
             var pacotesMaterias = await _pacoteQueries.GetMateriasPacote(command.pacoteId);
 
             var aulasPresenciais = pacotesMaterias.Where(p => p.modalidade == "Presencial").ToList();
-            // get pacotesMateriaById
-            // set materias!
-            //var x = calendarios?[300];
 
-
-            //var qntAulas = 0;
-
-            try
-            {
-                var diaCalendario = 0;
+            var diaCalendario = 0;
             for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
             {
                 double horasTotaisDaMateriaEmMinutos = aulasPresenciais[mat].cargaHoraria * 60;
 
                 while (!DoubleExtensions.NegativeOrZero(horasTotaisDaMateriaEmMinutos))
                 {
-
-
                     if (diaCalendario >= calendarios.Count()) return;
                     calendarios[diaCalendario].SetMateriaId(aulasPresenciais[mat].materiaId);
 
@@ -175,26 +327,29 @@ namespace Invictus.Application.AdmApplication
 
                     diaCalendario++;
                 }
-
-
             }
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-
 
             await _calendarioRepo.SaveCalendarios(calendarios);
 
-
-
-
-
             _turmaRepo.Commit();
+            */
+        }
 
+        private List<DiasSemanaCommand> SetMinutosTotaisDaAula(List<DiasSemanaCommand> diasSemana)
+        {
+            foreach (var dias in diasSemana)
+            {
+                var ini = dias.horarioInicio.Split(":");
+                var final = dias.horarioFim.Split(":");
+
+                var horarioInicial = new TimeSpan(Convert.ToInt32(ini[0]), Convert.ToInt32(ini[1]), 0);
+                var horarioFinal = new TimeSpan(Convert.ToInt32(final[0]), Convert.ToInt32(final[1]), 0);
+
+                var totalMinutos = (horarioFinal - horarioInicial).TotalMinutes;
+
+                dias.totalMinutos = Convert.ToInt32(totalMinutos);
+            }
+            return diasSemana;
         }
 
         public async Task IniciarTurma(Guid turmaId)
@@ -253,12 +408,12 @@ namespace Invictus.Application.AdmApplication
                 {
                     turmaMat.RemoveProfessorDaMateria();
                     var calendarios = _mapper.Map<IEnumerable<Calendario>>(await _calendarioQueries.GetFutureCalendarsByTurmaIdAndMateriaId(turmaMatDto.materiaId, turmaId));
-                   
+
                     if (calendarios.Any())
                     {
                         calendarios.ForEach(c => c.RemoveProfessorDaAula());
                         _calendarioRepo.UpdateCalendarios(calendarios.ToList());
-                    }                    
+                    }
                 }
                 await _turmaRepo.UpdateMateriaDaTurma(turmaMat);
             }
@@ -360,9 +515,9 @@ namespace Invictus.Application.AdmApplication
 
             foreach (var presenca in presencaList)
             {
-                presenca.SetPresenca(presenca.IsPresentToString);                
+                presenca.SetPresenca(presenca.IsPresentToString);
             }
-           
+
             //var calendarioDto = await _calendarioQueries.GetCalendarioById(saveCommand.aulaViewModel.id);// _context.Calendarios.Find(savePresencaCommand.calendarId);
 
             //var calendario = _mapper.Map<Calendario>(calendarioDto);

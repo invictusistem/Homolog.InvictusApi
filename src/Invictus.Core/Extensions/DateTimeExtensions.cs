@@ -11,17 +11,30 @@ namespace Invictus.Core.Extensions
         public static DateTime ToCompleteTime(this DateTime date, int hour, int minute)
         {
             DateTime newDate = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
-            
+
             return newDate;
         }
 
-        public static int CalculateTotalMinutes(this DateTime date, DateTime dateIni, DateTime dateFinal) 
+        public static int CalculateTotalMinutes(this DateTime date, DateTime dateIni, DateTime dateFinal)
         {
             TimeSpan minutes = dateFinal - dateIni;
-            
+
             return Convert.ToInt32(minutes.TotalMinutes);
+        }
+
+        public static DateTime GetTheNexDayOfTheWeekByWeek(this DateTime date, DayOfWeek dayOfWeek)
+        {
+            // ...segunda
+            date = date.AddDays(1);
+          
+            while (date.DayOfWeek != dayOfWeek)
+            {
+                date = date.AddDays(1);
+            }
+
+            return date;
         }
     }
 
-    
+
 }

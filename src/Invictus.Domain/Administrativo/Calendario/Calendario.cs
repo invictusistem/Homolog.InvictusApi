@@ -16,7 +16,7 @@ namespace Invictus.Domain.Administrativo.Calendarios
             //Turno turno,
             string diaDaSemana,
             string horaInicial,
-string horaFinal,
+            string horaFinal,
 
             //string materia,
             //Guid materiaId,

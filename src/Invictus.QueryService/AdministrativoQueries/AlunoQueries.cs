@@ -348,5 +348,78 @@ WHERE Alunos.nome = 'Mario Gomes'
                 return results;
             }
         }
+
+        public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetAllMatriculadosView(int itemsPerPage, int currentPage, string paramsJson)
+        {            
+
+            // old
+            var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+            var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
+
+            var alunos = await GetAllAlunosByFilter(itemsPerPage, currentPage, param, unidade.id);
+
+            var alunosCount = await CountAllAlunosByFilter(itemsPerPage, currentPage, param, unidade.id);
+
+            var paginatedItems = new PaginatedItemsViewModel<ViewMatriculadosDto>(currentPage, itemsPerPage, alunosCount, alunos.ToList());
+
+            return paginatedItems;
+        }
+
+        private async Task<int> CountAllAlunosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("select Count(*) ");
+            queryCount.Append("from alunos full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
+            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
+           // if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+           // if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+           // if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            queryCount.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); 
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString());
+
+                connection.Close();
+
+                return countItems;
+
+            }
+        }
+
+        public async Task<IEnumerable<ViewMatriculadosDto>> GetAllAlunosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder query = new StringBuilder();
+            query.Append("select alunos.id, matriculas.numeromatricula, alunos.cpf, alunos.rg, alunos.nascimento, alunos.dataCadastro, alunos.nome, alunos.ativo, matriculas.id as matriculaId, unidades.sigla ");
+            query.Append("from alunos full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
+            if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
+            //if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+           // if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+          //  if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); 
+            query.Append(" ORDER BY Alunos.Nome ");
+            query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<ViewMatriculadosDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+
+                if (results.Count() > 0)
+                    results = BindCPF(results.ToList());
+
+                connection.Close();
+
+                return results;
+            }
+        }
     }
 }

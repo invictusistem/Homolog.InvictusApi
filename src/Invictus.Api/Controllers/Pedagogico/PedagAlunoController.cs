@@ -93,14 +93,16 @@ namespace Invictus.Api.Controllers.Pedagogico
         {
             var notas = await _pedagTurmaQueries.GetNotaAluno(matriculaId);
 
-            return Ok(new { notas = notas });
+            var turma = await _pedagTurmaQueries.GetTurmaByMatriculaId(matriculaId);
+
+            return Ok(new { notas = notas, turma = turma });
         }
 
         [HttpGet]
         [Route("certificado/{matriculaId}")]
         public async Task<IActionResult> GetCertificado(Guid matriculaId)
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(2000);
 
 
             return NotFound();

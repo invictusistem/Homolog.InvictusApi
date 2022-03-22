@@ -11,6 +11,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<IEnumerable<PacoteDto>> GetPacotes(Guid typePacoteId, Guid unidadeId);
         Task<IEnumerable<PacoteMateriaDto>> GetMateriasPacote(Guid pacoteId);
+        Task<IEnumerable<PacoteMateriasViewModel>>  GetMateriasPresenciaisPacote(Guid pacoteId);
         Task<IEnumerable<PacoteDto>> GetPacotesByUserUnidade(Guid typePacoteId);
         Task<IEnumerable<DocumentacaoExigidaDto>> GetDocsByPacoteId(Guid pacoteId);
         Task<PacoteDto> GetPacoteById(Guid typePacoteId);

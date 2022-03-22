@@ -1,5 +1,9 @@
 ﻿using Invictus.Application.ReportService.Interfaces;
+using Invictus.Core.Extensions;
 using Invictus.Domain.Administrativo.ContratoAggregate;
+using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -14,9 +18,13 @@ namespace Invictus.Application.ReportService
     public class PDFDesigns : IPDFDesigns
     {
         private IWebHostEnvironment _webHostEnvironment;
-        public PDFDesigns(IWebHostEnvironment webHostEnvironment)
+        private IAlunoQueries _alunoQueries;
+        private IPedagDocsQueries _pedagDocsQueries;
+        public PDFDesigns(IWebHostEnvironment webHostEnvironment, IAlunoQueries alunoQueries, IPedagDocsQueries pedagQueries)
         {
             _webHostEnvironment = webHostEnvironment;
+            _alunoQueries = alunoQueries;
+            _pedagDocsQueries = pedagQueries;
         }
         public string GetHTMLString()
         {
@@ -237,8 +245,12 @@ namespace Invictus.Application.ReportService
             return sb.ToString();
         }
 
-        public string GetPendenciaDocs(string nomeCompleto)
+        public string GetPendenciaDocs(Guid matriculaId)
         {
+            var aluno = _alunoQueries.GetAlunoByMatriculaId(matriculaId).Result;
+            var docs = _pedagDocsQueries.GetDocsMatriculaViewModel(matriculaId).Result;
+            // descricao: contrato | fica de matricula
+            var docsFilter = docs.Where(d => d.descricao != "contrato" & d.descricao != "ficha de matrícula");
             var path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "logo4a.png");//_webHostEnvironment.WebRootPath + "\\logo4a.png";
             //htmlDoc.AppendLine($"<img src=\"{path}\" />");
             //htmlDoc.AppendLine("</td>");
@@ -254,27 +266,31 @@ namespace Invictus.Application.ReportService
                <br>
            
                <div style='margin-top: 50px;' >
-                Eu, "+ nomeCompleto + @", matriculado(a) no curso de Enfermagem, nesta Instituição de Ensino, declaro estar ciente da Pendência dos documentos abaixo para regularização da minha matrícula e me responsabilizo pela entrega dos mesmos no prazo de 45 dias.
+                Eu, " + aluno.nome + @", matriculado(a) no curso de Enfermagem, nesta Instituição de Ensino, declaro estar ciente da Pendência dos documentos abaixo para regularização da minha matrícula e me responsabilizo pela entrega dos mesmos no prazo de 45 dias.
           </div>
           
               <br>
           
-                  <div> DOCUMENTOS PENDENTES:</div>
-             
-                     <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX RG</div>
-        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CPF</div>
-        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CERTIDÃO NASCIMENTO OU CASAMENTO</div>
-        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX COREN</div>
-        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) OUTROS _______________________________________________________</div>
-        
+                  <div> DOCUMENTOS ENVIADOS:</div>");
 
-</div>"
-                          );
+            sb.AppendLine(BuildDocPendentList(docsFilter));
 
-            sb.AppendLine(@"<br><br><br><br><br><br><br>
+
+            //             <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX RG</div>
+            //<div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CPF</div>
+            //<div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CERTIDÃO NASCIMENTO OU CASAMENTO</div>
+            //<div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX COREN</div>
+            //<div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) OUTROS _______________________________________________________</div>
+
+
+            //</div>"
+            //);
+
+            sb.AppendLine(@"</div> <br><br><br>
 
 <div style='text-align: center;' > ____________________________________________________________<br>
-             <div style='font-weight: bold;' >" + nomeCompleto + @"</div><div style='font-weight: bold;' >CPF:</div></div>
+             <div style='font-weight: bold;' >" + aluno.nome + @"</div><div style='font-weight: bold;' >
+            CPF: "+aluno.cpf.MaskingCPF() + @"</div></div>
     
 
         </div>");
@@ -282,7 +298,32 @@ namespace Invictus.Application.ReportService
             sb.AppendLine(@" </body></html>");
 
             return sb.ToString();
+        }
 
+        private string BuildDocPendentList(IEnumerable<AlunoDocumentoDto> documentos)
+        {
+            var sb = new StringBuilder(); // comentario
+//            sb.AppendLine(@"
+//        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX RG</div>
+//        <div class='doc'>( X ) XEROX CPF</div>
+//        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX CERTIDÃO NASCIMENTO OU CASAMENTO</div>
+//        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) XEROX COREN</div>
+//        <div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) OUTROS _______________________________________________________</div>
+//");
+
+            foreach (var doc in documentos)
+            {
+                if(doc.docEnviado == true)
+                {
+                    sb.AppendLine(@"<div class='doc'>( X ) "+doc.comentario.ToUpper()+@"</div>");
+                }
+                else
+                {
+                    sb.AppendLine(@"<div class='doc'>(&nbsp;&nbsp;&nbsp;&nbsp; ) " + doc.comentario.ToUpper() + @"</div>");
+                }
+            }
+
+            return sb.ToString();
 
         }
     }

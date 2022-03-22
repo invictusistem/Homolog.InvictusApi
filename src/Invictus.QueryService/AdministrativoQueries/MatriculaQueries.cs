@@ -159,6 +159,9 @@ select Pacotes.TypePAcoteId from Pacotes WHERE Pacotes.id not in ('f2bb154b-c45d
             }
         }
 
-
+        public Task<string> GetInfoMatriculasByCPF(string cpf)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

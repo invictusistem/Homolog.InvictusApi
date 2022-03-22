@@ -45,6 +45,8 @@ namespace Invictus.Application.AdmApplication
 
             var tamanho = file.Length / 1024;
 
+            doc.ValidarDoc(true);
+
             doc.AddDocumento(arquivo, fileName, fileExtension, file.ContentType, System.Convert.ToInt32(tamanho));
            
 

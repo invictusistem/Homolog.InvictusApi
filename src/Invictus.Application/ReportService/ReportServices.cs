@@ -93,7 +93,7 @@ namespace Invictus.Application.ReportService
 
         public async Task<byte[]> GeneratePendenciaDocs(Guid matriculaId)
         {
-            var aluno = await _alunoQueries.GetAlunoByMatriculaId(matriculaId);
+            //var aluno = await _alunoQueries.GetAlunoByMatriculaId(matriculaId);
 
             var globalSettings = new GlobalSettings
             {
@@ -106,7 +106,7 @@ namespace Invictus.Application.ReportService
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = _pdfDesign.GetPendenciaDocs(aluno.nome),//
+                HtmlContent = _pdfDesign.GetPendenciaDocs(matriculaId),//
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }

@@ -50,6 +50,7 @@ namespace Invictus.Data.Context
         public DbSet<LogBoletos> LogBoletos { get; set; }
         public DbSet<LogLogin> LogLogins { get; set; }
         public DbSet<LogMatriculas> LogMatriculas { get; set; }
+        public DbSet<LogTurmas> LogTurmas { get; set; }
         public DbSet<MateriaTemplate> MateriasTemplates { get; set; }
         public DbSet<DocumentacaoExigencia> DocumentacoesExigencias { get; set; }
         public DbSet<PacoteMateria> Materias { get; set; }

@@ -38,6 +38,17 @@ namespace Invictus.Api.Controllers.Administrativo
         }
 
         [HttpGet]
+        [Route("get-all")]
+        public async Task<IActionResult> GetAllAlunoByFilter([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        {
+            var results = await _alunoQueries.GetAllMatriculadosView(itemsPerPage, currentPage, paramsJson);
+
+            if (results.Data.Count() == 0) return NotFound();
+
+            return Ok(results);
+        }
+
+        [HttpGet]
         [Route("matriculados")]
         public async Task<IActionResult> GetMatriculadosByFilter([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {

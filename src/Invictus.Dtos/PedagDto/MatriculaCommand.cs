@@ -18,6 +18,11 @@ namespace Invictus.Dtos.PedagDto
         public MatForm respMenor { get; set; }
         public bool temRespFin { get; set; }
         public MatForm respFin { get; set; }
+
+
+
+        public Guid alunoId { get; set; }
+        public Guid turmaId { get; set; }
     }
 
     public class MatForm

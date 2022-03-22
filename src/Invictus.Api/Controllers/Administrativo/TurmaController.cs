@@ -40,6 +40,7 @@ namespace Invictus.Api.Controllers
         [Route("create")]
         public async Task<IActionResult> GetCreateTurmaViewModel()
         {
+            // return BadRequest();
             var salas = await _unidadeQueries.GetSalasByUserUnidade();
 
             var typePacotes = await _typeQueries.GetTypePacotes();
@@ -162,6 +163,7 @@ namespace Invictus.Api.Controllers
             return Ok();
 
         }
+
 
         /*
           var turma = _db.Turmas.Find(turmaId);

@@ -60,6 +60,25 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<IEnumerable<PacoteMateriasViewModel>> GetMateriasPresenciaisPacote(Guid pacoteId)
+        {
+            var query = @"SELECT * FROM PacotesMaterias WHERE PacotesMaterias.PacoteId = @pacoteId 
+                        AND PacotesMaterias.Modalidade = 'Presencial' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<PacoteMateriasViewModel>(query, new { pacoteId = pacoteId });
+
+                connection.Close();
+
+                return results.OrderBy(r => r.ordem);
+
+            }
+        }
+
         public async Task<IEnumerable<string>> GetPacoteByDescricao(string descricao)
         {
             var query = @"SELECT Pacotes.descricao FROM Pacotes WHERE LOWER(Pacotes.descricao) = LOWER(@descricao) collate SQL_Latin1_General_CP1_CI_AI ";

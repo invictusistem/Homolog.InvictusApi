@@ -50,6 +50,70 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { turmas = turmas });
         }
 
+        //[HttpGet]
+        //[Route("transfinterna")]// Entre unidades
+        //public async Task<ActionResult> SearchAluno([FromQuery] string CPF)
+        //{
+        //    //CPF = CPF.Replace(".", "").Replace("-", "");
+
+        //    // TODO
+        //    // string unidade = "CGI";
+        //    var unidadeAtual = await _context.Unidades.Where(u => u.Sigla == unidade).FirstOrDefaultAsync();
+
+
+        //    //var materias = await _pedagogicoQuery.GetNotaAlunos(turmaId);
+        //    var aluno = await _context.Alunos.Where(aluno => aluno.CPF == CPF).SingleOrDefaultAsync();
+
+
+        //    if (aluno == null) { return NotFound(new { message = "Nenhum Aluno foi localizado com este CPF." }); }
+
+        //    if (aluno != null)
+        //    {
+        //        // bool daMesmaUnidade = aluno.UnidadeCadastrada == unidade;
+        //        bool daMesmaUnidade = aluno.UnidadeCadastrada == unidadeAtual.Id;
+        //        if (daMesmaUnidade)
+        //        {
+        //            return Conflict(new { message = "O Aluno já está matriculado/cadastrado nesta unidade." });
+
+        //        }
+
+        //    }
+
+        //    // VERIFICAR PENDENCIA ALUNO
+
+        //    //Unidades uni = Unidades.CGI;
+
+        //    // var turmas = _context.Turmas.Where(t => t.Unidade == uni & t.TotalAlunos < t.Vagas).ToList();
+        //    var turmas = await _turmaQueries.GetTurmasComVagas(unidadeAtual.Id);
+
+        //    if (turmas.Count() > 0)
+        //    {
+        //        //var turmaOld = await _turmaQueries.GetTurmasMatriculadosOutraUnidade(aluno.Id, aluno.UnidadeCadastrada); //unidadeAtual
+        //        var turmaOld = await _turmaQueries.GetTurmasMatriculadosOutraUnidade(aluno.Id, unidadeAtual.Id); //unidadeAtual
+
+        //        if (turmaOld.Count() == 0) return Conflict(new { message = "O Aluno está cadastrado em outra unidade, porém não matriculado." });
+
+        //        var debitos = await _finQueries.GetDebitoAlunos(aluno.Id, turmaOld.ToArray()[0].id);
+        //        // Em aberto
+        //        var hoje = DateTime.Now;
+        //        var temdebitoVencido = debitos.Where(d => d.status == "Vencido" & d.dataVencimento < hoje);
+
+        //        if (temdebitoVencido.Count() > 0)
+        //        {
+        //            return Ok(new { aluno = aluno, turmas = turmas, debitos = true });
+        //        }
+        //        //else
+        //        //{
+
+        //        //}
+        //    }
+        //    //var capacidade = _context.Salas.Where(s => s.Id == turmas)
+
+
+        //    return Ok(new { aluno = aluno, turmas = turmas, debitos = false });
+        //}
+
+
         [HttpGet]
         [Route("calendario/{turmaId}")]
         public async Task<ActionResult> GetCalendarios(Guid turmaId)

@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using System.Text;
 
 namespace Invictus.Api
@@ -62,8 +63,11 @@ namespace Invictus.Api
             services.AddSignalR();
             #region Newtonsoft
             services.AddControllers().AddNewtonsoftJson(options =>
-                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-               );
+            {
+                //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local;
+            });
             #endregion
 
             #region Identity
@@ -165,7 +169,7 @@ namespace Invictus.Api
                     builder.AllowAnyOrigin()
                        .AllowAnyHeader()
                        .AllowAnyMethod();
-                       //.AllowCredentials();
+                    //.AllowCredentials();
                 });
             });
 

@@ -11,5 +11,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<IEnumerable<TypePacoteDto>> GetTypesLiberadorParaMatricula(Guid alunoId);
         Task<int> TotalMatriculados();
+        Task<string> GetInfoMatriculasByCPF(string cpf);
     }
 }
