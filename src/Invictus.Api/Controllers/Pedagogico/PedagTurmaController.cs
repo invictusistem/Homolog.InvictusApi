@@ -123,14 +123,14 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { calends = calends });
         }
 
-        //[HttpGet]
-        //[Route("calendario/{turmaId}")]
-        //public async Task<ActionResult> GetCalendariosPAGINATORTESTE(Guid turmaId)
-        //{
-        //    var calends = await _calendarioQueries.GetCalendarioByTurmaId(turmaId);
+        [HttpGet]
+        [Route("calendario-pagination")]
+        public async Task<ActionResult> GetCalendariosPaginatead([FromQuery] Guid turmaId,[FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        {
+            var calends = await _calendarioQueries.GetCalendarioPaginatedByTurmaId(turmaId, itemsPerPage, currentPage, paramsJson);
 
-        //    return Ok(new { calends = calends });
-        //}
+            return Ok(new { result = calends });
+        }
 
         [HttpGet]
         [Route("aula/{calendarioId}")]

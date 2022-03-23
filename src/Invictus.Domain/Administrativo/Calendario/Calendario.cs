@@ -76,7 +76,12 @@ namespace Invictus.Domain.Administrativo.Calendarios
         public string Observacoes { get; private set; }
         public bool EhSubstituto { get; private set; }
         public Guid SalaId { get; private set; }
+        public bool Editada { get; private set; }
         // public virtual Turma Turma { get; private set; }
+        public void SetEdit()
+        {
+            Editada = true;
+        }
         public void VerificarSeSubstituto(Guid professorDaMateria, Guid professorPretendido)
         {
             if(professorDaMateria == professorPretendido)

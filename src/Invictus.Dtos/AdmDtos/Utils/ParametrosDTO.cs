@@ -13,5 +13,6 @@ namespace Invictus.Dtos.AdmDtos.Utils
         public string cpf { get; set; }
         public bool ativo { get; set; }
         public bool todasUnidades { get; set; }
+        public bool primeiraReq { get; set; }
     }
 }

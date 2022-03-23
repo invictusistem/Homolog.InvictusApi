@@ -38,6 +38,7 @@ namespace Invictus.Data.Mapping.AdmMappings
             modelBuilder.ApplyConfiguration(new MatriculaDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentaoExigenciaDbMapping());
             modelBuilder.ApplyConfiguration(new LogBoletoDbMapping());
+            modelBuilder.ApplyConfiguration(new LogCalendarioDbMapping());
             modelBuilder.ApplyConfiguration(new LogLoginDbMapping());
             modelBuilder.ApplyConfiguration(new LogMatriculasDbMapping());
             modelBuilder.ApplyConfiguration(new LogTurmasDbMapping());

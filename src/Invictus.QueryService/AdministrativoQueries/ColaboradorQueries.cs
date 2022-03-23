@@ -105,9 +105,9 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 var results = await connection.QueryAsync<ColaboradorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
-                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());
-
                 connection.Close();
+
+                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());               
 
                 return paginatedItems;
 

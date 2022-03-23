@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.AdministrativoQueries
@@ -316,6 +318,139 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return results;
+            }
+        }
+
+        public async Task<PaginatedItemsViewModel<TurmaCalendarioViewModel>> GetCalendarioPaginatedByTurmaId(Guid turmaId, int itemsPerPage, int currentPage, string paramsJson)
+        {
+            var parametros = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+
+            var allDatesQuery = @"select 
+                                    calendarios.diaaula
+                                    from calendarios                        
+                                    where Calendarios.TurmaId = @turmaId 
+                                    order by Calendarios.DiaAula asc  "; // apenas se 
+
+            var calendarioQuery = @"select 
+                        calendarios.Id,
+                        calendarios.diaaula,
+                        calendarios.diadasemana,
+                        calendarios.horainicial,
+                        calendarios.horafinal,
+                        calendarios.aulainiciada,
+                        calendarios.aulaconcluida,
+                        calendarios.observacoes,
+                        Unidadessalas.titulo,
+                        materiastemplate.nome,
+                        Professores.Nome as professor 
+                        from calendarios 
+                        left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
+                        left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
+                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        where Calendarios.TurmaId = @turmaId 
+                        order by Calendarios.DiaAula asc 
+                        OFFSET( @currentPage - 1) * @itemsPerPage ROWS FETCH NEXT @itemsPerPage ROWS ONLY ";
+
+            var calendariosCount = @"select Count(*) from calendarios where Calendarios.TurmaId = @turmaId "; // apenas se 
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                
+                if (parametros.primeiraReq)
+                {
+                    var dates = await connection.QueryAsync<DateTime>(allDatesQuery, new { turmaId = turmaId });
+
+                    connection.Close();
+
+                    var data = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+                    var closestTime = dates.OrderBy(t => Math.Abs((t - data).Ticks))
+                                 .First();
+
+                    int index = dates.ToList().IndexOf(closestTime);
+
+                    decimal number = (index + 1) / itemsPerPage;
+
+                    currentPage = Convert.ToInt32(Math.Floor(number)) + 1;
+
+                    //Debug.WriteLine("");
+                }
+
+                var results = await connection.QueryAsync<TurmaCalendarioViewModel>(calendarioQuery, new { itemsPerPage = itemsPerPage, currentPage = currentPage, turmaId = turmaId });
+
+                var count = await connection.QuerySingleAsync<int>(calendariosCount, new { turmaId = turmaId });
+
+                Debug.WriteLine("");
+
+                var hoje = DateTime.Now;
+
+                //foreach (var cal in results)
+                //{
+
+                //    //Debug.WriteLine(diaSeguinte);
+                //    if (cal.diaaula < hoje)
+                //    {
+                //        cal.podeVerRelatorioAula = true;
+                //    }
+                //    else if (cal.diaaula == hoje)
+                //    {
+                //        cal.podeVerRelatorioAula = null;
+                //    }
+                //    else
+                //    {
+                //        cal.podeVerRelatorioAula = false;
+                //    }
+
+                //}
+
+                foreach (var cal in results)
+                {
+
+                    // var calendario = await connection.QueryAsync<CalendarioDto>(query2, new { turmaId = turma.id });
+
+
+                    //if (calendario.Any())
+                    //{
+                    //    turma.calendarioId = calendario.Select(c => c.id).First();
+
+
+                    var horaCompletaAula = cal.diaaula;
+                    var horaInicio = cal.horainicial.Split(":");// calendario.Select(c => c.horaInicial).First().Split(":");
+                    var horaFinal = cal.horafinal.Split(":");// calendario.Select(c => c.horaFinal).First().Split(":");
+
+                    horaCompletaAula = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                        Convert.ToInt32(horaInicio[0]), Convert.ToInt32(horaInicio[1]), 0);
+
+                    var horaCompletaFinal = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                        Convert.ToInt32(horaFinal[0]), Convert.ToInt32(horaFinal[1]), 0);
+                    var timeSpan = new TimeSpan(0, 15, 0);
+
+                    var iniciar = horaCompletaAula - timeSpan;
+
+                    if (hoje < horaCompletaFinal & hoje >= horaCompletaAula - timeSpan)
+                    {
+                        //hoje.podeIniciarAula = true;
+                        cal.podeVerRelatorioAula = null;
+                    }
+                    else
+                    {
+                        if (hoje < horaCompletaAula - timeSpan)
+                        {
+                            cal.podeVerRelatorioAula = false;
+                        }
+                        else
+                        {
+                            cal.podeVerRelatorioAula = true;
+                        }
+                    }
+                }
+
+                var paginatedItems = new PaginatedItemsViewModel<TurmaCalendarioViewModel>(currentPage, itemsPerPage, count, results.ToList());
+
+                return paginatedItems;
             }
         }
     }
