@@ -135,6 +135,18 @@ namespace Invictus.Api.Controllers
 
         }
 
+        [HttpGet]
+        [Route("materias-notas-v2/{turmaId}")]
+        public async Task<IActionResult> GetNotasV2(Guid turmaId)
+        {
+            var materias = await _turmaQueries.GetMateriasDoProfessorLiberadasParaNotasV2(turmaId);
+            
+            if (!materias.Any()) return NotFound();
+
+            return Ok(new { materias = materias });
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateTurma([FromBody] CreateTurmaCommand command)
         {

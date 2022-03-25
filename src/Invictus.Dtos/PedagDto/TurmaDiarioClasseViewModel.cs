@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Invictus.Dtos.PedagDto
 {
-    public class TurmaDiarioClasseViewModel
+    public class TurmaDiarioClasseViewModel // select id, diaAula, horaInicial, horaFinal
     {
         public Guid id { get; set; }
         public string identificador { get; set; }
@@ -21,5 +21,13 @@ namespace Invictus.Dtos.PedagDto
         // aula do DIA
         public Guid calendarioId { get; set; }
         public bool podeIniciarAula { get; set; }
+        // próxima aula
+        public DateTime diaAula { get; set; }
+        public string horaInicial { get; set; }
+        public string horaFinal { get; set; }
+        public DateTime proximaAula { get; set; }
+        public DateTime proximaAulaFinal { get; set; }
+        public string descAula { get; set; }
+        public string professor { get; set; }
     }
 }

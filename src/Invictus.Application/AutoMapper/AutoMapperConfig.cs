@@ -126,7 +126,7 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<FornecedorDto, Fornecedor>();
 
-            CreateMap<CalendarioDto, Calendario>();
+            CreateMap<TurmaCalendarioViwModel, Calendario>();
 
             CreateMap<EstagioDto, Estagio>();
 

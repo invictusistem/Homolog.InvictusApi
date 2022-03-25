@@ -2,16 +2,16 @@
 
 namespace Invictus.Domain.Administrativo.Logs
 {
-    public class LogCalendario
+    public class LogProduto
     {
-        public LogCalendario(Guid calendarioId,
+        public LogProduto(Guid produtoId,
                             Guid colaboradorID,
                             string metodo,
                             DateTime dataCriacao,
                             string oldCommand,
                             string newCommand)
         {
-            CalendarioId = calendarioId;
+            ProdutoId = produtoId;
             ColaboradorID = colaboradorID;
             Metodo = metodo;
             DataCriacao = dataCriacao;
@@ -21,14 +21,14 @@ namespace Invictus.Domain.Administrativo.Logs
         }
 
         public Guid Id { get; private set; }
-        public Guid CalendarioId { get; private set; }
+        public Guid ProdutoId { get; private set; }
         public Guid ColaboradorID { get; private set; }
         public string Metodo { get; private set; }
         public DateTime DataCriacao { get; private set; }
         public string OldCommand { get; private set; }
         public string NewCommand { get; private set; }
 
-        public LogCalendario()
+        public LogProduto()
         {
 
         }

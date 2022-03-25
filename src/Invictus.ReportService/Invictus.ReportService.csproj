@@ -3,5 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
+	
+<ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.95.3" />
+  </ItemGroup>
 
 </Project>

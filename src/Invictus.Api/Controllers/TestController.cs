@@ -95,7 +95,7 @@ namespace Invictus.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("calendario")]        
-        public IActionResult UpdateCalendario([FromBody] CalendarioDto calendDto)
+        public IActionResult UpdateCalendario([FromBody] TurmaCalendarioViwModel calendDto)
         {
             var calend = _mapper.Map<Calendario>(calendDto);
 

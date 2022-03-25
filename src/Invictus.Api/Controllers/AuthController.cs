@@ -126,7 +126,7 @@ namespace Invictus.Api.Controllers
 
                 //var role = userRoles.Where()
 
-                if(userRoles[0] == "Aluno")
+                if (userRoles[0] == "Aluno")
                 {
                     return BadRequest();
                 }
@@ -148,7 +148,7 @@ namespace Invictus.Api.Controllers
                 foreach (var uni in listaUnidades)
                 {
                     var desc = await _unidadeQueries.GetUnidadeBySigla(uni);
-                    unidadeSelect.Add(new UnidadeSelect() { unidadeId = desc.id, sigla = uni, value= desc.descricao });
+                    unidadeSelect.Add(new UnidadeSelect() { unidadeId = desc.id, sigla = uni, value = desc.descricao });
                 }
 
 
@@ -252,7 +252,7 @@ namespace Invictus.Api.Controllers
             var claims = await _userManager.GetClaimsAsync(user);
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            if(userRoles[0] == "Aluno")
+            if (userRoles[0] == "Aluno")
             {
                 throw new NotImplementedException();
             }
@@ -265,13 +265,13 @@ namespace Invictus.Api.Controllers
             var result = claims.Where(c => c.Type == "Unidade" & c.Value != siglaUnidade.sigla);
             //try
             //{
-                if (result.Count() > 0)
+            if (result.Count() > 0)
+            {
+                foreach (var item in result.ToList())
                 {
-                    foreach (var item in result.ToList())
-                    {
-                        claims.Remove(item);
-                    }
+                    claims.Remove(item);
                 }
+            }
             //}catch(Exception ex)
             //{
 
@@ -290,7 +290,14 @@ namespace Invictus.Api.Controllers
 
             claims.Add(new Claim("UnidadesAutorizadas", autorizacoesSerialize));
 
-            
+            // TESTE ACESSOS TELA
+            var telas = new List<TelasAcess>();
+            telas.Add(new TelasAcess() { path = "./adm", title = "Administrativo", @class = "" });
+            telas.Add(new TelasAcess() { path = "./newmat", title = "Matrícula", @class = "" });
+
+            var telasJson = JsonSerializer.Serialize(telas);
+
+            claims.Add(new Claim("Telas", telasJson));
 
             claims.Add(new Claim("usuarioId", colaborador.id.ToString()));
 
@@ -344,13 +351,14 @@ namespace Invictus.Api.Controllers
             };
             // log login
 
-            var logLogin = new LogLogin(colaborador.id,colaborador.email, DateTime.Now, siglaUnidade.sigla);
+            var logLogin = new LogLogin(colaborador.id, colaborador.email, DateTime.Now, siglaUnidade.sigla);
             await _db.AddAsync(logLogin);
             try
             {
                 _db.SaveChanges();
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
@@ -361,6 +369,15 @@ namespace Invictus.Api.Controllers
         private static long ToUnixEpochDate(DateTime date)
             => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);//
     }
+
+    public class TelasAcess
+    {
+        public string path { get; set; }
+        public string title { get; set; }
+        public string @class { get; set;}
+
+    }
+
 
     public class UnidadeSelect
     {

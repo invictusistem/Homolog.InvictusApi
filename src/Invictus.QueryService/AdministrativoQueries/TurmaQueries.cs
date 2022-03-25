@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Dapper;
 using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MoreLinq;
 using System;
@@ -25,8 +27,11 @@ namespace Invictus.QueryService.AdministrativoQueries
         private readonly IMateriaTemplateQueries _materiaTemplateQueries;
         private readonly IMapper _mapper;
         private readonly ITurmaRepo _turmaRepo;
+        private readonly ICalendarioQueries _calendaQueries;
+        private readonly InvictusDbContext _db;
         public TurmaQueries(IConfiguration config, IAspNetUser aspUser,
-            IUnidadeQueries unidadeQueries, IMapper mapper, ITurmaRepo turmaRepo, IMateriaTemplateQueries materiaTemplateQueries)
+            IUnidadeQueries unidadeQueries, IMapper mapper, ITurmaRepo turmaRepo, IMateriaTemplateQueries materiaTemplateQueries, InvictusDbContext db,
+            ICalendarioQueries calendaQueries)
         {
             _config = config;
             _aspUser = aspUser;
@@ -34,6 +39,8 @@ namespace Invictus.QueryService.AdministrativoQueries
             _mapper = mapper;
             _turmaRepo = turmaRepo;
             _materiaTemplateQueries = materiaTemplateQueries;
+            _db = db;
+            _calendaQueries = calendaQueries;
         }
         public async Task<int> CountTurmas(Guid unidadeId)
         {
@@ -153,7 +160,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             //query.Append(" ProfessoresMaterias.ProfessorId = '" + professorId + "' ) and TurmasMaterias.TurmaId = '" + turmaId + "' ");
             //query.Append(" and TurmasMaterias.ProfessorId = '00000000-0000-0000-0000-000000000000' OR TurmasMaterias.ProfessorId = '" + professorId + "' ");
 
-            
+
             string query = @"SELECT * FROM TurmasMaterias 
                             WHERE TurmasMaterias.turmaId = @turmaId
                             AND TurmasMaterias.ProfessorId in (@professorId,'00000000-0000-0000-0000-000000000000') ";
@@ -436,24 +443,63 @@ namespace Invictus.QueryService.AdministrativoQueries
             var unidadeSigla = _aspUser.ObterUnidadeDoUsuario();
 
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
-
+            /*
+             select calendarios.id, 
+calendarios.diaAula, 
+calendarios.horaInicial, 
+calendarios.horaFinal,
+Professores.Nome,
+MateriasTemplate.nome
+from calendarios 
+LEFT JOIN Professores on Calendarios.ProfessorId = Professores.Id
+LEFT JOIN MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
+where Calendarios.DiaAula > '2022-03-23' 
+and Calendarios.TurmaId = 'c21a80ce-9d44-4551-a64d-edafe1e51e2b' 
+order by DiaAula
+             */
             var query = @"SELECT id, identificador, descricao, 
                         statusAndamento
                         FROM Turmas WHERE Turmas.UnidadeId = @unidadeId 
                         AND Turmas.statusAndamento <> 'Aguardando início'  ";
 
             var dateNow = DateTime.Now;
-            var query2 = @"select id, diaAula, horaInicial, horaFinal from calendarios 
-                        where Calendarios.DiaAula = '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
-                        and Calendarios.TurmaId = @turmaId ";
+            var query2 = @"SELECT Calendarios.id, 
+                        Calendarios.diaAula, 
+                        Calendarios.horaInicial, 
+                        Calendarios.horaFinal,
+                        Professores.Nome as professor,
+                        MateriasTemplate.nome AS descAula
+                        FROM Calendarios 
+                        LEFT JOIN Professores ON Calendarios.ProfessorId = Professores.Id
+                        LEFT JOIN MateriasTemplate ON Calendarios.MateriaId = MateriasTemplate.Id
+                        WHERE Calendarios.DiaAula = '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
+                        AND Calendarios.TurmaId = @turmaId ";
 
-            //var query2 = @"select 
-            //                DiaAula, 
-            //                HoraInicial, 
-            //                HoraFinal
-            //                from calendarios where turmaId = @turmaId  
-            //                and DiaAula = @DataPesquisa
-            //                order by DiaAula asc";
+            var query3 = @"SELECT Calendarios.id, 
+                        Calendarios.diaAula, 
+                        Calendarios.horaInicial, 
+                        Calendarios.horaFinal,
+                        Professores.Nome as professor,
+                        MateriasTemplate.nome AS descAula
+                        FROM Calendarios 
+                        LEFT JOIN Professores ON Calendarios.ProfessorId = Professores.Id
+                        LEFT JOIN MateriasTemplate ON Calendarios.MateriaId = MateriasTemplate.Id
+                        WHERE Calendarios.DiaAula >= '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
+                        AND Calendarios.TurmaId = @turmaId 
+                        order by DiaAula";
+
+            var query4 = @"SELECT Calendarios.id, 
+                        Calendarios.diaAula, 
+                        Calendarios.horaInicial, 
+                        Calendarios.horaFinal,
+                        Professores.Nome as professor,
+                        MateriasTemplate.nome AS descAula
+                        FROM Calendarios 
+                        LEFT JOIN Professores ON Calendarios.ProfessorId = Professores.Id
+                        LEFT JOIN MateriasTemplate ON Calendarios.MateriaId = MateriasTemplate.Id
+                        WHERE Calendarios.DiaAula > '" + dateNow.Year + "-" + dateNow.Month + "-" + dateNow.Day + @"' 
+                        AND Calendarios.TurmaId = @turmaId 
+                        order by DiaAula";
 
             var DataPesquisa = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
 
@@ -469,7 +515,12 @@ namespace Invictus.QueryService.AdministrativoQueries
                 foreach (var turma in turmas)
                 {
 
-                    var calendario = await connection.QueryAsync<CalendarioDto>(query2, new { turmaId = turma.id });
+                    var calendario = await connection.QueryAsync<TurmaDiarioClasseViewModel>(query2, new { turmaId = turma.id });
+
+                    //Get próxima aula
+                    var proximaAula = await connection.QueryAsync<TurmaDiarioClasseViewModel>(query3, new { turmaId = turma.id });
+                    var now = DateTime.Now;
+                    //var cal = proximaAula.OrderBy(c => c.DiaAula);
 
                     // confirmar se tem o guid e pegar o default
                     if (calendario.Any())
@@ -477,32 +528,71 @@ namespace Invictus.QueryService.AdministrativoQueries
                         turma.calendarioId = calendario.Select(c => c.id).First();
                         //TEMP
 
-                        var horaCompletaAula = calendario.Select(c => c.diaAula).First();
+                        var horaCompletaInicio = calendario.Select(c => c.diaAula).First();
                         var horaInicio = calendario.Select(c => c.horaInicial).First().Split(":");
                         var horaFinal = calendario.Select(c => c.horaFinal).First().Split(":");
 
-                        horaCompletaAula = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                        horaCompletaInicio = new DateTime(horaCompletaInicio.Year, horaCompletaInicio.Month, horaCompletaInicio.Day,
                             Convert.ToInt32(horaInicio[0]), Convert.ToInt32(horaInicio[1]), 0);
-                        
-                        var horaCompletaFinal = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+
+                        var horaCompletaFinal = new DateTime(horaCompletaInicio.Year, horaCompletaInicio.Month, horaCompletaInicio.Day,
                             Convert.ToInt32(horaFinal[0]), Convert.ToInt32(horaFinal[1]), 0);
                         var timeSpan = new TimeSpan(0, 15, 0);
 
-                        var iniciar = horaCompletaAula - timeSpan;
+                        var iniciar = horaCompletaInicio - timeSpan;
 
-                        if (dateNow < horaCompletaFinal & dateNow >= horaCompletaAula - timeSpan)
+                        if (dateNow < horaCompletaFinal & dateNow >= horaCompletaInicio - timeSpan)
                         {
+                            turma.proximaAula = horaCompletaInicio;
+                            turma.proximaAulaFinal = horaCompletaFinal;
+                            turma.descAula = calendario.Select(c => c.descAula).First();
+                            turma.professor = calendario.Select(c => c.professor).First();
                             turma.podeIniciarAula = true;
                         }
                         else
                         {
+                            //var aulas = await connection.QueryAsync<CalendarioDto>(query3, new { turmaId = turma.id });
+
+                            //var horaIni = aulas.ToList()[1].diaAula;
+                            //var ini = aulas.ToList()[1].horaInicial.Split(":");
+                            //var fim = aulas.ToList()[1].horaFinal.Split(":");
+
+                            //var horaInicial = new DateTime(horaIni.Year, horaIni.Month, horaIni.Day,
+                            //    Convert.ToInt32(ini[0]), Convert.ToInt32(ini[1]), 0);
+
+                            //var horaFim = new DateTime(horaIni.Year, horaIni.Month, horaIni.Day,
+                            //    Convert.ToInt32(fim[0]), Convert.ToInt32(fim[1]), 0);
+
+                            //turma.proximaAula = horaInicial;
+                            //turma.proximaAulaFinal = horaFim;
+                            turma.descAula = calendario.Select(c => c.descAula).First();
+                            turma.professor = calendario.Select(c => c.professor).First();
+                            turma.proximaAula = horaCompletaInicio;
+                            turma.proximaAulaFinal = horaCompletaFinal;
                             turma.podeIniciarAula = false;
                         }
 
-                        
+
                     }
                     else
                     {
+                        var proximaAulaX = await connection.QueryAsync<TurmaDiarioClasseViewModel>(query4, new { turmaId = turma.id });
+                        var horaCompletaAula = proximaAulaX.Select(c => c.diaAula).First();
+                        var horaInicio = proximaAulaX.Select(c => c.horaInicial).First().Split(":");
+                        var horaFinal = proximaAulaX.Select(c => c.horaFinal).First().Split(":");
+
+
+                        horaCompletaAula = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                            Convert.ToInt32(horaInicio[0]), Convert.ToInt32(horaInicio[1]), 0);
+
+                        var horaCompletaFinal = new DateTime(horaCompletaAula.Year, horaCompletaAula.Month, horaCompletaAula.Day,
+                            Convert.ToInt32(horaFinal[0]), Convert.ToInt32(horaFinal[1]), 0);
+
+                        turma.proximaAula = horaCompletaAula;
+                        turma.proximaAulaFinal = horaCompletaFinal;
+                        turma.descAula = proximaAulaX.Select(c => c.descAula).First();
+                        turma.professor = proximaAulaX.Select(c => c.professor).First();
+
                         turma.podeIniciarAula = false;
                     }
 
@@ -514,7 +604,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 }
 
-                
+                // Pegar dados da próxima aula - (próxima aula: Ética - 25/03/2022 08:00 às 12:00)
 
                 return turmas;
 
@@ -655,11 +745,11 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 if (!listaPresenca.Any())
                 {
-                    var calendario = await connection.QuerySingleAsync<CalendarioDto>(calendarioDoDiaQuery, new { calendarioId = calendarioId });
+                    var calendario = await connection.QuerySingleAsync<TurmaCalendarioViwModel>(calendarioDoDiaQuery, new { calendarioId = calendarioId });
                     var alunosDaTurma = await connection.QueryAsync<MatriculaDto>(alunosDaTurmaQuerie, new { turmaId = calendario.turmaId });
-                    
+
                     var turmaPresencaList = new List<Presenca>();
-                    
+
                     foreach (var aluno in alunosDaTurma)
                     {
                         var presenca = new Presenca(calendarioId, null, aluno.alunoId, null);
@@ -698,7 +788,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 aulaView.listaPresenca = presencas.ToList();
 
                 return aulaView;
-            }            
+            }
         }
 
         public async Task<IEnumerable<TurmaMateriasDto>> GetTurmasMateriasByProfessorAndMateriaId(Guid materiaId, Guid professorId)
@@ -720,7 +810,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasDoProfessorLiberadasParaNotas(Guid turmaId)
         {
-            var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,0,0,0);
+            var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
             var userRole = _aspUser.ObterRole();
             var listGuidMaterias = new List<Guid>();
             var calendarios = await GetMatriasConcluidas(turmaId);
@@ -746,12 +836,12 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
 
             var materias = await _materiaTemplateQueries.GetMateriasByListIds(listGuidMaterias);
-            
+
 
             return materias;
         }
 
-        private async Task<IEnumerable<CalendarioDto>> GetMatriasConcluidas(Guid turmaId)
+        private async Task<IEnumerable<TurmaCalendarioViwModel>> GetMatriasConcluidas(Guid turmaId)
         {
             string query = @"SELECT * FROM Calendarios WHERE Calendarios.turmaId = @turmaId ";
 
@@ -760,13 +850,57 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = turmaId });
+                var result = await connection.QueryAsync<TurmaCalendarioViwModel>(query, new { turmaId = turmaId });
 
                 connection.Close();
 
 
                 return result;
             }
+        }
+
+        public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasDoProfessorLiberadasParaNotasV2(Guid turmaId)
+        {
+            var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            var userRole = _aspUser.ObterRole();
+            var materias = new List<MateriaTemplateDto>();
+            var aulasDaTurma = await _calendaQueries.GetCalendarioByTurmaId(turmaId);
+            var aulasDistinct = aulasDaTurma.ToList().DistinctBy(a => a.materiaId);
+
+
+
+            if (userRole == "MasterAdm" || userRole == "SuperAdm")
+            {
+
+                foreach (var cal in aulasDistinct)
+                {
+
+                    var aulas = aulasDaTurma.Where(a => a.materiaId == cal.materiaId);
+
+                    var aulasPassadas = aulasDaTurma.Where(a => a.materiaId == cal.materiaId & a.diaaula < dateNow);
+
+                    var aulasPassadasCount = aulasPassadas.Count();
+
+                    var aulasCount = aulas.Count();
+
+                    if (aulasCount == aulasPassadasCount)
+                    {
+                        var mat = new MateriaTemplateDto();
+                        mat.id = cal.materiaId;
+                        mat.nome = cal.Nome;
+                        materias.Add(mat);
+                    }
+                }
+            }
+            else
+            {
+
+            }
+
+            
+
+
+            return materias;
         }
     }
 
@@ -777,7 +911,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             listaPresenca = new List<ListaPresencaViewModel>();
         }
         public AulaViewModel aulaViewModel { get; set; }
-        public List<ListaPresencaViewModel> listaPresenca {get;set;}
+        public List<ListaPresencaViewModel> listaPresenca { get; set; }
 
     }
 
@@ -785,7 +919,7 @@ namespace Invictus.QueryService.AdministrativoQueries
     {
         public Guid id { get; set; }
         public string nome { get; set; }
-        public string nomeSocial {get;set;}
+        public string nomeSocial { get; set; }
         public Guid calendarioId { get; set; }
         public bool? isPresent { get; set; }
         public string isPresentToString { get; set; }

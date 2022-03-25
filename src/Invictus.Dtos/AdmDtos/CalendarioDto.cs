@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Invictus.Dtos.AdmDtos
 {
-    public class CalendarioDto
+    public class TurmaCalendarioViwModel
     {
         public Guid id { get; set; }
         public DateTime diaAula { get; set; }

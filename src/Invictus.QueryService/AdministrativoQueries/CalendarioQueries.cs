@@ -69,7 +69,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<CalendarioDto> GetCalendarioById(Guid calendarioId)
+        public async Task<TurmaCalendarioViwModel> GetCalendarioById(Guid calendarioId)
         {
             var query = @"SELECT * FROM Calendarios WHERE Calendarios.Id = @calendarioId";
 
@@ -79,7 +79,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
-                var results = await connection.QuerySingleAsync<CalendarioDto>(query, new { calendarioId = calendarioId });
+                var results = await connection.QuerySingleAsync<TurmaCalendarioViwModel>(query, new { calendarioId = calendarioId });
 
                 connection.Close();// 2022 01 30
 
@@ -88,7 +88,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<CalendarioDto>> GetCalendarioByProfessorId(Guid professorId)
+        public async Task<IEnumerable<TurmaCalendarioViwModel>> GetCalendarioByProfessorId(Guid professorId)
         {
             var query = @"SELECT * FROM Calendarios WHERE Calendarios.ProfessorId = @professorId ";
 
@@ -97,7 +97,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId });
+                var results = await connection.QueryAsync<TurmaCalendarioViwModel>(query, new { professorId = professorId });
 
                 connection.Close();
 
@@ -118,6 +118,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                         calendarios.observacoes,
                         Unidadessalas.titulo,
                         materiastemplate.nome,
+                        materiastemplate.id as materiaId,
                         Professores.Nome as professor 
                         from calendarios 
                         left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
@@ -204,7 +205,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByProfessorIdAndUnidadeId(Guid unidadeId, Guid professorId)
+        public async Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByProfessorIdAndUnidadeId(Guid unidadeId, Guid professorId)
         {
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
 
@@ -216,7 +217,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId, unidadeId = unidadeId, hoje = hoje });
+                var results = await connection.QueryAsync<TurmaCalendarioViwModel>(query, new { professorId = professorId, unidadeId = unidadeId, hoje = hoje });
 
                 connection.Close();
 
@@ -281,7 +282,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByProfessorIdAndMateriaId(Guid materiaId, Guid professorId)
+        public async Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByProfessorIdAndMateriaId(Guid materiaId, Guid professorId)
         {
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
 
@@ -293,7 +294,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<CalendarioDto>(query, new { professorId = professorId, materiaId = materiaId, hoje = hoje });
+                var results = await connection.QueryAsync<TurmaCalendarioViwModel>(query, new { professorId = professorId, materiaId = materiaId, hoje = hoje });
 
                 connection.Close();
 
@@ -301,7 +302,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<CalendarioDto>> GetFutureCalendarsByTurmaIdAndMateriaId(Guid materiaId, Guid turmaId)
+        public async Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByTurmaIdAndMateriaId(Guid materiaId, Guid turmaId)
         {
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
 
@@ -313,7 +314,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<CalendarioDto>(query, new { turmaId = turmaId, materiaId = materiaId, hoje = hoje });
+                var results = await connection.QueryAsync<TurmaCalendarioViwModel>(query, new { turmaId = turmaId, materiaId = materiaId, hoje = hoje });
 
                 connection.Close();
 

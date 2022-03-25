@@ -69,6 +69,17 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { alunos = alunos });
         }
 
+        [HttpGet]
+        [Route("relatorio")]
+        public async Task<IActionResult> GetRelatorio([FromQuery] string paramJson)
+        {            
+            var matriculas = await _pedagMatriculaQueries.GetRelatorioMatriculas(paramJson);
+
+            if (!matriculas.Any()) return NotFound();
+
+            return Ok(new { matriculas = matriculas });
+        }
+
         [HttpPost]
         [Route("{turmaId}/{alunoId}")]
         public async Task<IActionResult> Matricular(Guid turmaId, Guid alunoId, [FromBody] MatriculaCommand command)

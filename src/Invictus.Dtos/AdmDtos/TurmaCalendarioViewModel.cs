@@ -16,6 +16,7 @@ namespace Invictus.Dtos.AdmDtos
         public string titulo { get; set; }
         public string descricao { get; set; }
         public string Nome { get; set; }
+        public Guid materiaId { get; set; }
         public bool? podeVerRelatorioAula { get; set; }
         public string professor { get; set; }
     }

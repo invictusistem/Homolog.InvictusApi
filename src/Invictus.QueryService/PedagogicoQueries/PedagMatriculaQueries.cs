@@ -1,8 +1,11 @@
 ﻿using Dapper;
+using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -13,10 +16,14 @@ namespace Invictus.QueryService.PedagogicoQueries
 {
     public class PedagMatriculaQueries : IPedagMatriculaQueries
     {
-        private readonly IConfiguration _config;        
-        public PedagMatriculaQueries(IConfiguration config)
+        private readonly IConfiguration _config;
+        private readonly IAspNetUser _aspNetUser;
+        private readonly IUnidadeQueries _unidadeQueries;
+        public PedagMatriculaQueries(IConfiguration config, IAspNetUser aspNetUser, IUnidadeQueries unidadeQueries)
         {
             _config = config;
+            _aspNetUser = aspNetUser;
+            _unidadeQueries = unidadeQueries;
         }
         public async Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId)
         {
@@ -107,6 +114,61 @@ namespace Invictus.QueryService.PedagogicoQueries
                 // connection.Close();
 
                 return result.OrderBy(a => a.dataRegistro);
+
+            }
+        }
+
+        public async Task<IEnumerable<MatriculaViewModel>> GetRelatorioMatriculas(string param)
+        {
+            var parametro = JsonConvert.DeserializeObject<MatriculaRelatorioParam>(param);
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+            IEnumerable<MatriculaViewModel> matriculas = new List<MatriculaViewModel>();
+
+            var matriculaDateRangeQuery = @"SELECT 
+                                        Matriculas.Id as matriculaId,
+                                        Matriculas.Nome as alunoNome,
+                                        Matriculas.DiaMatricula,
+                                        Turmas.Descricao,
+                                        Turmas.Identificador,
+                                        Colaboradores.Nome as colaboradorNome
+                                        FROM Matriculas
+                                        INNER JOIN Turmas on Matriculas.TurmaId = Turmas.Id
+                                        INNER JOIN Colaboradores on Matriculas.ColaboradorResponsavelMatricula = Colaboradores.Id
+                                        WHERE Matriculas.DiaMatricula > @rangeIni AND Matriculas.DiaMatricula < @rangeFinal AND
+                                        Turmas.UnidadeId = @unidadeId ";
+
+            var matriculaTurmaQuery = @"SELECT 
+                                        Matriculas.Id as matriculaId,
+                                        Matriculas.Nome as alunoNome,
+                                        Matriculas.DiaMatricula,
+                                        Turmas.Descricao,
+                                        Turmas.Identificador,
+                                        Colaboradores.Nome as colaboradorNome
+                                        FROM Matriculas
+                                        INNER JOIN Turmas on Matriculas.TurmaId = Turmas.Id
+                                        INNER JOIN Colaboradores on Matriculas.ColaboradorResponsavelMatricula = Colaboradores.Id
+                                        WHERE Matriculas.TurmaId = @turmaId AND
+                                        Turmas.UnidadeId = @unidadeId  ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                if(parametro.opcao == "periodo") 
+                {
+                    matriculas = await connection.QueryAsync<MatriculaViewModel>(matriculaDateRangeQuery, new { rangeIni = parametro.inicio, rangeFinal = parametro.fim, unidadeId = unidade.id });
+ 
+                } else
+                {
+                    matriculas = await connection.QueryAsync<MatriculaViewModel>(matriculaTurmaQuery, new { turmaId = parametro.turmaId, unidadeId = unidade.id });
+                }
+
+                connection.Close();
+
+                return matriculas.OrderBy(m => m.diaMatricula);
 
             }
         }

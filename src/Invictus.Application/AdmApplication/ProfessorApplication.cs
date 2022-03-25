@@ -88,7 +88,7 @@ namespace Invictus.Application.AdmApplication
 
         private async Task RemoverProfessorDoCalendarioDaUnidade(Guid unidadeId,Guid professorId)
         {
-            IEnumerable<CalendarioDto> calendarios = await _calendariosQueries.GetFutureCalendarsByProfessorIdAndUnidadeId(unidadeId, professorId);
+            IEnumerable<TurmaCalendarioViwModel> calendarios = await _calendariosQueries.GetFutureCalendarsByProfessorIdAndUnidadeId(unidadeId, professorId);
 
             if (calendarios.Any())
             {
@@ -106,7 +106,7 @@ namespace Invictus.Application.AdmApplication
 
         private async Task AtualizarAulasProfessor(DisponibilidadeDto dispoDto, Guid unidadeId, Guid professorId)
         {
-            IEnumerable<CalendarioDto> calendariosDto = await _calendariosQueries.GetFutureCalendarsByProfessorIdAndUnidadeId(unidadeId, professorId);
+            IEnumerable<TurmaCalendarioViwModel> calendariosDto = await _calendariosQueries.GetFutureCalendarsByProfessorIdAndUnidadeId(unidadeId, professorId);
 
             IEnumerable<Calendario> calendarios = _mapper.Map<IEnumerable<Calendario>>(calendariosDto);
 

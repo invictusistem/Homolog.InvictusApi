@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Invictus.Core\Invictus.Core.csproj" />
+		<ProjectReference Include="..\Invictus.Data\Invictus.Data.csproj" />
 		<ProjectReference Include="..\Invictus.Domain\Invictus.Domain.csproj" />
 		<ProjectReference Include="..\Invictus.Dtos\Invictus.Dtos.csproj" />
 	</ItemGroup>

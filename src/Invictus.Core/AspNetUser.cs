@@ -77,7 +77,7 @@ namespace Invictus.Core
             var roles = _accessor.HttpContext.User.Claims;
 
             //var asd = roles.Select(r => r.
-            var role = roles.ToList()[11];
+            var role = roles.ToList()[12];
             //string role = _accessor.HttpContext.User.FindFirst("role").Value;
 
             return role.Value;
