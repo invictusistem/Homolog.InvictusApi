@@ -11,6 +11,7 @@ namespace Invictus.Dtos.PedagDto
         public Guid id { get; set; }
         public string tipo { get; set; }
         public string nome { get; set; }
+        public string parentesco { get; set; }
         // public string NomeSocial { get; private set; }
         public string cpf { get; set; }
         public string rg { get; set; }

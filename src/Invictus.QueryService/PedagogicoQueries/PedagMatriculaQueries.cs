@@ -175,32 +175,8 @@ namespace Invictus.QueryService.PedagogicoQueries
 
         public async Task<ResponsavelDto> GetRespFinanceiroByMatriculaId(Guid matriculaId)
         {
-            var query = @"select 
-        responsaveis.id, 
-        responsaveis.tipo, 
-        responsaveis.nome ,
-        responsaveis.cpf ,
-        responsaveis.rg ,
-        responsaveis.nascimento ,
-        responsaveis.naturalidade ,
-        responsaveis.naturalidadeUF ,
-        responsaveis.email ,
-        responsaveis.temRespFin ,
-        responsaveis.telCelular ,
-        responsaveis.telResidencial ,
-        responsaveis.matriculaId ,
-        responsaveis.telWhatsapp ,
-        responsaveis.bairro,
-        responsaveis.cep ,
-        responsaveis.complemento ,
-        responsaveis.logradouro,
-        responsaveis.numero,
-        responsaveis.cidade ,
-        responsaveis.uf 
-FROM Responsaveis 
-left join matriculas on Responsaveis.matriculaId = matriculas.id
-where matriculas.id = @matriculaId AND
-Responsaveis.tipo = 'Responsável financeiro'";
+            var query = @"SELECT * FROM Responsaveis where Responsaveis.MatriculaId = @matriculaId AND
+                        Responsaveis.tipo = 'Responsável financeiro'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -218,32 +194,8 @@ Responsaveis.tipo = 'Responsável financeiro'";
 
         public async Task<ResponsavelDto> GetRespMenorByMatriculaId(Guid matriculaId)
         {
-            var query = @"select 
-        responsaveis.id, 
-        responsaveis.tipo, 
-        responsaveis.nome ,
-        responsaveis.cpf ,
-        responsaveis.rg ,
-        responsaveis.nascimento ,
-        responsaveis.naturalidade ,
-        responsaveis.naturalidadeUF ,
-        responsaveis.email ,
-        responsaveis.temRespFin ,
-        responsaveis.telCelular ,
-        responsaveis.telResidencial ,
-        responsaveis.matriculaId ,
-        responsaveis.telWhatsapp ,
-        responsaveis.bairro,
-        responsaveis.cep ,
-        responsaveis.complemento ,
-        responsaveis.logradouro,
-        responsaveis.numero,
-        responsaveis.cidade ,
-        responsaveis.uf 
-FROM Responsaveis 
-left join matriculas on Responsaveis.matriculaId = matriculas.id
-where matriculas.id = @matriculaId AND
-Responsaveis.tipo = 'Responsável menor'";
+            var query = @"SELECT * FROM Responsaveis where Responsaveis.MatriculaId = @matriculaId AND
+                        Responsaveis.tipo = 'Responsável menor'";
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
@@ -260,30 +212,7 @@ Responsaveis.tipo = 'Responsável menor'";
 
         public async Task<ResponsavelDto> GetResponsavel(Guid matriculaId)
         {
-            var query = @"select 
-        responsaveis.id, 
-        responsaveis.tipo, 
-        responsaveis.nome ,
-        responsaveis.cpf ,
-        responsaveis.rg ,
-        responsaveis.nascimento ,
-        responsaveis.naturalidade ,
-        responsaveis.naturalidadeUF ,
-        responsaveis.email ,
-        responsaveis.temRespFin ,
-        responsaveis.telCelular ,
-        responsaveis.telResidencial ,
-        responsaveis.telWhatsapp ,
-        responsaveis.bairro,
-        responsaveis.cep ,
-        responsaveis.complemento ,
-        responsaveis.logradouro,
-        responsaveis.numero,
-        responsaveis.cidade ,
-        responsaveis.uf 
-FROM Responsaveis 
-left join matriculas on Responsaveis.matriculaId = matriculas.id
-where matriculas.id = @matriculaId ";
+            var query = @"SELECT * FROM Responsaveis WHERE Responsaveis.MatriculaId = @matriculaId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

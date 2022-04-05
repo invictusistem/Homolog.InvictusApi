@@ -17,7 +17,7 @@ using Invictus.Data.Mapping.AdmMappings.UnidadeMapping;
 using Invictus.Domain.Administrativo.Logs;
 using Microsoft.EntityFrameworkCore;
 
-namespace Invictus.Data.Mapping.AdmMappings
+namespace Invictus.Data.Mapping
 {
     public class AdmModelBuilder
     {

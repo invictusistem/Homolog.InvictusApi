@@ -34,7 +34,7 @@ namespace Invictus.Application.AdmApplication
             var unidade = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
            // var turmaId = new Guid("7104d99b-142d-4d1c-9c41-f7c1dde52b0d");
             //using (var stream = new MemoryStream())
-            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 01.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 04.xlsx", FileMode.Open, FileAccess.Read))
             {
                 //file.CopyTo(stream);
                 stream.Position = 1;
@@ -155,7 +155,7 @@ namespace Invictus.Application.AdmApplication
             //var listaNomes = new List<string>();
             var listaFin = new List<PlanilhafinDto>();
 
-            using (var stream = File.Open("FINANCEIRO ENF 01.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open("FINANCEIRO ENF 04.xlsx", FileMode.Open, FileAccess.Read))
             {
                 stream.Position = 1;
 
@@ -219,7 +219,7 @@ namespace Invictus.Application.AdmApplication
                 command.alunoId = alunoId;
                 
 
-                var turmaId = new Guid("a8cdb85b-5976-4a0a-99cc-37891040acb9");
+                var turmaId = new Guid("f6a79467-b929-4d33-bcd1-6e2f482c264a");
                 command.turmaId = turmaId;
                 //_matriculaApplication.AddParams(turmaId, alunoId, command);
                 //_matriculaApplication.Matricular().ConfigureAwait(true);

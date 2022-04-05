@@ -1,4 +1,9 @@
-﻿using Invictus.QueryService.FinanceiroQueries.Interfaces;
+﻿using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
+using Invictus.Domain.Financeiro;
+using Invictus.Dtos.Financeiro;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Invictus.QueryService.FinanceiroQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +20,18 @@ namespace Invictus.Api.Controllers.Financeiro
     public class FinanceiroController : ControllerBase
     {
         private readonly IFinanceiroQueries _finQueries;
+        private readonly IAspNetUser _aspNetUser;
         private readonly ITurmaPedagQueries _turmaQueries;
-        public FinanceiroController(IFinanceiroQueries finQueries, ITurmaPedagQueries turmaQueries)
+        private readonly IUnidadeQueries _unidadeQueries;
+        private readonly InvictusDbContext _db;
+        public FinanceiroController(IFinanceiroQueries finQueries, ITurmaPedagQueries turmaQueries, InvictusDbContext db, IAspNetUser aspNetUser,
+            IUnidadeQueries unidadeQueries)
         {
             _finQueries = finQueries;
             _turmaQueries = turmaQueries;
+            _db = db;
+            _aspNetUser = aspNetUser;
+            _unidadeQueries = unidadeQueries;
         }
 
 
@@ -53,22 +65,35 @@ namespace Invictus.Api.Controllers.Financeiro
             //return Ok(pessoas);
         }
 
-       
-        //public List<AlunoDto> SetCPFBind(List<AlunoDto> datas)
-        //{
-        //    foreach (var data in datas)
-        //    {
+        [HttpPut]
+        [Route("boleto-pagar")]
+        public async Task<IActionResult> ReceberBoleto([FromBody] ReceberBoletoCommand command)
+        {
 
-        //        var newValue = "***.***." + data.cpf.Substring(6, 3) + "-**";
+            var boleto = await _db.Boletos.FindAsync(command.boletoId);
 
-        //        data.cpf = newValue;
+            // VERIFICAR NA API 
+            if(!(boleto.StatusBoleto == "Vencido" || boleto.StatusBoleto == "Em aberto"))
+            {
+                return BadRequest();
+            }
 
-        //    }
-        //    //var newValue = "***.***." + CPF.Substring(6, 3) + "-**";
+            boleto.ReceberBoleto(command.valorRecebido,command.formaRecebimento);
 
-        //    //CPF = newValue;
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+            var usuarioId = _aspNetUser.ObterUsuarioId();
 
-        //    return datas;
-        //}
+
+            var caixa = new Caixa(usuarioId, unidade.id, DateTime.Now, command.boletoId);
+
+            await _db.Boletos.SingleUpdateAsync(boleto);
+            await _db.Caixas.SingleUpdateAsync(caixa);
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+            
+        }
     }
 }

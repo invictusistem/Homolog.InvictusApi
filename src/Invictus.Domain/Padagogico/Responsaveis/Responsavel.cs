@@ -10,7 +10,7 @@ namespace Invictus.Domain.Pedagogico.Responsaveis
         public Responsavel(//int id,
                     TipoResponsavel tipo,
                     string nome,
-                    //string nomeSocial,
+                    string parentesco,
                     string cpf,
                     string rg,
                     DateTime? nascimento,
@@ -32,6 +32,7 @@ namespace Invictus.Domain.Pedagogico.Responsaveis
             // Id = id;
             Tipo = tipo.DisplayName;
             Nome = nome;
+            Parentesco = parentesco;
             //NomeSocial = nomeSocial;
             CPF = cpf;
             RG = rg;
@@ -55,6 +56,7 @@ namespace Invictus.Domain.Pedagogico.Responsaveis
         // public TipoResponsavel TipoResponsavel { get; private set; }
         public string Tipo { get; private set; }
         public string Nome { get; private set; }
+        public string Parentesco { get; private set; }
         // public string NomeSocial { get; private set; }
         public string CPF { get; private set; }
         public string RG { get; private set; }

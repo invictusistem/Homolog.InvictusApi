@@ -12,12 +12,14 @@ namespace Invictus.Domain.Administrativo.Logs
                             Guid turmaId,
                             Guid guidColaborador,
                             DateTime dataCriacao,
+                            Guid unidadeId,
                             string createTurmaCommandJson)
         {
 
             TurmaId = turmaId;
             GuidColaborador = guidColaborador;
             DataCriacao = dataCriacao;
+            UnidadeId = unidadeId;
             CreateTurmaCommandJson = createTurmaCommandJson;
 
         }
@@ -26,6 +28,7 @@ namespace Invictus.Domain.Administrativo.Logs
         public Guid TurmaId { get; private set; }
         public Guid GuidColaborador { get; private set; }
         public DateTime DataCriacao { get; private set; }
+        public Guid UnidadeId { get; private set; }
         public string CreateTurmaCommandJson { get; private set; }
 
         public LogTurmas()

@@ -1,5 +1,7 @@
 ﻿using Invictus.Data.Context;
 using Invictus.Domain.Financeiro;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,11 +15,14 @@ namespace Invictus.Api.Controllers
     [Route("api/dev")]
     public class DesenvolvimentoController : ControllerBase
     {
-
+        private readonly IUnidadeQueries _unidadeQueries;
+        public UserManager<IdentityUser> UserManager { get; set; }
         private readonly InvictusDbContext _db;
-        public DesenvolvimentoController(InvictusDbContext db)
+        public DesenvolvimentoController(InvictusDbContext db, UserManager<IdentityUser> userMgr, IUnidadeQueries unidadeQueries)
         {
             _db = db;
+            UserManager = userMgr;
+            _unidadeQueries = unidadeQueries;
         }
 
         [HttpDelete]
@@ -54,7 +59,7 @@ namespace Invictus.Api.Controllers
             var turma = await _db.Turmas.Where(c => c.Id == turmaId).FirstOrDefaultAsync();
             if (turma != null) _db.Turmas.Remove(turma);
 
-            await _db.SaveChangesAsync();
+            //await _db.SaveChangesAsync();
 
             var logTurma = await _db.LogTurmas.Where(t => t.TurmaId == turmaId).ToListAsync();
             _db.LogTurmas.RemoveRange(logTurma);
@@ -77,6 +82,20 @@ namespace Invictus.Api.Controllers
 
             if (mat.Any())
             {
+                //remover usuario do Identity
+                foreach (var item in mat)
+                {
+                    var aluno = await _db.Alunos.Where(a => a.Id == item.AlunoId).FirstOrDefaultAsync();
+                   
+                    if (!String.IsNullOrEmpty(aluno.Email))
+                    {   
+                        var usuario = await UserManager.FindByEmailAsync(aluno.Email);
+
+                        if (usuario != null) await UserManager.DeleteAsync(usuario);
+                    }
+
+                }
+
                 var listMatIds = mat.Select(c => c.Id);
 
                 var resps = await _db.Responsaveis.Where(m => listMatIds.Contains(m.MatriculaId)).ToListAsync();
@@ -107,17 +126,17 @@ namespace Invictus.Api.Controllers
                 var boletos = await _db.Boletos.Where(m => listInfoDebsIds.Contains(m.InformacaoDebitoId)).ToListAsync();
 
                 var listBoletosId = boletos.Select(c => c.Id);
-                var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
+                //var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
 
 
-                _db.LogBoletos.RemoveRange(logBoletos);
+               // _db.LogBoletos.RemoveRange(logBoletos);
                 _db.Boletos.RemoveRange(boletos);
                 _db.InformacoesDebito.RemoveRange(infoDebitos);
 
                 _db.AlunoPlanos.RemoveRange(alunosPlanos);
                 _db.AlunosDocs.RemoveRange(alunosDocs);
 
-                _db.LogMatriculas.RemoveRange(logMat);
+                //_db.LogMatriculas.RemoveRange(logMat);
 
                 _db.Matriculas.RemoveRange(mat);
 
@@ -233,8 +252,8 @@ namespace Invictus.Api.Controllers
 
             var boletos = await _db.Boletos.Where(m => listInfoDebsIds.Contains(m.InformacaoDebitoId)).ToListAsync();
 
-            var listBoletosId = boletos.Select(c => c.Id);
-            var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
+            //var listBoletosId = boletos.Select(c => c.Id);
+            //var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
 
 
             var alunoAnots = await _db.AlunosAnotacoes.Where(m => m.MatriculaId == mat.Id).ToListAsync();
@@ -246,6 +265,15 @@ namespace Invictus.Api.Controllers
 
 
 
+            var aluno = await _db.Alunos.Where(a => a.Id == mat.AlunoId).FirstOrDefaultAsync();
+
+            if (!String.IsNullOrEmpty(aluno.Email))
+            {
+                var usuario = await UserManager.FindByEmailAsync(aluno.Email);
+
+                if (usuario != null) await UserManager.DeleteAsync(usuario);
+            }
+
             var alunosDocs = await _db.AlunosDocs.Where(m => m.MatriculaId == mat.Id).ToListAsync();
 
             var alunosPlanos = await _db.AlunoPlanos.Where(m => m.MatriculaId == mat.Id).ToListAsync();
@@ -253,14 +281,14 @@ namespace Invictus.Api.Controllers
             
 
 
-            _db.LogBoletos.RemoveRange(logBoletos);
+            //_db.LogBoletos.RemoveRange(logBoletos);
             _db.Boletos.RemoveRange(boletos);
             _db.InformacoesDebito.RemoveRange(infoDebitos);
 
             _db.AlunoPlanos.RemoveRange(alunosPlanos);
             _db.AlunosDocs.RemoveRange(alunosDocs);
 
-            _db.LogMatriculas.RemoveRange(logMat);
+            //_db.LogMatriculas.RemoveRange(logMat);
 
             _db.Matriculas.RemoveRange(mat);
 
@@ -294,6 +322,27 @@ namespace Invictus.Api.Controllers
 
             return Ok();
 
+        }
+
+        [HttpPut]
+        [Route("atualizar-boletos")]
+        public async Task<IActionResult> AtualizarBoletos()
+        {
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            var boletos = await _db.Boletos.Where(b => b.Vencimento < hoje &
+                                            b.StatusBoleto == "Em aberto").ToListAsync();
+
+            foreach (var boleto in boletos)
+            {
+                boleto.SetBoletoVencido();
+            }
+
+            _db.Boletos.UpdateRange(boletos);
+
+            _db.SaveChanges();
+
+            return Ok();
         }
     }
 }

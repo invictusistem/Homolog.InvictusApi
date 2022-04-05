@@ -118,7 +118,11 @@ namespace Invictus.Application.AdmApplication
             for (int i = 0; i < boletos.Count(); i++)
             {
                 //int qntBoletosSalvos = _db.LogBoletos.Count();
-                
+
+                qndBoletosSalvos++;
+
+                var numeroPedido = qndBoletosSalvos.ToString();
+
                 NumberFormatInfo config = new NumberFormatInfo();
                 config.NumberDecimalSeparator = ".";
 
@@ -152,7 +156,7 @@ namespace Invictus.Application.AdmApplication
                 parametross.Add("instrucao_adicional", "");
                 parametross.Add("grupo", "Boletos00" + i);
                 parametross.Add("webhook", "http://example.com.br");
-                parametross.Add("pedido_numero", (qndBoletosSalvos + 1).ToString());
+                parametross.Add("pedido_numero", numeroPedido);
                 parametross.Add("especie_documento", "DS");
                 parametross.Add("pix", "pix-e-boleto");
 

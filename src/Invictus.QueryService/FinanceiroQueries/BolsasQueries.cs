@@ -33,7 +33,7 @@ namespace Invictus.QueryService.FinanceiroQueries
             {
                 connection.Open();
 
-                var result = await connection.QuerySingleAsync<BolsaDto>(query, new { senha = senha });
+                var result = await connection.QueryAsync<BolsaDto>(query, new { senha = senha });
 
                 connection.Close();
 
@@ -43,7 +43,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                 //}
 
 
-                return result;//.FirstOrDefault();
+                return result.FirstOrDefault();//.FirstOrDefault();
 
             }
         }

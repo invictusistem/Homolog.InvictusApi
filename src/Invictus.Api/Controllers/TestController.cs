@@ -356,6 +356,19 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("removerusuario")]
+        public async Task<IActionResult> RemoverUsuario()
+        {
+            var email = "andrietograce@gmail.com";
+            var usuario = await UserManager.FindByEmailAsync(email);
+
+            if(usuario != null) await UserManager.DeleteAsync(usuario);
+
+
+            return Ok();
+        }
+
+        [HttpGet]
         [Route("delete-registros")]
         public string DeleteExcel()
         {

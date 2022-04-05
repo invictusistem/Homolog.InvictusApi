@@ -52,13 +52,13 @@ namespace Invictus.ReportService
                 IXLWorksheet worksheet =
                 workbook.Worksheets.Add("Eventos");
 
-                // var imagePath = Path.Combine($"wwwroot\\logo_globo.png");
-                // var image = worksheet.AddPicture(imagePath)
-                // .MoveTo(worksheet.Cell(2, 2));
+                //var imagePath = Path.Combine($"wwwroot\\logo_globo.png");
+                //var image = worksheet.AddPicture(imagePath)
+                //.MoveTo(worksheet.Cell(2, 2));
 
-                // image.Name = "rede-globo-logo";
-                // image.ScaleWidth(1.3);
-                // image.ScaleHeight(1.3);
+                //image.Name = "rede-globo-logo";
+                //image.ScaleWidth(1.3);
+                //image.ScaleHeight(1.3);
 
                 worksheet.Row(1).Height = 3.5;
                 worksheet.Row(2).Height = 16.5;

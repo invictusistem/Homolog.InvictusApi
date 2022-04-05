@@ -25,6 +25,10 @@ namespace Invictus.Domain.Administrativo.Parametros
         public string Descricao { get; private set; }
         public string Comentario { get; private set; }
         
+        public void SetValue(string value)
+        {
+            Value = value;
+        }
 
 
         #region EF

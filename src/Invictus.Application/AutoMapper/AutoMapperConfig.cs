@@ -69,16 +69,14 @@ namespace Invictus.Application.AutoMapper
                      new AlunoEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<MatForm, Responsavel>()
-                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome,c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
                  c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
-
 
             CreateMap<ProfessorDto, Professor>()
                  .ConstructUsing(c => new Professor(c.nome, c.email, c.cpf, c.celular,c.cnpj,c.telefoneContato,c.nomeContato, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ProfessorEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf),
                      new DadosBancarios(c.bancoNumero, c.agencia, c.conta, TipoConta.TryParse(c.tipoConta))));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
-
 
             CreateMap<MateriaTemplateDto, MateriaTemplate>()
                 .ConstructUsing(m => new MateriaTemplate(m.nome, m.descricao, ModalidadeCurso.TryParse(m.modalidade), m.cargaHoraria, m.typePacoteId, m.ativo));
@@ -135,7 +133,7 @@ namespace Invictus.Application.AutoMapper
                 b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));
 
             CreateMap<ResponsavelDto, Responsavel>()
-                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome,c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
                  c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
 

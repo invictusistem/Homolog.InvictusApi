@@ -82,7 +82,7 @@ namespace Invictus.Application.AdmApplication
             var sala = await _unidadeQueries.GetSala(command.salaId);
             var siglaUnidade = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(siglaUnidade);
-            var totalTurmas = _db.LogTurmas.Count();// await _turmaQueries.CountTurmas(unidade.id);
+            var totalTurmas = _db.LogTurmas.Where(l => l.UnidadeId == unidade.id).Count();// await _turmaQueries.CountTurmas(unidade.id);
             var typePacote = await _pacoteQueries.GetPacoteById(command.pacoteId);
             var materias = await _turmaQueries.GetMateriasFromPacotesMaterias(command.pacoteId);
             var turmaMaterias = _mapper.Map<IEnumerable<TurmaMaterias>>(materias);
@@ -211,7 +211,7 @@ namespace Invictus.Application.AdmApplication
 
             var colab = _aspNetUser.ObterUsuarioId();
             var commandJson = JsonConvert.SerializeObject(command);
-            var log = new LogTurmas(turma.Id, colab, DateTime.Now, commandJson);
+            var log = new LogTurmas(turma.Id, colab, DateTime.Now, unidade.id, commandJson);
 
             _db.LogTurmas.Add(log);
             _db.SaveChanges();

@@ -1,4 +1,5 @@
-﻿using Invictus.Data.Mapping.AdmMappings;
+﻿using Invictus.Data.Mapping;
+using Invictus.Data.Mapping.AdmMappings;
 using Invictus.Data.Mapping.FinanceiroMappings;
 using Invictus.Data.Mapping.PedagMappings;
 using Invictus.Domain.Administrativo.AlunoAggregate;
@@ -80,6 +81,7 @@ namespace Invictus.Data.Context
 
         public DbSet<Boleto> Boletos { get; set; }
         public DbSet<Bolsa> Bolsas { get; set; }
+        public DbSet<Caixa> Caixas { get; set; }
         public DbSet<Fornecedor> Fornecedors { get; set; }
         public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
 

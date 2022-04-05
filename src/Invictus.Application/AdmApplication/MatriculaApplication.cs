@@ -119,12 +119,25 @@ namespace Invictus.Application.AdmApplication
 
         public async Task<Guid> Matricular()
         {
+            var boletoCount = _db.ParametrosValues.Where(l => l.ParametrosKeyId == new Guid("e27ae51b-2974-4cc5-b9e1-6acc7aa8d8a6")).FirstOrDefault();
+            _qntBolatos = Convert.ToInt32(boletoCount.Value);
+            var total = Convert.ToInt32(boletoCount.Value) + _command.plano.infoParcelas.Count();
+            boletoCount.SetValue(total.ToString());
 
+            _db.ParametrosValues.Update(boletoCount);
+
+            _db.SaveChanges();
             // verificar confirmação matrícula
             // acima, gerr apenas a primeira parcela
             // paa a primeira, gerar as demais parcela
+            var matConfirmada = await VerificarSeConfirmacaoMatricula();
 
-
+            if(_command.plano.confirmacaoPagmMat)
+            {
+                return new Guid("");
+            }
+            
+                    
             await VerificarResponsaveis();
 
             await AdicionarAlunoNaTurma();
@@ -144,10 +157,12 @@ namespace Invictus.Application.AdmApplication
             await SaveContratoAluno();
 
             //await ProcurarPorLead();
-            _qntBolatos = _db.Boletos.Count();
-            var boletoLog = new LogBoletos(Guid.NewGuid(), "", DateTime.Now);
+            
+            
 
-            _db.LogBoletos.Add(boletoLog);
+            //var boletoLog = new LogBoletos(Guid.NewGuid(), "", DateTime.Now);
+
+            //_db.LogBoletos.Add(boletoLog);
 
             //_db.SaveChanges();
             // TODO
@@ -169,7 +184,16 @@ namespace Invictus.Application.AdmApplication
             return _newMatriculaId;
         }
         
+        private async Task<bool> VerificarSeConfirmacaoMatricula()
+        {
+            if (_command.plano.confirmacaoPagmMat)
+            {
 
+
+            }
+
+            return _command.plano.confirmacaoPagmMat;
+        }
         private async Task VerificarResponsaveis()
         {
             var menorDeIdade = await _alunoQueries.GetIdadeAluno(_alunoId);
@@ -193,7 +217,7 @@ namespace Invictus.Application.AdmApplication
         private async Task AdicionarAlunoNaTurma()
         {
             _turma = _mapper.Map<Turma>(await _turmaQueries.GetTurma(_turmaId));
-            _turma.AddAlunoNaTurma();
+           // _turma.AddAlunoNaTurma();
             await _turmaRepo.Edit(_turma);
             _pacoteId = _turma.PacoteId;
         }
@@ -363,6 +387,7 @@ namespace Invictus.Application.AdmApplication
 
             }
             
+            
             var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa, _qntBolatos);
             var turmaX = await _turmaQueries.GetTurma(turmaId);
             var boletos = new List<Boleto>();
@@ -372,7 +397,7 @@ namespace Invictus.Application.AdmApplication
             for (int i = 1; i <= comand.plano.infoParcelas.Count(); i++)
             {
                 var boletoResp = boletosOderByDate[i - 1];//.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
-
+                
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletoResp);
                 //var boleto = _mapper.Map<BoletoResponseInfo>(boletosResponse[i - 1]);
                 //var boletoResp = boletosResponse[i - 1];

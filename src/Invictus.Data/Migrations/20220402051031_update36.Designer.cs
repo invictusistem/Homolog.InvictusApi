@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220402051031_update36")]
+    partial class update36
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1236,9 +1238,6 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("DiasDesconto")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FormaPAgamento")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Historico")
                         .HasColumnType("nvarchar(max)");
 
@@ -1321,29 +1320,6 @@ namespace Invictus.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Bolsas");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Financeiro.Caixa", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BoletoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("HorarioTransacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UnidadeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Caixa");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Financeiro.Fornecedores.Fornecedor", b =>

@@ -46,7 +46,7 @@ namespace Invictus.QueryService.FinanceiroQueries
         {
 
             StringBuilder query = new StringBuilder();
-            query.Append("SELECT alunos.nome, alunos.cpf, alunos.ativo, Matriculas.id as matriculaId, Matriculas.NumeroMatricula, unidades.descricao ");
+            query.Append("SELECT alunos.nome, alunos.email, alunos.cpf, alunos.ativo, Matriculas.id as matriculaId, Matriculas.NumeroMatricula, unidades.descricao ");
             query.Append("FROM Matriculas inner join alunos on Matriculas.AlunoId = Alunos.Id inner join unidades on alunos.UnidadeId = unidades.Id WHERE ");
             if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
             if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");

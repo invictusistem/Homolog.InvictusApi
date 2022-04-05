@@ -12,5 +12,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
         List<BoletoLoteResponse> GerarBoletosEmLote(List<Parcela> boletosLote, DadosPessoaDto pessoa);
         Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletosLote, decimal valorBonusPontualidade, DadosPessoaDto pessoa, int qndBoletosSalvos);
+
     }
 }

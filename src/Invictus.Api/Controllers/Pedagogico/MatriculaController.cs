@@ -84,12 +84,13 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("{turmaId}/{alunoId}")]
         public async Task<IActionResult> Matricular(Guid turmaId, Guid alunoId, [FromBody] MatriculaCommand command)
         {
-            //var msg = await _utils.ValidaDocumentosAluno(command.)
-
+           
             _matriculaApplication.AddParams(turmaId, alunoId, command);
             var matriculaId = await _matriculaApplication.Matricular();            
 
             return Ok(new { matriculaId = matriculaId });
+           
+          //  return Ok();
         }
 
         [HttpPost]

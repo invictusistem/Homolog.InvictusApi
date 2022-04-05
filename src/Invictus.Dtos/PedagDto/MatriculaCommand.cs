@@ -59,6 +59,7 @@ namespace Invictus.Dtos.PedagDto
         {
             infoParcelas = new List<Parcela>();
         }
+        public DateTime diaDefault { get; set; }
         public decimal valor { get; set; }  // ok
         public decimal taxaMatricula { get; set; }// ??
         public bool confirmacaoPagmMat { get; set; } // true

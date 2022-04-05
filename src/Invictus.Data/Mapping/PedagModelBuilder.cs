@@ -5,7 +5,7 @@ using Invictus.Data.Mapping.PedagMappings.EstagioMappping;
 using Invictus.Data.Mapping.PedagMappings.NotasTurmasMapping;
 using Microsoft.EntityFrameworkCore;
 
-namespace Invictus.Data.Mapping.PedagMappings
+namespace Invictus.Data.Mapping
 {
     public class PedagModelBuilder
     {
