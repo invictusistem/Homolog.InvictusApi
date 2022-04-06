@@ -164,6 +164,8 @@ namespace Invictus.Api.Controllers
             AdicionarErroProcessamento("Usuário ou senha incorretos.");
             // return BadRequest();
             return CustomResponse();
+
+
         }
 
         [HttpPost("login/{unidadeId}")]
