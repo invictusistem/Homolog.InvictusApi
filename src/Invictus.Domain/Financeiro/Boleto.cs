@@ -59,18 +59,31 @@ namespace Invictus.Domain.Financeiro
         public string Historico { get; private set; }
         public string SubConta { get; private set; }
         public string FormaPAgamento { get; private set; }
+        public string DigitosCartao { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
         public Guid CentroCustoUnidadeId { get; private set; }
         public Guid InformacaoDebitoId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
-        public void ReceberBoleto(decimal valorPago, string formaPagamento)
+        public void CancelarBoleto()
+        {            
+            StatusBoleto = StatusPagamento.Cancelado.DisplayName;
+           
+            SubConta = "Caixa da escola";
+
+        }
+
+        public void ReceberBoleto(decimal valorPago, string formaPagamento, string digitosCartao)
         {
             DataPagamento = DateTime.Now;
             ValorPago = valorPago;
             StatusBoleto = StatusPagamento.Pago.DisplayName;
             FormaPAgamento = formaPagamento;
             SubConta = "Caixa da escola";
+            if(formaPagamento != "dinheiro")
+            {
+                DigitosCartao = digitosCartao;
+            }
 
         }
         public void SetBoletoVencido()

@@ -1,4 +1,5 @@
-﻿using Invictus.Core.Interfaces;
+﻿using Invictus.Core.Enumerations;
+using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Financeiro;
 using Invictus.Dtos.Financeiro;
@@ -78,7 +79,7 @@ namespace Invictus.Api.Controllers.Financeiro
                 return BadRequest();
             }
 
-            boleto.ReceberBoleto(command.valorRecebido,command.formaRecebimento);
+            boleto.ReceberBoleto(command.valorRecebido,command.formaRecebimento, command.digitosCartao);
 
             var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
@@ -94,6 +95,31 @@ namespace Invictus.Api.Controllers.Financeiro
 
             return Ok();
             
+        }
+
+        [HttpPut]
+        [Route("boleto-cancelar/{boletoId}")]
+        public async Task<IActionResult> CancelarBoleto(Guid boletoId)
+        {
+
+            var boleto = await _db.Boletos.FindAsync(boletoId);
+
+            // VERIFICAR NA API 
+            if (!(boleto.StatusBoleto == StatusPagamento.Vencido.DisplayName || 
+                boleto.StatusBoleto == StatusPagamento.EmAberto.DisplayName))
+                
+            {
+                return BadRequest();
+            }
+
+            boleto.CancelarBoleto();           
+
+            await _db.Boletos.SingleUpdateAsync(boleto);            
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+
         }
     }
 }

@@ -13,5 +13,6 @@ namespace Invictus.Dtos.Financeiro
         public decimal valorRecebido { get; set; }
         public string formaRecebimento { get; set; }
         public string transferencia { get; set; }
+        public string digitosCartao { get; set; }
     }
 }

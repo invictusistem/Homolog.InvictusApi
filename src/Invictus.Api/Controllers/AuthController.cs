@@ -172,7 +172,7 @@ namespace Invictus.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLogin user, Guid unidadeId)
         {
-            return BadRequest();
+            //return BadRequest();
             // if (!ModelState.IsValid) return BadRequest();
             if (!ModelState.IsValid) return CustomResponse(ModelState);
             var usuario = await _userManager.FindByEmailAsync(user.Email);

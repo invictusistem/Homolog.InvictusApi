@@ -348,6 +348,22 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("teste-get")]
+        public async Task<IActionResult> TesteGet()
+        {
+            
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("teste-post")]
+        public async Task<IActionResult> TestePost()
+        {
+            
+            return Ok();
+        }
+
+        [HttpGet]
         [Route("readexcelalunos")]
         public string ReadExcel()
         {
