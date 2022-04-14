@@ -42,9 +42,9 @@ namespace Invictus.Api.Controllers.Financeiro
         {
             var debitos = await _finQueries.GetDebitoAlunos(matriculaId);
             var turma = await _turmaQueries.GetTurmaByMatriculaId(matriculaId);
-            
+
             return Ok(new { debitos = debitos.OrderBy(c => c.vencimento), turma = turma });
-            
+
         }
 
         [HttpGet]
@@ -66,6 +66,17 @@ namespace Invictus.Api.Controllers.Financeiro
             //return Ok(pessoas);
         }
 
+        [HttpGet]
+        [Route("produtos-venda")]
+        public async Task<IActionResult> BuscaVendaProdutos([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        {
+            var registros = await _finQueries.GetProdutosVendaByRangeDate(itemsPerPage, currentPage, paramsJson);
+            //var alunos = await _finQueries.GetAlunosFinanceiro(itemsPerPage, currentPage, paramsJson);
+            if (registros.Data.Count() == 0) return NotFound();
+
+            return Ok(registros);
+        }
+
         [HttpPut]
         [Route("boleto-pagar")]
         public async Task<IActionResult> ReceberBoleto([FromBody] ReceberBoletoCommand command)
@@ -74,12 +85,12 @@ namespace Invictus.Api.Controllers.Financeiro
             var boleto = await _db.Boletos.FindAsync(command.boletoId);
 
             // VERIFICAR NA API 
-            if(!(boleto.StatusBoleto == "Vencido" || boleto.StatusBoleto == "Em aberto"))
+            if (!(boleto.StatusBoleto == "Vencido" || boleto.StatusBoleto == "Em aberto"))
             {
                 return BadRequest();
             }
 
-            boleto.ReceberBoleto(command.valorRecebido,command.formaRecebimento, command.digitosCartao);
+            boleto.ReceberBoleto(command.valorRecebido, command.formaRecebimento, command.digitosCartao);
 
             var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
@@ -94,7 +105,7 @@ namespace Invictus.Api.Controllers.Financeiro
             await _db.SaveChangesAsync();
 
             return Ok();
-            
+
         }
 
         [HttpPut]
@@ -105,16 +116,16 @@ namespace Invictus.Api.Controllers.Financeiro
             var boleto = await _db.Boletos.FindAsync(boletoId);
 
             // VERIFICAR NA API 
-            if (!(boleto.StatusBoleto == StatusPagamento.Vencido.DisplayName || 
+            if (!(boleto.StatusBoleto == StatusPagamento.Vencido.DisplayName ||
                 boleto.StatusBoleto == StatusPagamento.EmAberto.DisplayName))
-                
+
             {
                 return BadRequest();
             }
 
-            boleto.CancelarBoleto();           
+            boleto.CancelarBoleto();
 
-            await _db.Boletos.SingleUpdateAsync(boleto);            
+            await _db.Boletos.SingleUpdateAsync(boleto);
 
             await _db.SaveChangesAsync();
 

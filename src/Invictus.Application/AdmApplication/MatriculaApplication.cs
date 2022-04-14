@@ -67,6 +67,7 @@ namespace Invictus.Application.AdmApplication
         private List<TurmaNotas> _turmaNotas;
         private Guid _newMatriculaId;
         private Guid _pacoteId;
+        private Guid _responsavelMatricula;
         private bool _temRespMenor;
         private bool _temRespFinanc;
         private Turma _turma;
@@ -98,6 +99,7 @@ namespace Invictus.Application.AdmApplication
             _unidadeQueries = unidadeQueries;
             _turmaId = Guid.NewGuid();
             _alunoId = Guid.NewGuid();
+            _responsavelMatricula = Guid.NewGuid();
             _newMatriculaId = Guid.NewGuid();
             _pacoteId = Guid.NewGuid();
             _command = new MatriculaCommand();
@@ -235,8 +237,8 @@ namespace Invictus.Application.AdmApplication
             newMatricula.SetDiaMatricula();
             // var totalMatriculados = await _matQueries.TotalMatriculados();
             _numeroMatricula = newMatricula.SetNumeroMatricula(qntMatriculasNaBase);
-            var colabId = _aspNetUser.ObterUsuarioId();
-            newMatricula.SetColaboradorResponsavelMatricula(colabId);
+            _responsavelMatricula = _aspNetUser.ObterUsuarioId();
+            newMatricula.SetColaboradorResponsavelMatricula(_responsavelMatricula);
             newMatricula.SetCiencia(_command.plano.ciencia, _command.plano.cienciaAlunoId);
             newMatricula.SetBolsaId(_command.plano.bolsaId);
             newMatricula.SetConfirmacaoMatricula(!_command.plano.confirmacaoPagmMat);
@@ -244,7 +246,7 @@ namespace Invictus.Application.AdmApplication
             await _matRepo.Save(newMatricula);//  newMatricula.Repo
             _newMatriculaId = newMatricula.Id;
             var commandJson = JsonConvert.SerializeObject(_command);
-            await _db.LogMatriculas.AddAsync(new LogMatriculas(_newMatriculaId, colabId, DateTime.Now, commandJson));
+            await _db.LogMatriculas.AddAsync(new LogMatriculas(_newMatriculaId, _responsavelMatricula, DateTime.Now, commandJson));
             
         }
 
@@ -403,18 +405,14 @@ namespace Invictus.Application.AdmApplication
                 //var boletoResp = boletosResponse[i - 1];
                 var boleto = new BoletoResponseInfo(boletoResp.id_unico, boletoResp.id_unico_original, boletoResp.status, boletoResp.msg, boletoResp.nossonumero,
                     boletoResp.linkBoleto, boletoResp.linkGrupo, boletoResp.linhaDigitavel, boletoResp.pedido_numero, boletoResp.banco_numero,
-                    boletoResp.token_facilitador, boletoResp.credencial);
-
-                
+                    boletoResp.token_facilitador, boletoResp.credencial);                
 
                 var parc = i.ToString();
 
-                var parcela = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();//.FirstOrDefault();
-
-                //var dataVencimento = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).Select(i => i.vencimento).FirstOrDefault();
+                var parcela = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();
 
                 var boletoNew = new Boleto(parcela.vencimento, parcela.valor, 0, 0, "", "",
-                    comand.plano.bonusPontualidade.ToString(), "", StatusPagamento.EmAberto, turmaX.unidadeId, infoFin.Id, boleto);
+                    comand.plano.bonusPontualidade.ToString(),TipoLancamento.Credito, "", StatusPagamento.EmAberto, turmaX.unidadeId, infoFin.Id, _responsavelMatricula, boleto, DateTime.Now);
                 string historico = i + "/" + boletosOderByDate.Count() + " MENSALIDADE";
                 boletoNew.SetHistorico(historico);
 

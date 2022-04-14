@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -258,6 +259,25 @@ namespace Invictus.Api.Controllers
                 return BadRequest(ex);
             }
         }
+
+
+        //[HttpGet]
+        //[Route("boleto-resp")]
+        //public async Task<IActionResult> GetAsync()
+        //{
+        //    var boletos = await _db.Boletos.ToListAsync();
+        //    var date = new DateTime(2022, 1, 10, 12, 0, 0);
+        //    foreach (var item in boletos)
+        //    {
+        //        item.SetBoletoDateCadastro(date);
+        //    }
+
+        //    _db.Boletos.UpdateRange(boletos);
+
+        //    _db.SaveChanges();
+
+        //    return Ok();
+        //}
 
 
         [HttpGet]

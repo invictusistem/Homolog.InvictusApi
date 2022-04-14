@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Invictus.Core.Extensions;
+using Invictus.Core.Interfaces;
 
 namespace Invictus.QueryService.FinanceiroQueries
 {
@@ -21,10 +22,12 @@ namespace Invictus.QueryService.FinanceiroQueries
     {
         private readonly IConfiguration _config;
         private readonly IUnidadeQueries _unidadeQueries;
-        public FinancQueries(IConfiguration config, IUnidadeQueries unidadeQueries)
+        private readonly IAspNetUser _aspNetUser;
+        public FinancQueries(IConfiguration config, IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser)
         {
             _config = config;
             _unidadeQueries = unidadeQueries;
+            _aspNetUser = aspNetUser;
         }
 
         public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetAlunosFinanceiro(int itemsPerPage, int currentPage, string paramsJson)
@@ -69,7 +72,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                     {
                         aluno.cpf = aluno.cpf.BindingCPF();
                     }
-                   
+
                 }
                 connection.Close();
 
@@ -123,5 +126,120 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
+        public async Task<PaginatedItemsViewModel<BoletoDto>> GetProdutosVendaByRangeDate(int itemsPerPage, int currentPage, string paramsJson)
+        {
+
+            var parametros = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+            parametros.end = new DateTime(parametros.end.Year, parametros.end.Month, parametros.end.Day, 23, 59, 59);
+
+            var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
+
+            var registros = await GetBoletosPaginatedByFilter(itemsPerPage, currentPage, parametros, unidade.id);
+
+            var boletosCount = await GetBoletosCountByFilter(itemsPerPage, currentPage, parametros, unidade.id);
+
+            var paginatedItems = new PaginatedItemsViewModel<BoletoDto>(currentPage, itemsPerPage, boletosCount, registros.ToList());
+
+            return paginatedItems;
+
+        }
+
+        private async Task<IEnumerable<BoletoDto>> GetBoletosPaginatedByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+            //StringBuilder query = new StringBuilder();
+            var query = @"select 
+                        Boletos.Vencimento,
+                        Boletos.DataPagamento,
+                        Boletos.Valor,
+                        Boletos.ValorPago,
+                        Boletos.Juros,
+                        Boletos.JurosFixo,
+                        Boletos.Multa,
+                        Boletos.MultaFixo,
+                        Boletos.Desconto,
+                        Boletos.Tipo,
+                        Boletos.DiasDesconto,
+                        Boletos.StatusBoleto,
+                        Boletos.Historico,
+                        Boletos.SubConta,
+                        Boletos.FormaPagamento,
+                        Boletos.DigitosCartao,
+                        Boletos.DataCadastro,
+                        Boletos.ReparcelamentoId,
+                        Boletos.CentroCustoUnidadeId,
+                        Boletos.InformacaoDebitoId,
+                        Boletos.ResponsavelCadastroId,
+                        Boletos.Id_unico,
+                        Boletos.Id_unico_original,
+                        Boletos.Status,
+                        Boletos.Msg,
+                        Boletos.Nossonumero,
+                        Boletos.LinkBoleto,
+                        Boletos.LinkGrupo,
+                        Boletos.LinhaDigitavel,
+                        Boletos.Pedido_numero,
+                        Boletos.Banco_numero,
+                        Boletos.Token_facilitador,
+                        Boletos.Credencial,
+                        Colaboradores.Nome
+                        from Boletos
+                        left join Colaboradores on Boletos.ResponsavelCadastroId  = Colaboradores.Id                        
+                        WHERE Boletos.CentroCustoUnidadeId = @unidadeId
+                        AND boletos.DataCadastro >= @start
+                        AND boletos.DataCadastro <= @end
+                        ORDER BY boletos.DataPagamento 
+                        OFFSET( @currentPage - 1) * @itemsPerPage ROWS FETCH NEXT @itemsPerPage ROWS ONLY";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                // itemsPerPage currentPage  param   unidadeId
+
+                var boletos = await connection.QueryAsync<BoletoDto>(query, new
+                {
+                    unidadeId = unidadeId,
+                    start = param.start,
+                    end = param.end,
+                    currentPage = currentPage,
+                    itemsPerPage = itemsPerPage
+                });
+
+                connection.Close();                
+
+                return boletos;
+            }
+        }
+
+        private async Task<int> GetBoletosCountByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+            var query = @"select Count(*)
+                        from Boletos
+                        left join Colaboradores on Boletos.ResponsavelCadastroId  = Colaboradores.Id                        
+                        WHERE Boletos.CentroCustoUnidadeId = @unidadeId
+                        AND boletos.DataCadastro >= @start
+                        AND boletos.DataCadastro <= @end ";
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var count = await connection.QuerySingleAsync<int>(query.ToString(), new
+                {
+                    unidadeId = unidadeId,
+                    start = param.start,
+                    end = param.end,
+                    currentPage = currentPage,
+                    itemsPerPage = itemsPerPage
+                });
+
+                connection.Close();
+
+                return count;
+            }
+        }
     }
 }

@@ -20,11 +20,10 @@ namespace Invictus.Dtos.Financeiro
         public string desconto { get; set; }
         public string diasDesconto { get; set; }
         public string statusBoleto { get; set; }
-        public string historico { get; set; }
-        public string subConta { get; set; }
         public Guid reparcelamentoId { get; set; }
         public Guid centroCustoUnidadeId { get; set; }
         public Guid informacaoDebitoId { get; set; }
+        
         //public BoletoResponseInfo InfoBoletos { get; private set; }
         public string id_unico { get; set; }
         public string id_unico_original { get; set; }
@@ -38,5 +37,13 @@ namespace Invictus.Dtos.Financeiro
         public string banco_numero { get; set; }
         public string token_facilitador { get; set; }
         public string credencial { get; set; }
+        public string historico { get; set; }
+        public string subConta { get; set; }
+        public string formaPagamento { get; set; }
+        public string digitosCartao { get; set; }
+        public Guid responsavelCadastroId { get; set; }
+        public string tipo { get; set; }
+        public DateTime dataCadastro { get; set; }
+
     }
 }

@@ -14,5 +14,6 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
     {
         Task<IEnumerable<BoletoDto>> GetDebitoAlunos(Guid matriculaId);
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetAlunosFinanceiro(int itemsPerPage, int currentPage, string paramsJson);
+        Task<PaginatedItemsViewModel<BoletoDto>> GetProdutosVendaByRangeDate(int itemsPerPage, int currentPage, string paramsJson);
     }
 }

@@ -12,37 +12,41 @@ namespace Invictus.Domain.Financeiro
     {
 
         public Boleto(DateTime vencimento,
-                   // DateTime dataPagamento,
+                    // DateTime dataPagamento,
                     decimal valor,
-                   // decimal valorPago,
+                    // decimal valorPago,
                     int juros,
                     int jurosFixo,
                     string multa,
                     string multaFixo,
                     string desconto,
+                    TipoLancamento tipo,
                     string diasDesconto,
-                    StatusPagamento statusBoleto,                    
+                    StatusPagamento statusBoleto,
                     //Guid reparcelamentoId,
                     Guid centroCustoUnidadeId,
                     Guid informacaoDebitoId,
-                    BoletoResponseInfo infoBoletos
-                    )
+                    Guid responsavelCadastroId,
+                    BoletoResponseInfo infoBoletos,
+                    DateTime dataCadastro)
         {
             Vencimento = vencimento;
-          //  DataPagamento = dataPagamento;
+            //  DataPagamento = dataPagamento;
             Valor = valor;
-          //  ValorPago = valorPago;
+            //  ValorPago = valorPago;
             Juros = juros;
             JurosFixo = jurosFixo;
             Multa = multa;
             MultaFixo = multaFixo;
             Desconto = desconto;
+            Tipo = tipo.DisplayName;
             DiasDesconto = diasDesconto;
             StatusBoleto = statusBoleto.DisplayName;
             CentroCustoUnidadeId = centroCustoUnidadeId;
             InformacaoDebitoId = informacaoDebitoId;
+            ResponsavelCadastroId = responsavelCadastroId;
             InfoBoletos = infoBoletos;
-
+            DataCadastro = dataCadastro;
         }
 
         public DateTime Vencimento { get; private set; }
@@ -54,23 +58,36 @@ namespace Invictus.Domain.Financeiro
         public string Multa { get; private set; }
         public string MultaFixo { get; private set; }
         public string Desconto { get; private set; }
+        public string Tipo { get; private set; }
         public string DiasDesconto { get; private set; }
-        public string StatusBoleto { get; private set; }   
+        public string StatusBoleto { get; private set; }
         public string Historico { get; private set; }
         public string SubConta { get; private set; }
-        public string FormaPAgamento { get; private set; }
+        public string FormaPagamento { get; private set; }
         public string DigitosCartao { get; private set; }
+        public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
         public Guid CentroCustoUnidadeId { get; private set; }
         public Guid InformacaoDebitoId { get; private set; }
+        public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
         public void CancelarBoleto()
-        {            
+        {
             StatusBoleto = StatusPagamento.Cancelado.DisplayName;
-           
-            SubConta = "Caixa da escola";
 
+            SubConta = "Caixa da escola";
+        }
+
+        public void SetBoletoDateCadastro(DateTime date)
+        {
+            DataCadastro = date;
+        }
+
+        public void SetResponsavelTipo()
+        {
+            Tipo = TipoLancamento.Credito.DisplayName;
+            ResponsavelCadastroId = new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8");
         }
 
         public void ReceberBoleto(decimal valorPago, string formaPagamento, string digitosCartao)
@@ -78,9 +95,9 @@ namespace Invictus.Domain.Financeiro
             DataPagamento = DateTime.Now;
             ValorPago = valorPago;
             StatusBoleto = StatusPagamento.Pago.DisplayName;
-            FormaPAgamento = formaPagamento;
+            FormaPagamento = formaPagamento;
             SubConta = "Caixa da escola";
-            if(formaPagamento != "dinheiro")
+            if (formaPagamento != "dinheiro")
             {
                 DigitosCartao = digitosCartao;
             }
@@ -101,7 +118,7 @@ namespace Invictus.Domain.Financeiro
         }
 
         #region EF
-        
+
         public Boleto() { }
         public virtual InformacaoDebito InformacaoDebito { get; private set; }
 
@@ -156,7 +173,7 @@ namespace Invictus.Domain.Financeiro
 
         public Guid BoletoId { get; private set; }
         public virtual Boleto Boleto { get; private set; }
-        public BoletoResponseInfo(){ }
+        public BoletoResponseInfo() { }
 
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -18,16 +19,18 @@ namespace Invictus.Api.Controllers
     public class ColaboradorController : ControllerBase
     {
         private readonly IColaboradorQueries _colaboradorQueries;
+        private readonly InvictusDbContext _db;
         private readonly IColaboradorApplication _colaboradorApplication;
         private readonly IParametrosQueries _paramQueries;
         private readonly IUtils _utils;
         public ColaboradorController(IColaboradorQueries colaboradorQueries, IColaboradorApplication colaboradorApplication, IUtils utils,
-            IParametrosQueries paramQueries)
+            IParametrosQueries paramQueries, InvictusDbContext db)
         {
             _colaboradorQueries = colaboradorQueries;
             _colaboradorApplication = colaboradorApplication;
             _utils = utils;
             _paramQueries = paramQueries;
+            _db = db;
         }
        
 
@@ -71,6 +74,19 @@ namespace Invictus.Api.Controllers
         public async Task<IActionResult> EditColaborador([FromBody] ColaboradorDto colaborador)
         {
             await _colaboradorApplication.EditColaborador(colaborador);
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{colaboradorId}")]
+        public async Task<IActionResult> DeleteColaborador(Guid colaboradorId)
+        {
+            var colab = await _db.Colaboradores.FindAsync(colaboradorId);
+
+            _db.Colaboradores.Remove(colab);
+
+            _db.SaveChanges();
 
             return NoContent();
         }

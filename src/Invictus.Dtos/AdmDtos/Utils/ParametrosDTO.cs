@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Invictus.Dtos.AdmDtos.Utils
 {
@@ -14,5 +10,7 @@ namespace Invictus.Dtos.AdmDtos.Utils
         public bool ativo { get; set; }
         public bool todasUnidades { get; set; }
         public bool primeiraReq { get; set; }
+        public DateTime start { get; set; }
+        public DateTime end { get; set; }
     }
 }
