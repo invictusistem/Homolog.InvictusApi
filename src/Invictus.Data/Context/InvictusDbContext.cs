@@ -84,6 +84,7 @@ namespace Invictus.Data.Context
         public DbSet<Caixa> Caixas { get; set; }
         public DbSet<Fornecedor> Fornecedors { get; set; }
         public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
+        public DbSet<Reparcelado> Reparcelamentos { get; set; }
 
 
         #endregion

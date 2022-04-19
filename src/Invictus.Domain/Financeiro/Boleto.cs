@@ -1,13 +1,24 @@
 ﻿using Invictus.Core;
 using Invictus.Core.Enumerations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Invictus.Domain.Financeiro
 {
+    public class Reparcelado : Entity
+    {
+        public Reparcelado(string listBoletoReparceladoId,
+                           string listNewBoletoId)
+        {
+            ListBoletoReparceladoId = listBoletoReparceladoId;
+            ListNewBoletoId = listNewBoletoId;
+
+        }
+
+        public string ListBoletoReparceladoId { get; private set; }
+        public string ListNewBoletoId { get; private set; }
+    }
+
+
     public class Boleto : Entity
     {
 
@@ -72,6 +83,14 @@ namespace Invictus.Domain.Financeiro
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
+        public void SetInfoBoletos(BoletoResponseInfo infoBoletos)
+        {
+            InfoBoletos = infoBoletos;
+        }
+        public void ChangeStatusToReparcelado()
+        {
+            StatusBoleto = StatusPagamento.Reparcelado.DisplayName;// "Reparcelado";
+        }
         public void CancelarBoleto()
         {
             StatusBoleto = StatusPagamento.Cancelado.DisplayName;

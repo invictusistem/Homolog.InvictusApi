@@ -1,4 +1,7 @@
-﻿using Invictus.Core.Enumerations;
+﻿using Invictus.Application.AdmApplication;
+using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations;
+using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Financeiro;
@@ -8,6 +11,7 @@ using Invictus.QueryService.FinanceiroQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +25,16 @@ namespace Invictus.Api.Controllers.Financeiro
     public class FinanceiroController : ControllerBase
     {
         private readonly IFinanceiroQueries _finQueries;
+        private readonly IBoletoService _boletoService;
         private readonly IAspNetUser _aspNetUser;
         private readonly ITurmaPedagQueries _turmaQueries;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly InvictusDbContext _db;
         public FinanceiroController(IFinanceiroQueries finQueries, ITurmaPedagQueries turmaQueries, InvictusDbContext db, IAspNetUser aspNetUser,
-            IUnidadeQueries unidadeQueries)
+            IUnidadeQueries unidadeQueries, IBoletoService boletoService)
         {
             _finQueries = finQueries;
+            _boletoService = boletoService;
             _turmaQueries = turmaQueries;
             _db = db;
             _aspNetUser = aspNetUser;
@@ -76,6 +82,114 @@ namespace Invictus.Api.Controllers.Financeiro
 
             return Ok(registros);
         }
+
+        [HttpPost]
+        [Route("reparcelar")]
+        public async Task<IActionResult> SaveReparcelas([FromBody] ReparcelaCommand reparcelasCommand)
+        {
+
+
+            var boletos = await _db.Boletos.Where(p => reparcelasCommand.debitosIds.Contains(p.Id)).ToListAsync();
+
+            var verificar = boletos.Where(b => b.StatusBoleto != "Vencido");
+
+            if (verificar.Any())
+            {
+                return BadRequest(new { mensagem = "Só é possível reparcelamento vencidos." });
+
+            }
+
+            boletos.ForEach(b => b.ChangeStatusToReparcelado());
+            var usuarioId = _aspNetUser.ObterUsuarioId();
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+            var infoDebito = await _db.Boletos.Where(d => d.Id == reparcelasCommand.debitosIds[0]).FirstOrDefaultAsync();
+
+            var newDebitos = new List<Boleto>();
+            var i = 0;
+
+            foreach (var parcela in reparcelasCommand.parcelas)
+            {
+
+                var boletoRespInfo = new BoletoResponseInfo();
+
+                var boleto = new Boleto(parcela.vencimento, parcela.valor, 0, 0, "", "", "", TipoLancamento.Credito, "", StatusPagamento.EmAberto, unidade.id, infoDebito.InformacaoDebitoId,
+                    usuarioId, boletoRespInfo, DateTime.Now);
+
+                newDebitos.Add(boleto);
+                i++;
+            }
+
+            if (reparcelasCommand.valorEntrada != 0)
+            {
+                var boletoRespInfo = new BoletoResponseInfo();
+
+                var boleto = new Boleto(DateTime.Now.AddDays(1), reparcelasCommand.valorEntrada, 0, 0, "", "", "", TipoLancamento.Credito, "", StatusPagamento.EmAberto, unidade.id, infoDebito.InformacaoDebitoId,
+                    usuarioId, boletoRespInfo, DateTime.Now);
+
+                boleto.SetHistorico("Entrada reparcelamento");
+
+                newDebitos.Add(boleto);
+
+            }
+
+
+            var pessoa = new DadosPessoaDto();
+            var infoFim = await _db.InformacoesDebito.Where(d => d.Id == boletos[0].InformacaoDebitoId).FirstOrDefaultAsync();
+            var matricula = await _db.Matriculas.FindAsync(infoFim.MatriculaId);
+            var aluno = await _db.Alunos.FindAsync(matricula.AlunoId);
+
+            pessoa.nome = aluno.Nome;
+            pessoa.telefone = "";
+            pessoa.cpf = aluno.CPF;
+            pessoa.logradouro = aluno.Endereco.Logradouro;
+            pessoa.bairro = aluno.Endereco.Bairro;
+            pessoa.cidade = aluno.Endereco.Cidade;
+            pessoa.estado = aluno.Endereco.UF;
+            pessoa.cep = aluno.Endereco.CEP;
+
+            _db.Boletos.UpdateRange(boletos);
+            _db.Boletos.AddRange(newDebitos);
+            _db.SaveChanges();
+
+            var boletoCount = _db.ParametrosValues.Where(l => l.ParametrosKeyId == new Guid("e27ae51b-2974-4cc5-b9e1-6acc7aa8d8a6")).FirstOrDefault();
+            var qntBoletos = Convert.ToInt32(boletoCount.Value);
+
+
+            foreach (var boleto in newDebitos)
+            {
+                qntBoletos++;
+                var boletoResp = await _boletoService.GerarBoleto(boleto.Valor, boleto.Vencimento, pessoa, qntBoletos);
+
+                var boletoInfo = new BoletoResponseInfo(boletoResp.id_unico, boletoResp.id_unico_original, boletoResp.status, boletoResp.msg, boletoResp.nossonumero,
+                    boletoResp.linkBoleto, boletoResp.linkGrupo, boletoResp.linhaDigitavel, boletoResp.pedido_numero, boletoResp.banco_numero,
+                    boletoResp.token_facilitador, boletoResp.credencial);
+
+                boleto.SetInfoBoletos(boletoInfo);
+
+            }
+
+            _db.Boletos.UpdateRange(newDebitos);
+
+            boletoCount.SetValue(qntBoletos.ToString());
+
+            _db.ParametrosValues.Update(boletoCount);
+
+            _db.SaveChanges();
+
+            string listBoletosParcelado = GuidsToString.ParseGuidsToString(boletos.Select(b => b.Id).ToList());
+            string newBoletos = GuidsToString.ParseGuidsToString(newDebitos.Select(b => b.Id).ToList());
+
+            var logReparcelado = new Reparcelado(listBoletosParcelado, newBoletos);
+
+            _db.Reparcelamentos.Add(logReparcelado);
+
+            _db.SaveChanges();
+
+            return Ok();
+        }
+
+
 
         [HttpPut]
         [Route("boleto-pagar")]
