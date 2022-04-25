@@ -154,5 +154,25 @@ namespace Invictus.QueryService.PedagogicoQueries
 
             }
         }
+
+        public async Task<IEnumerable<TypeEstagioDto>> GetTiposDeEstagios()
+        {
+            // estagiosMatriculas
+            var query = @"SELECT * FROM TypeEstagio";
+            
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var estagioTipos = await connection.QueryAsync<TypeEstagioDto>(query);
+
+                connection.Close();
+
+                return estagioTipos;
+
+            }
+        }
     }
 }

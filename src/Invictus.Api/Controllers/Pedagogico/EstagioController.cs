@@ -29,7 +29,7 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> GetEstagios()
         {
             var estagios = await _estagioQueries.GetEstagios();
-            
+
             if (!estagios.Any()) return NotFound();
 
             return Ok(new { estagios = estagios });
@@ -57,6 +57,18 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(estagioarios);
         }
 
+        [HttpGet]
+        [Route("tipos")]
+        public async Task<IActionResult> GetTypeEstagios()
+        {
+
+            var tiposEstagios = await _estagioQueries.GetTiposDeEstagios();
+
+            if (!tiposEstagios.Any()) return NotFound();
+
+            return Ok(new { tipos = tiposEstagios });
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveEstagio([FromBody] EstagioDto estagio)
         {
@@ -65,10 +77,37 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok();
         }
 
+        [HttpPost]
+        [Route("tipos")]
+        public async Task<IActionResult> EstagioTypeCreate([FromBody] TypeEstagioDto typeEstagio)
+        {
+            await _estagioApp.CreateTypeEstagio(typeEstagio);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("tipos")]
+        public async Task<IActionResult> EstagioTypeEdit([FromBody] TypeEstagioDto typeEstagio)
+        {
+            await _estagioApp.EditTypeEstagio(typeEstagio);
+
+            return Ok();
+        }
+
         [HttpPut]
         public async Task<IActionResult> EditEstagio([FromBody] EstagioDto estagio)
         {
             await _estagioApp.EditEstagio(estagio);
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("tipo/{estagioTipoId}")]
+        public async Task<IActionResult> EstagioTypeDelete(Guid estagioTipoId)
+        {
+            await _estagioApp.DeleteTypeEstagio(estagioTipoId);
 
             return Ok();
         }

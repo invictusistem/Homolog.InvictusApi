@@ -17,6 +17,7 @@ namespace Invictus.Dtos.PedagDto
         public string uf { get; set; }
         public string bairro { get; set; }
         public bool ativo { get; set; }
+        public Guid tipoEstagio { get; set; }
         public Guid supervisorId { get; set; }        
     }
 }

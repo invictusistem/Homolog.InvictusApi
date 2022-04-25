@@ -12,8 +12,6 @@ namespace Invictus.Api.Controllers.Comercial
         public ComercialController()
         {            
 
-        }
-
-       
+        }       
     }
 }

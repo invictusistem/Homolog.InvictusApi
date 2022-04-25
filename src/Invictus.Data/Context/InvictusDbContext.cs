@@ -94,6 +94,7 @@ namespace Invictus.Data.Context
         public DbSet<DocumentoEstagio> DocumentosEstagio { get; set; }
         public DbSet<Estagio> Estagios { get; set; }
         public DbSet<MatriculaEstagio> MatriculasEstagios { get; set; }
+        public DbSet<TypeEstagio> TypeEstagios { get; set; }
         public DbSet<TurmaNotas> TurmasNotas { get; set; }
 
         #endregion

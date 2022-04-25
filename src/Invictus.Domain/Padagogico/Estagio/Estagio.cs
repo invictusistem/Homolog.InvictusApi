@@ -26,6 +26,7 @@ namespace Invictus.Domain.Padagogico.Estagio
                         string cidade,
                         string uf,
                         string bairro,
+                        Guid tipoEstagio,
                         bool ativo
                         )
         {
@@ -42,6 +43,7 @@ namespace Invictus.Domain.Padagogico.Estagio
             Cidade = cidade;
             UF = uf;
             Bairro = bairro;
+            TipoEstagio = tipoEstagio;
             Ativo = ativo;
            // Matriculados = new List<EstagioMatricula>();
 
@@ -60,6 +62,7 @@ namespace Invictus.Domain.Padagogico.Estagio
         public string UF { get; private set; }
         public string Bairro { get; private set; }
         public bool Ativo { get; private set; }
+        public Guid TipoEstagio { get; private set; }
         public Guid SupervisorId { get; private set; }
         //public List<EstagioMatricula> Matriculados { get; private set; }
 

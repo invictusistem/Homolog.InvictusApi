@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.Domain.Padagogico.Estagio.Interfaces
@@ -10,6 +7,9 @@ namespace Invictus.Domain.Padagogico.Estagio.Interfaces
     {
         Task CreateEstagio(Estagio estagio);
         Task EditEstagio(Estagio estagio);
+        Task CreateEstagioType(TypeEstagio type);
+        Task EditEstagioType(TypeEstagio type);
+        Task DeleteEstagioType(Guid typeEstagio);
         void Commit();
     }
 }

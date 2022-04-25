@@ -11,5 +11,6 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
         Task<IEnumerable<EstagioDto>> GetEstagios();
         Task<EstagioDto> GetEstagioById(Guid estagioId);
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosView(int itemsPerPage, int currentPage, string paramsJson);
+        Task<IEnumerable<TypeEstagioDto>> GetTiposDeEstagios();
     }
 }

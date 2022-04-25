@@ -128,6 +128,8 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<EstagioDto, Estagio>();
 
+            CreateMap<TypeEstagioDto, TypeEstagio>();
+
             CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
                 .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,
                 b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));

@@ -15,6 +15,7 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new DocumentoEstagioDbMapping());
             modelBuilder.ApplyConfiguration(new EstagioDbMapping());
             modelBuilder.ApplyConfiguration(new MatriculaEstagioDbMapping());
+            modelBuilder.ApplyConfiguration(new TypeEstagioDbMapping());
             modelBuilder.ApplyConfiguration(new TurmaNotasDbMapping());
         }
     }

@@ -2,9 +2,6 @@
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.Estagio.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.Data.Repositories.Pedagogico
@@ -27,6 +24,19 @@ namespace Invictus.Data.Repositories.Pedagogico
             await _db.Estagios.AddAsync(estagio);
         }
 
+        public async Task CreateEstagioType(TypeEstagio type)
+        {
+            await _db.TypeEstagios.AddAsync(type);
+        }
+
+        public async Task DeleteEstagioType(Guid typeEstagio)
+        {
+            var tipo = await _db.TypeEstagios.FindAsync(typeEstagio);
+
+            await _db.TypeEstagios.SingleDeleteAsync(tipo);
+            
+        }
+
         public void Dispose()
         {
             _db.Dispose();
@@ -35,6 +45,11 @@ namespace Invictus.Data.Repositories.Pedagogico
         public async Task EditEstagio(Estagio estagio)
         {
             await _db.Estagios.SingleUpdateAsync(estagio);
+        }
+
+        public async Task EditEstagioType(TypeEstagio type)
+        {
+            await _db.TypeEstagios.SingleUpdateAsync(type);
         }
     }
 }
