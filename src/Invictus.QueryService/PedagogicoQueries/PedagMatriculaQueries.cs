@@ -118,6 +118,24 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<MatriculaDto> GetMatriculaById(Guid matriculaId)
+        {
+            var query = @"SELECT * FROM Matriculas WHERE Matriculas.id = @matriculaId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<MatriculaDto>(query, new { matriculaId = matriculaId });
+
+                // connection.Close();
+
+                return result.FirstOrDefault();
+
+            }
+        }
+
         public async Task<IEnumerable<MatriculaViewModel>> GetRelatorioMatriculas(string param)
         {
             var parametro = JsonConvert.DeserializeObject<MatriculaRelatorioParam>(param);

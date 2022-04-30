@@ -30,7 +30,7 @@ namespace Invictus.Domain.Pedagogico.AlunoAggregate
         public Guid MatriculaId { get; private set; }
 
         #region EF
-        public AlunoAnotacao()
+        protected AlunoAnotacao()
         {
 
         }

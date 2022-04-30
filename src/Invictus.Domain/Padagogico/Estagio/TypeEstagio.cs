@@ -24,7 +24,7 @@ namespace Invictus.Domain.Padagogico.Estagio
 
         #region EF 
 
-        public TypeEstagio()
+        protected TypeEstagio()
         {
 
         }

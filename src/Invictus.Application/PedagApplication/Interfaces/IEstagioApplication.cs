@@ -14,6 +14,8 @@ namespace Invictus.Application.PedagApplication.Interfaces
         Task DeleteTypeEstagio(Guid typeEstagio);
         Task CreateTypeEstagio(TypeEstagioDto typeEstagio);
         Task EditTypeEstagio(TypeEstagioDto typeEstagio);
+        Task LiberarMatricula(LiberarEstagioCommand command);
+        Task AprovarDocumento(Guid documentoId, bool aprovar);
 
     }
 }

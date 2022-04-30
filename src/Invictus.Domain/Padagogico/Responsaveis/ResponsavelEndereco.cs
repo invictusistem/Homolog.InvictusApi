@@ -9,7 +9,7 @@ namespace Invictus.Domain.Pedagogico.Responsaveis
 {
     public class ResponsavelEndereco : ValueObject
     {
-        public ResponsavelEndereco() { }
+        protected ResponsavelEndereco() { }
         public ResponsavelEndereco(string bairro,
                         string cep,
                         string complemento,

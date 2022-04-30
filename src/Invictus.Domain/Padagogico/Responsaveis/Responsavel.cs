@@ -6,7 +6,7 @@ namespace Invictus.Domain.Pedagogico.Responsaveis
 {
     public class Responsavel : Entity
     {
-        public Responsavel() { }
+        protected Responsavel() { }
         public Responsavel(//int id,
                     TipoResponsavel tipo,
                     string nome,

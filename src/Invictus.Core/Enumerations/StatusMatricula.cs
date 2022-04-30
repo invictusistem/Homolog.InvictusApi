@@ -12,7 +12,8 @@ namespace Invictus.Core.Enumerations
         public static StatusMatricula Suspensa = new(2, "Suspensa");
         public static StatusMatricula Regular = new(3, "Regular");
         public static StatusMatricula Encerrada = new(4, "Encerrada");
-        
+        public static StatusMatricula AguardoDocumentacao = new(5, "Aguardando envio/análise documental");
+
 
         //public static Status Encerrada = new(4, "Encerrada");
         public StatusMatricula()
@@ -41,6 +42,11 @@ namespace Invictus.Core.Enumerations
             else if (compare == "Encerrada")
             {
                 return Encerrada;
+
+            }
+            else if (compare == "Aguardando envio/análise documental")
+            {
+                return AguardoDocumentacao;
 
             }
 

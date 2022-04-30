@@ -16,6 +16,7 @@ namespace Invictus.Dtos.PedagDto
         public string nome { get; set; }
         public string status { get; set; }
         public Guid matriculaId { get; set; }
+        public Guid estagioMatriculaId { get; set; }
         public DateTime nascimento { get; set; }
         public DateTime dataCadastro { get; set; }
         public string sigla { get; set; }
@@ -24,6 +25,5 @@ namespace Invictus.Dtos.PedagDto
         public bool MatriculaConfirmada { get; set; }
         public string turmaDescricao { get; set; }
         public string turmaIdentificador { get; set; }
-
     }
 }

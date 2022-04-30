@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220428020234_update44")]
+    partial class update44
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1504,9 +1506,6 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeArquivo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Observacao")

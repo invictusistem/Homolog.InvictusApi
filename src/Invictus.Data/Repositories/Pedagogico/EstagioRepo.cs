@@ -29,6 +29,11 @@ namespace Invictus.Data.Repositories.Pedagogico
             await _db.TypeEstagios.AddAsync(type);
         }
 
+        public async Task CreateMatricula(MatriculaEstagio matricula)
+        {
+            await _db.MatriculasEstagios.AddAsync(matricula);
+        }
+
         public async Task DeleteEstagioType(Guid typeEstagio)
         {
             var tipo = await _db.TypeEstagios.FindAsync(typeEstagio);

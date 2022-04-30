@@ -5,7 +5,7 @@ namespace Invictus.Domain.Padagogico.Estagio
 {
     public class DocumentoEstagio : Entity
     {
-        public DocumentoEstagio() { }
+        protected DocumentoEstagio() { }
 
         public DocumentoEstagio(string descricao,
                               string nome,
@@ -14,6 +14,7 @@ namespace Invictus.Domain.Padagogico.Estagio
                               string tipoArquivo,
                               string contentArquivo,
                               byte[] dataFile,
+                              string observacao,
                               DateTime? dataCriacao)
         {  
             Descricao = descricao;
@@ -23,6 +24,7 @@ namespace Invictus.Domain.Padagogico.Estagio
             TipoArquivo = tipoArquivo;
             ContentArquivo = contentArquivo;
             DataFile = dataFile;
+            Observacao = observacao;
             DataCriacao = dataCriacao;
 
         }
@@ -36,20 +38,29 @@ namespace Invictus.Domain.Padagogico.Estagio
         public string TipoArquivo { get; private set; }
         public string ContentArquivo { get; private set; }
         public byte[] DataFile { get; private set; }
+        public string NomeArquivo { get; private set; }
         public DateTime? DataCriacao { get; private set; }
-
+        public string Observacao { get; private set; }
         public Guid MatriculaEstagioId { get; private set; }
         public virtual MatriculaEstagio MatriculaEstagio { get; private set; }
 
-        public void AddDataByte(byte[] bytes)
-        {
-            DataFile = bytes;
-        }
+        //public void AddDataByte(byte[] bytes)
+        //{
+        //    DataFile = bytes;
+        //}
 
         public void ValidarDoc(bool validado)
         {
             Analisado = true;
             Validado = validado;
+        }
+
+        public void AddFileByAluno(byte[] dataFile, string content, string fileName)
+        {
+            DataCriacao = DateTime.Now;
+            DataFile = dataFile;
+            ContentArquivo = content;
+            NomeArquivo = fileName;
         }
     }
 }

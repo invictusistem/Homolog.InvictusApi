@@ -3,8 +3,11 @@ using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -41,7 +44,9 @@ namespace Invictus.Api.Controllers.Pedagogico
         {
             var estagio = await _estagioQueries.GetEstagioById(estagioId);
 
-            return Ok(new { estagio = estagio });
+            var tiposEstagios = await _estagioQueries.GetTiposDeEstagios();
+
+            return Ok(new { estagio = estagio, tipos = tiposEstagios });
         }
 
         [HttpGet]
@@ -55,7 +60,7 @@ namespace Invictus.Api.Controllers.Pedagogico
             if (estagioarios.Data.Count() == 0) return NotFound();
 
             return Ok(estagioarios);
-        }
+        }        
 
         [HttpGet]
         [Route("tipos")]
@@ -67,6 +72,35 @@ namespace Invictus.Api.Controllers.Pedagogico
             if (!tiposEstagios.Any()) return NotFound();
 
             return Ok(new { tipos = tiposEstagios });
+        }
+
+        [HttpGet]
+        [Route("aluno/tipos-liberados/{matriculaId}")]
+        public async Task<IActionResult> GetTypeEstagios(Guid matriculaId)
+        {
+            var tiposEstagios = await _estagioQueries.GetTiposDeEstagiosLiberadorParaAluno(matriculaId);
+
+            if (!tiposEstagios.Any()) return NoContent();
+
+            return Ok(new { tipos = tiposEstagios });
+        }
+
+        [HttpGet]
+        [Route("aluno/{matriculaId}/documentos-estagio")]
+        public async Task<IActionResult> GetDocumentos(Guid matriculaId)
+        {
+            var documentos = await _estagioQueries.GetDocumentosDoEstagio(matriculaId);
+
+            return Ok(new { docs = documentos });
+        }
+
+        [HttpPost]
+        [Route("matricular")]
+        public async Task<IActionResult> CreateEstagio([FromBody] LiberarEstagioCommand command)
+        {
+            await _estagioApp.LiberarMatricula(command);
+
+            return Ok();
         }
 
         [HttpPost]
@@ -86,11 +120,106 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok();
         }
 
+        [HttpPost]
+        //[Authorizarion]
+        [Route("arquivos")]
+        public IActionResult Index(List<IFormFile> file)
+        {
+            /*
+            if (file != null)
+            {
+                if (file.Count() > 0)
+                {
+                    foreach (var item in file)
+                    {
+
+
+                        var fileName = Path.GetFileName(item.FileName);
+                        var desc = fileName.Substring(0, 2);
+
+                        //var testarSemanaPort = "sábado";
+                        DocumentoDesc doscDesc;
+                        DocumentoDesc.TryParse(desc, out doscDesc);
+
+                        var fileExtension = Path.GetExtension(fileName);
+
+                        var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
+
+                        var token = HttpContext.GetTokenAsync("Bearer", "access_token");
+                        var x = HttpContext.User.Identity.Name;
+                        var email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
+                        //var aluno = _db.Alunos.Where(t => t.Email == email).SingleOrDefault();
+
+                        var aluno = _db.Alunos.Where(a => a.Email == email).FirstOrDefault();//   .OrderBy(c => c.Id).LastOrDefault();
+
+                        var documento = new Documento(0, aluno.Id, doscDesc.GetDescription(), fileName.Remove(0, 2), false, false, fileExtension, item.ContentType, null, DateTime.Now);
+
+                        byte[] arquivo = null;
+
+                        using (var target = new MemoryStream())
+                        {
+                            item.CopyTo(target);
+                            arquivo = target.ToArray();
+                        }
+
+                        documento.AddDataByte(arquivo);
+
+                        _db.DocumentosEStagio.Add(documento);
+                        _db.SaveChanges();
+
+                        //public IActionResult SalvarLeads([FromQuery] string userEmail, IFormFile file)
+                        //{
+                        //List<UserModel> users = new List<UserModel>();
+                        //List<LeadDto> leadsDto = new List<LeadDto>();
+                        //System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                        //using (var stream = new MemoryStream())
+                        //{
+                        //    item.CopyTo(stream);
+                        //    stream.Position = 0;
+                        //    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                        //    {
+                        //        while (reader.Read())
+                        //        {
+                        //            if (String.IsNullOrEmpty(reader?.GetValue(0)?.ToString())) break;
+                        //            leadsDto.Add(new LeadDto()
+                        //            {
+                        //                nome = reader.GetValue(0).ToString(),
+                        //                email = reader.GetValue(1).ToString(),
+                        //                data = reader.GetValue(2).ToString(),
+                        //                telefone = reader.GetValue(3).ToString(),
+                        //                bairro = reader.GetValue(4).ToString(),
+                        //                cursoPretendido = reader.GetValue(5).ToString(),
+                        //                unidade = reader.GetValue(6).ToString()
+                        //            });
+                        //        }
+                        //    }
+                        //}
+
+                        //leadsDto.RemoveAt(0);
+                    }
+
+                }
+            }
+
+            //CreateUser();
+            */
+            return Ok();
+        }
+
         [HttpPut]
         [Route("tipos")]
         public async Task<IActionResult> EstagioTypeEdit([FromBody] TypeEstagioDto typeEstagio)
         {
             await _estagioApp.EditTypeEstagio(typeEstagio);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("aluno/{documentoId}/documentos-estagio/{aprovar}")]
+        public async Task<IActionResult> EstagioDocumentoAprovar(Guid documentoId, bool aprovar)
+        {
+            await _estagioApp.AprovarDocumento(documentoId, aprovar);
 
             return Ok();
         }
