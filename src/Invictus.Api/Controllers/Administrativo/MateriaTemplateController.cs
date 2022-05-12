@@ -17,18 +17,31 @@ namespace Invictus.Api.Controllers
     {
         private readonly IMateriaTemplateQueries _materiaQueries;
         private readonly IMateriaTemplateApplication _materiaApplication;
-        public MateriaTemplateController(IMateriaTemplateQueries materiaQueries, IMateriaTemplateApplication materiaApplication)
+        private readonly ITypePacoteQueries _typeQueries;
+        public MateriaTemplateController(IMateriaTemplateQueries materiaQueries, IMateriaTemplateApplication materiaApplication, ITypePacoteQueries typeQueries)
         {
             _materiaQueries = materiaQueries;
             _materiaApplication = materiaApplication;
+            _typeQueries = typeQueries;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMaterias([FromQuery] int itemsPerPage, [FromQuery] int currentPage)
+        public async Task<IActionResult> GetMateriasPaginated([FromQuery] int itemsPerPage, [FromQuery] int currentPage)
         {
             var results = await _materiaQueries.GetMateriasTemplateList(itemsPerPage, currentPage);
 
             if (results.Data.Count() == 0) return NotFound();
+
+            return Ok(new { results = results });
+        }
+
+        [HttpGet]
+        [Route("materias")]
+        public async Task<IActionResult> GetMaterias()
+        {
+            var results = await _materiaQueries.GetAllMaterias();
+
+            if (results.Count() == 0) return NotFound();
 
             return Ok(new { results = results });
         }
@@ -40,10 +53,13 @@ namespace Invictus.Api.Controllers
 
             var results = await _materiaQueries.GetMateriaTemplate(materiaId);//.GetProfessores(itemsPerPage, currentPage, paramsJson);
 
-            // var cargos = await _db.Cargos.ToListAsync();
             if (results == null) return NotFound();
 
-            return Ok(new { results = results });
+            var typePacotes = await _typeQueries.GetTypePacotes();
+
+            if (typePacotes.Count() == 0) return NotFound();
+
+            return Ok(new { results = results, types = typePacotes });
         }
 
         [HttpGet]
@@ -73,6 +89,15 @@ namespace Invictus.Api.Controllers
         public async Task<IActionResult> EditMateria([FromBody] MateriaTemplateDto materia)
         {
             await _materiaApplication.EditMateria(materia);
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{materiaId}")]
+        public async Task<IActionResult> DeleteMateria(Guid materiaId)
+        {
+            await _materiaApplication.DeleteMateria(materiaId);
 
             return NoContent();
         }

@@ -59,5 +59,14 @@ namespace Invictus.Api.Controllers
 
             return Ok();
         }
+
+        [HttpDelete]
+        [Route("{documentoId}")]
+        public async Task<IActionResult> RemoveDocumentacao(Guid documentoId)
+        {
+            await _docTemplateApplication.RemoveDoc(documentoId);
+
+            return Ok();
+        }
     }
 }

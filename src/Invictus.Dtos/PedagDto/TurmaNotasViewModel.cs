@@ -23,6 +23,8 @@ namespace Invictus.Dtos.PedagDto
         public Guid turmaId { get; set; }
         public int percentualPresenca { get; set; }
         public int qntFaltas { get; set; }
+        public Guid typePacoteId { get; set; }
+        public int ordem { get; set; }
     }
 
     public class TurmaNotasDto
@@ -39,5 +41,11 @@ namespace Invictus.Dtos.PedagDto
         public string resultado { get; set; }
         public Guid matriculaId { get; set; }
         public Guid turmaId { get; set; }
+    }
+
+    public class TurmaPresencaViewModel
+    {
+        public string IsPresentToString { get; set; }
+        public Guid materiaId { get; set; }
     }
 }

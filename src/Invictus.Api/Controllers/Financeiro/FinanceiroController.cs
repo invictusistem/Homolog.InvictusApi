@@ -49,7 +49,7 @@ namespace Invictus.Api.Controllers.Financeiro
             var debitos = await _finQueries.GetDebitoAlunos(matriculaId);
             var turma = await _turmaQueries.GetTurmaByMatriculaId(matriculaId);
 
-            return Ok(new { debitos = debitos.OrderBy(c => c.vencimento), turma = turma });
+            return Ok(new { debitos = debitos, turma = turma });
 
         }
 

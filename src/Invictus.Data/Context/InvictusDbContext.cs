@@ -14,11 +14,13 @@ using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.Parametros;
 using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.RegistroMatricula;
+using Invictus.Domain.Administrativo.RequerimentoAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Administrativo.UnidadeAuth;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
+using Invictus.Domain.Financeiro.Configuracoes;
 using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
@@ -65,6 +67,8 @@ namespace Invictus.Data.Context
         public DbSet<Disponibilidade> Disponibilidades { get; set; }
         public DbSet<MateriaHabilitada> MateriasHabilitadas { get; set; }
         public DbSet<Professor> Professores { get; set; }
+        public DbSet<Requerimento> Requerimentos { get; set; }
+        public DbSet<TipoRequerimento> TypeRequerimentos { get; set; }
         public DbSet<Responsavel> Responsaveis { get; set; }
         public DbSet<Horario> Horarios { get; set; }
         public DbSet<Presenca> Presencas { get; set; }
@@ -79,6 +83,12 @@ namespace Invictus.Data.Context
 
         #region FINANC
 
+        public DbSet<Banco> Bancos { get; set; }
+        public DbSet<CentroCusto> CentroCustos { get; set; }
+        public DbSet<FormaRecebimento> FormasRecebimento { get; set; }
+        public DbSet<MeioPagamento> MeiosPagamento { get; set; }
+        public DbSet<PlanoConta> PlanosConta { get; set; }
+        public DbSet<SubConta> SubContas { get; set; }
         public DbSet<Boleto> Boletos { get; set; }
         public DbSet<Bolsa> Bolsas { get; set; }
         public DbSet<Caixa> Caixas { get; set; }

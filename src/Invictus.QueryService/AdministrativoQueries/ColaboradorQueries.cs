@@ -78,23 +78,31 @@ namespace Invictus.QueryService.AdministrativoQueries
         private async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradores(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
             //var ativos = param.ativo;
-            StringBuilder query = new StringBuilder();
-            query.Append("SELECT * from Colaboradores where ");
-            if (param.nome != "") query.Append("LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append("LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append("LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            query.Append(" Colaboradores.UnidadeId = '" + unidadeId+"' ");
-            if (param.ativo == false) query.Append(" AND Colaboradores.Ativo = 'True' ");
+            StringBuilder query = new StringBuilder(); 
+            query.Append(@"SELECT 
+                        Colaboradores.id, 
+                        Colaboradores.nome, 
+                        Colaboradores.email,
+                        Colaboradores.ativo,
+                        Unidades.Sigla as unidadeSigla
+                        FROM Colaboradores 
+                        INNER JOIN Unidades on Colaboradores.UnidadeId = Unidades.Id 
+                        WHERE ");
+            if (param.todasUnidades == false) query.Append(" Colaboradores.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Colaboradores.Ativo = 'True' "); } else { query.Append(" Colaboradores.Ativo = 'True' OR Colaboradores.Ativo = 'False' "); }
             query.Append(" ORDER BY Colaboradores.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             StringBuilder queryCount = new StringBuilder();
-            queryCount.Append("SELECT Count(*) from Colaboradores where ");
-            if (param.nome != "") queryCount.Append("LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") queryCount.Append("LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") queryCount.Append("LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            queryCount.Append(" Colaboradores.UnidadeId = '" + unidadeId+"'");
-            if (param.ativo == false) queryCount.Append(" AND Colaboradores.Ativo = 'True' ");
+            queryCount.Append("SELECT Count(*) FROM Colaboradores INNER JOIN Unidades on Colaboradores.UnidadeId = Unidades.Id WHERE ");
+            if (param.todasUnidades == false) queryCount.Append(" Colaboradores.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Colaboradores.Ativo = 'True' "); } else { queryCount.Append(" Colaboradores.Ativo = 'True' OR Colaboradores.Ativo = 'False' "); }
 
 
             await using (var connection = new SqlConnection(

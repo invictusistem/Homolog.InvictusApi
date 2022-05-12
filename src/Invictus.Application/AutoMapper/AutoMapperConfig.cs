@@ -12,10 +12,12 @@ using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.Parametros;
 using Invictus.Domain.Administrativo.ProfessorAggregate;
+using Invictus.Domain.Administrativo.RequerimentoAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
+using Invictus.Domain.Financeiro.Configuracoes;
 using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
@@ -23,6 +25,7 @@ using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.Financeiro;
+using Invictus.Dtos.Financeiro.Configuracoes;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,8 +60,6 @@ namespace Invictus.Application.AutoMapper
                  .ConstructUsing(u => new Unidade(u.sigla, u.cnpj, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new Endereco(u.bairro, u.cep, u.complemento, u.logradouro, u.numero, u.cidade, u.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
-            CreateMap<SalaDto, Sala>();
-
             CreateMap<ColaboradorDto, Colaborador>()
                  .ConstructUsing(c => new Colaborador(c.nome, c.email, c.cpf, c.celular, c.cargoId, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ColaboradorEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
@@ -69,19 +70,17 @@ namespace Invictus.Application.AutoMapper
                      new AlunoEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<MatForm, Responsavel>()
-                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome,c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
                  c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
 
             CreateMap<ProfessorDto, Professor>()
-                 .ConstructUsing(c => new Professor(c.nome, c.email, c.cpf, c.celular,c.cnpj,c.telefoneContato,c.nomeContato, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                 .ConstructUsing(c => new Professor(c.nome, c.email, c.cpf, c.celular, c.cnpj, c.telefoneContato, c.nomeContato, c.unidadeId, c.ativo,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new ProfessorEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf),
                      new DadosBancarios(c.bancoNumero, c.agencia, c.conta, TipoConta.TryParse(c.tipoConta))));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<MateriaTemplateDto, MateriaTemplate>()
                 .ConstructUsing(m => new MateriaTemplate(m.nome, m.descricao, ModalidadeCurso.TryParse(m.modalidade), m.cargaHoraria, m.typePacoteId, m.ativo));
-
-            CreateMap<PacoteDto, Pacote>();
 
             CreateMap<PacoteMateriaDto, PacoteMateria>()
                 .ConstructUsing(m => new PacoteMateria(m.nome, m.materiaId, ModalidadeCurso.TryParse(m.modalidade), m.cargaHoraria));
@@ -93,22 +92,46 @@ namespace Invictus.Application.AutoMapper
                 .ConstructUsing(h => new Horario(DiaDaSemana.TryParseStringToString(h.diaSemana), h.horarioInicio, h.horarioFim));
 
             CreateMap<TurmaMateriasDto, TurmaMaterias>()
-                .ConstructUsing(t => new TurmaMaterias(t.nome, t.descricao, ModalidadeCurso.TryParse(t.modalidade), t.cargaHoraria, t.typePacoteId, t.materiaId, t.ativo));
-
-            CreateMap<ParametrosKeyDto, ParametrosKey>();
+                .ConstructUsing(t => new TurmaMaterias(t.nome, t.descricao, ModalidadeCurso.TryParse(t.modalidade), t.cargaHoraria, t.typePacoteId, t.materiaId, t.ordem, t.ativo));
 
             CreateMap<ParametroValueDto, ParametrosValue>()
-                .ConstructUsing(p => new ParametrosValue(p.value, p.descricao, p.comentario, p.parametrosKeyId));
+                .ConstructUsing(p => new ParametrosValue(p.value, p.descricao, p.comentario, p.ativo, p.parametrosKeyId));
 
             CreateMap<TurmaDto, Turma>()
                 .ConstructUsing(t => new Turma(t.descricao, t.totalAlunos, t.minimoAlunos, t.unidadeId, t.salaId, t.pacoteId, t.typePacoteId,
                 new Previsao(t.previsaoAtual, t.previsaoTerminoAtual, t.previsaoInfo, t.dataCriacao)));
 
             CreateMap<ListaPresencaDto, Presenca>()
-                .ConstructUsing(p => new Presenca(p.calendarioId, p.isPresent, p.alunoId, p.isPresentToString));
+                .ConstructUsing(p => new Presenca(p.calendarioId, p.isPresent, p.alunoId, p.matriculaId, p.isPresentToString));
 
             CreateMap<ListaPresencaViewModel, Presenca>()
-                .ConstructUsing(p => new Presenca(p.id, p.calendarioId, p.isPresent, p.alunoId, p.isPresentToString));
+                .ConstructUsing(p => new Presenca(p.id, p.calendarioId, p.isPresent, p.alunoId, p.matriculaId, p.isPresentToString));
+
+            CreateMap<RequerimentoDto, Requerimento>()
+                .ConstructUsing(src => new Requerimento(src.matriculaRequerenteId, src.dataRequerimento, src.descricao, src.observacao, src.unidadeId));
+
+            CreateMap<TypeEstagioDto, TypeEstagio>()
+                .ConstructUsing(src => new TypeEstagio(src.id, src.nome, src.observacao, src.nivel, src.ativo));
+
+            CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
+                .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,
+                b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));
+
+            CreateMap<ResponsavelDto, Responsavel>()
+                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome, c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
+                 c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                     new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
+
+            CreateMap<AlunoExcelDto, Aluno>()
+                 .ConstructUsing(c => new Aluno(c.Nome, c.NomeSocial, c.CPF, c.RG, c.NomePai, c.NomeMae, c.Nascimento, c.Naturalidade, c.NaturalidadeUF,
+                 c.Email, c.TelReferencia, c.NomeContatoReferencia, c.TelCelular, c.TelResidencial, c.TelWhatsapp,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                     new AlunoEndereco(c.Bairro, c.CEP, c.Complemento, c.Logradouro, c.Numero, c.Cidade, c.UF)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
+
+            CreateMap<ParametrosKeyDto, ParametrosKey>();
+
+            CreateMap<SalaDto, Sala>();
+
+            CreateMap<PacoteDto, Pacote>();
 
             CreateMap<AnotacaoDto, AlunoAnotacao>();
 
@@ -118,7 +141,7 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<TurmaProfessoresDto, TurmaProfessor>();
 
-            CreateMap<ParametroValueDto, ParametrosValue>();
+            CreateMap<TipoRequerimentoDto, TipoRequerimento>();
 
             CreateMap<TurmaNotasDto, TurmaNotas>();
 
@@ -128,31 +151,32 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<EstagioDto, Estagio>();
 
-            CreateMap<TypeEstagioDto, TypeEstagio>();
-
-            CreateMap<BoletoLoteResponse, BoletoResponseInfo>()
-                .ConstructUsing(b => new BoletoResponseInfo(b.id_unico, b.id_unico_original, b.status, b.msg, b.nossonumero, b.linkBoleto, b.linkGrupo, b.linhaDigitavel,
-                b.pedido_numero, b.banco_numero, b.token_facilitador, b.credencial));
-
-            CreateMap<ResponsavelDto, Responsavel>()
-                 .ConstructUsing(c => new Responsavel(TipoResponsavel.TryParse(c.tipo), c.nome,c.parentesco, c.cpf, c.rg, c.nascimento, c.naturalidade, c.naturalidadeUF,
-                 c.email, c.telCelular, c.telResidencial, c.telWhatsapp, c.matriculaId,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
-                     new ResponsavelEndereco(c.bairro, c.cep, c.complemento, c.logradouro, c.numero, c.cidade, c.uf)));
-
             CreateMap<ContratoView, Contrato>();
 
+            CreateMap<BancoDto, Banco>();
+
+            CreateMap<CentroCustoDto, CentroCusto>();
+
+            CreateMap<MeioPagamentoDto, MeioPagamento>();
+
+            CreateMap<PlanoContaDto, PlanoConta>();
+
+            CreateMap<SubContaDto, SubConta>();
+
             CreateMap<BolsaDto, Bolsa>();
+
             CreateMap<ContratoDto, Contrato>();
+
             CreateMap<ContratoConteudoDto, Conteudo>();
+
             CreateMap<ProdutoDto, Produto>();
+
             CreateMap<PlanoPagamentoDto, PlanoPagamentoTemplate>();
+
             CreateMap<AgendaTrimestreDto, AgendaTrimestre>();
+
             CreateMap<DocumentacaoTemplateDto, DocumentacaoTemplate>();
 
-            CreateMap<AlunoExcelDto, Aluno>()
-                 .ConstructUsing(c => new Aluno(c.Nome, c.NomeSocial, c.CPF, c.RG, c.NomePai, c.NomeMae, c.Nascimento, c.Naturalidade, c.NaturalidadeUF,
-                 c.Email, c.TelReferencia, c.NomeContatoReferencia, c.TelCelular, c.TelResidencial, c.TelWhatsapp,// (u.sigla, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
-                     new AlunoEndereco(c.Bairro, c.CEP, c.Complemento, c.Logradouro, c.Numero, c.Cidade, c.UF)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
         }
     }

@@ -39,13 +39,20 @@ namespace Invictus.Application.AdmApplication
             _paramRepo.Commit();
         }
 
+        public async Task RemoeValueById(Guid paramId)
+        {
+            await _paramRepo.RemoveParamValue(paramId);
+
+            _paramRepo.Commit();
+        }
+
         public async Task SaveCargo(string key, ParametroValueDto paramValue)
         {
             var paramKey = await _paramQueries.GetParamKey(key);
 
             paramValue.parametrosKeyId = paramKey.id;
 
-            var parametroValue = new ParametrosValue(paramValue.value, paramValue.descricao, paramValue.comentario, paramKey.id);// _mapper.Map<ParametrosValue>(paramKey);
+            var parametroValue = new ParametrosValue(paramValue.value, paramValue.descricao, paramValue.comentario, paramValue.ativo, paramKey.id);// _mapper.Map<ParametrosValue>(paramKey);
 
             await _paramRepo.AddParamValue(parametroValue);
 

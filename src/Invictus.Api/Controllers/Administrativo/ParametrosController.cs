@@ -62,6 +62,14 @@ namespace Invictus.Api.Controllers
             return NoContent();
         }
 
+        [HttpDelete]
+        [Route("value/{paramId}")]
+        public async Task<IActionResult> RemoveParamValue(Guid paramId)
+        {
+            await _paramApp.RemoeValueById(paramId);
+
+            return NoContent();
+        }
 
 
     }

@@ -52,13 +52,18 @@ namespace Invictus.QueryService.AdministrativoQueries
             var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
 
             StringBuilder query = new StringBuilder();
-            query.Append("SELECT * from Professores where ");
-
-            if (param.nome != "") query.Append("LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append("LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append("LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            query.Append("Professores.UnidadeId = '" + unidade.id + "'");
-            if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
+            query.Append(@"SELECT
+                        Professores.Id,
+                        Professores.Nome,
+                        Professores.Email,
+                        Professores.Ativo
+                        FROM Professores INNER JOIN Unidades on Professores.UnidadeId = Unidades.Id WHERE  ");
+            if (param.todasUnidades == false) query.Append(" Professores.UnidadeId = '" + unidade.id + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            //query.Append("Professores.UnidadeId = '" + unidade.id + "'");
+            if (param.ativo == false) { query.Append(" Professores.Ativo = 'True' "); } else { query.Append(" Professores.Ativo = 'True' OR Professores.Ativo = 'False' "); }
             query.Append(" ORDER BY Professores.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
@@ -87,13 +92,13 @@ namespace Invictus.QueryService.AdministrativoQueries
             var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
 
             StringBuilder queryCount = new StringBuilder();
-            queryCount.Append("SELECT Count(*) from Professores where ");
+            queryCount.Append("SELECT Count(*) FROM Professores INNER JOIN Unidades on Professores.UnidadeId = Unidades.Id WHERE ");
+            if (param.todasUnidades == false) queryCount.Append(" Professores.UnidadeId = '" + unidade.id + "' AND ");
             if (param.nome != "") queryCount.Append("LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.email != "") queryCount.Append("LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.cpf != "") queryCount.Append("LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            queryCount.Append(" Professores.UnidadeId = '" + unidade.id + "'");
-            if (param.ativo == false) queryCount.Append(" AND Professores.Ativo = 'True' ");
-
+            if (param.ativo == false) { queryCount.Append(" Professores.Ativo = 'True' "); } else { queryCount.Append(" Professores.Ativo = 'True' OR Professores.Ativo = 'False' "); }
+            //if (param.ativo == false) queryCount.Append(" AND Professores.Ativo = 'True' ");
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

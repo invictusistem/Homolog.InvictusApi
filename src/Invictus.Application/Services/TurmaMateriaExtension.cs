@@ -9,26 +9,20 @@ using System.Threading.Tasks;
 
 namespace Invictus.Application.Services
 {
-    public static class TurmaMateriaExtension
-    {
-        public static IEnumerable<TurmaMaterias> DtoToTurmaMateria(this IEnumerable<TurmaMaterias> materias, IEnumerable<MateriaTemplate> materiasTemplates)
-        {
-            var turmaMats = new List<TurmaMaterias>();
+    //public static class TurmaMateriaExtension
+    //{
+    //    public static IEnumerable<TurmaMaterias> DtoToTurmaMateria(this IEnumerable<TurmaMaterias> materias, IEnumerable<MateriaTemplate> materiasTemplates)
+    //    {
+    //        var turmaMats = new List<TurmaMaterias>();
 
-            foreach (var item in materiasTemplates)
-            {
-                turmaMats.Add(new TurmaMaterias(item.Nome, item.Descricao, ModalidadeCurso.TryParse(item.Modalidade), item.CargaHoraria, item.TypePacoteId,item.Id, item.Ativo));
-            }
+    //        foreach (var item in materiasTemplates)
+    //        {
+    //            turmaMats.Add(new TurmaMaterias(item.Nome, item.Descricao, ModalidadeCurso.TryParse(item.Modalidade), item.CargaHoraria, item.TypePacoteId,item.Id,item.Ativo));
+    //        }
 
-            return turmaMats;
-        }
+    //        return turmaMats;
+    //    }
 
-        //    public static IEnumerable<PainelCDEEventosDTO> ToDTOPainelCDE(this IEnumerable<WorkOrder> workOrders)
-        //{
-        //    foreach (var item in workOrders)
-        //    {
-        //        yield return item.ToEventosCDEDTO();
-        //    }
-        //}
-    }
+    
+    //}
 }

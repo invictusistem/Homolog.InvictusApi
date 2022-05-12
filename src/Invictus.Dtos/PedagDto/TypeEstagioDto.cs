@@ -8,6 +8,7 @@ namespace Invictus.Dtos.PedagDto
         public string nome { get; set; }
         public string nivel { get; set; }
         public bool ativo { get; set; }
-        public string observacao { get; set; }     
+        public string observacao { get; set; }    
+        public Guid matriculaId { get; set; }
     }
 }

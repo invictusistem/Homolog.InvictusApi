@@ -21,6 +21,12 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.SaveChanges();
         }
 
+        public async Task Delete(Guid documentoId)
+        {
+            var doc = await _db.DocumentacoesTemplate.FindAsync(documentoId);
+            await _db.DocumentacoesTemplate.SingleDeleteAsync(doc);
+        }
+
         public void Dispose()
         {
             _db.Dispose();

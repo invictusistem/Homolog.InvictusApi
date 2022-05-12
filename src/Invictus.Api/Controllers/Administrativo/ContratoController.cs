@@ -1,10 +1,14 @@
 ﻿using Invictus.Application.AdmApplication;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.ReportService;
+using Invictus.Application.ReportService.Interfaces;
+using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
@@ -16,12 +20,21 @@ namespace Invictus.Api.Controllers
     {
         private readonly IContratoQueries _contratoQuery;
         private readonly IContratoApplication _contratoApplication;
+        private readonly IUnidadeQueries _unidadeQueries;
+        private readonly IAspNetUser _aspNetUser;
+        private readonly IReportServices _reportService;
         public ContratoController(IContratoQueries contratoQuery,
-                                 IContratoApplication contratoApplication
+                                 IContratoApplication contratoApplication,
+                                 IUnidadeQueries unidadeQueries,
+                                 IAspNetUser aspNetUser,
+                                 IReportServices reportService
             )
         {
             _contratoQuery = contratoQuery;
             _contratoApplication = contratoApplication;
+            _unidadeQueries = unidadeQueries;
+            _aspNetUser = aspNetUser;
+            _reportService = reportService;
         }
 
         [HttpGet]
@@ -42,6 +55,65 @@ namespace Invictus.Api.Controllers
 
             return Ok(new { contrato = contrato });
 
+        }
+
+        [HttpGet]
+        [Route("exemplo/{contratoId}")]
+        public async Task<IActionResult> GetExemploContratoPDF(Guid contratoId)
+        {
+            //var usuarioId = _aspNetUser.ObterUsuarioId();
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+            // var colaborador = await _colabQueries.GetColaboradoresById(usuarioId);
+            //var aluno = await _alunoQueries.GetAlunoById(_alunoId);
+            //var menorDeIdade = await _alunoQueries.GetIdadeAluno(_alunoId);
+            //int age = 0;
+            //age = DateTime.Now.Subtract(menorDeIdade).Days;
+            //age = age / 365;
+            //var menor = true;
+            //if (age >= 18) menor = false;
+
+            //if (menor)
+            //{
+            //    _temRespMenor = true;
+            //}
+
+            //if (_command.temRespFin)
+            //{
+            //    _temRespFinanc = true;
+            //}
+
+            var infosToPrintPDF = new GenerateContratoDTO()
+            {
+                nome = "",
+                cpf = "",
+                cnpj = unidade.cnpj,
+                bairro = unidade.bairro,
+                complemento = unidade.complemento,
+                logradouro = unidade.logradouro,
+                numero = unidade.numero,
+                cidade = unidade.cidade,
+                uf = unidade.uf
+
+            };
+
+            var contratoFile = await _reportService.GenerateContratoExemplo(infosToPrintPDF, contratoId);
+
+            //var doc = await _reportService.GeneratePendenciaDocs(matriculaId);
+
+            var memory = new MemoryStream(contratoFile);
+
+            return File(memory, "application/pdf", "contrato-exemplo.pdf");
+
+
+            //var doc = new AlunoDocumento(_newMatriculaId, "contrato", "contrato", true, true, true, 0, _turmaId);
+            //doc.AddDocumento(contratoFile, "contrato", ".pdf", "application/pdf", contratoFile.Length);
+            //doc.SetDataCriacao();
+            //doc.SetDocClassificacao(ClassificacaoDoc.Outros);
+
+            //await _alunoRepo.SaveAlunoDoc(doc);
+
+            //return Ok(new { contratos = contratos });
         }
 
         [HttpGet]

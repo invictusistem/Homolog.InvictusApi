@@ -27,6 +27,12 @@ namespace Invictus.Application.AdmApplication
             _materiaRepo.Commit();
         }
 
+        public async Task DeleteMateria(Guid materiaId)
+        {   
+            await _materiaRepo.Remove(materiaId);
+            _materiaRepo.Commit();
+        }
+
         public async Task EditMateria(MateriaTemplateDto materiaDto)
         {
             var mat = _mapper.Map<MateriaTemplate>(materiaDto);

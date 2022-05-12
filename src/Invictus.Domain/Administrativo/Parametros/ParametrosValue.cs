@@ -1,9 +1,5 @@
 ﻿using Invictus.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Invictus.Domain.Administrativo.Parametros
 {
@@ -12,6 +8,7 @@ namespace Invictus.Domain.Administrativo.Parametros
         public ParametrosValue(string value,
                                 string descricao,
                                 string comentario,
+                                bool ativo,
                                 Guid parametrosKeyId
 )
         {
@@ -24,7 +21,9 @@ namespace Invictus.Domain.Administrativo.Parametros
         public string Value { get; private set; }
         public string Descricao { get; private set; }
         public string Comentario { get; private set; }
-        
+        public bool Ativo { get; private set; }
+        public Guid ParametrosKeyId { get; private set; }
+
         public void SetValue(string value)
         {
             Value = value;
@@ -33,8 +32,7 @@ namespace Invictus.Domain.Administrativo.Parametros
 
         #region EF
         public virtual ParametrosKey  ParametrosKey { get; private set; }
-        public Guid ParametrosKeyId { get; private set; }
-        public ParametrosValue() { }
+        protected ParametrosValue() { }
 
         #endregion
     }

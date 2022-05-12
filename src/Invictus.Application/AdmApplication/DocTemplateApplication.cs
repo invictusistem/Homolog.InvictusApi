@@ -3,6 +3,7 @@ using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate;
 using Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate.Interface;
 using Invictus.Dtos.AdmDtos;
+using System;
 using System.Threading.Tasks;
 
 namespace Invictus.Application.AdmApplication
@@ -27,6 +28,12 @@ namespace Invictus.Application.AdmApplication
         {
             var doc = _mapper.Map<DocumentacaoTemplate>(editedDoc);
             await _docRepo.EditDoc(doc);
+            _docRepo.Commit();
+        }
+
+        public async Task RemoveDoc(Guid documentoId)
+        {
+            await _docRepo.Delete(documentoId);
             _docRepo.Commit();
         }
     }

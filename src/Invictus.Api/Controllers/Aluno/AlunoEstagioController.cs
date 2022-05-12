@@ -1,10 +1,13 @@
-﻿using Invictus.Data.Context;
+﻿using Invictus.Core.Enumerations;
+using Invictus.Data.Context;
 using Invictus.QueryService.AlunoSia.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers.Aluno
@@ -24,13 +27,23 @@ namespace Invictus.Api.Controllers.Aluno
         [HttpGet]
         public async Task<IActionResult> GetStatus()
         {
-            // verificar se tem matricula liberada
+            var status = "";
 
-            // verificar se os docs ja foram enviados ou nao
+            var estagio = await _db.MatriculasEstagios.Include(e => e.Documentos).Where(e => e.MatriculaId == new Guid("D41BC26F-DC80-4F33-8EEC-3727B37846C0")).FirstOrDefaultAsync();
+            if (estagio == null) return Ok(new { status = "sem liberação" });
 
-            // Ou mostrar estágios
+            var docsLiberados = estagio.Documentos.Where(d => d.Status == StatusDocumento.Aprovado.DisplayName);
 
-            return Ok(new { status = "no aguardo" });
+            if(docsLiberados.Count() == estagio.Documentos.Count())
+            {
+                //var natriculas = pegar os estagios em que está matriculado
+                //var estagios = pegar os liberados para se matricular
+                return Ok(new { status = "liberado" });
+            }
+            else
+            {
+                return Ok(new { status = "no aguardo" });
+            }            
 
         }
 
@@ -48,6 +61,34 @@ namespace Invictus.Api.Controllers.Aluno
 
             return Ok(new { documentos = documentos });
 
+        }
+
+        [HttpGet]
+        [Route("tipo/{matriculaId}")]
+        public async Task<IActionResult> GetEstagiosLiberados(Guid matriculaId)
+        {
+            var tipos = await _alunoSiaQueries.GetEstagiosTiposLiberadosDoAluno(matriculaId);
+
+            return Ok(new { tipos = tipos });
+
+        }
+
+        [HttpGet]
+        [Route("liberados/{tipoEstagioId}")]
+        public async Task<IActionResult> GetEstagios(Guid tipoEstagioId)
+        {
+            var estagios = await _alunoSiaQueries.GetEstagiosLiberados(tipoEstagioId);
+
+            return Ok(new { estagios = estagios });
+        }
+
+        [HttpGet]
+        [Route("busca/{estagioId}")]
+        public async Task<IActionResult> GetEstagio(Guid estagioId)
+        {
+            var estagio = await _alunoSiaQueries.GetEstagio(estagioId);
+
+            return Ok(new { estagio = estagio });
         }
 
         [HttpPost]        

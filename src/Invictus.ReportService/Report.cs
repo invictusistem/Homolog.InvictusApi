@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace Invictus.ReportService
 {
+    //public interface IDownloadReport
+    //{
+    //    ClientRequestDto parametros { get; set; }
+    //    Task<byte[]> ExportFile(IEnumerable<MediaPulseReturn> workOrders, string site);
+    //}
     public class ExportExcelCDE //: IDownloadReport
     {
        // public ParametrosDTO parametros { get; set; }

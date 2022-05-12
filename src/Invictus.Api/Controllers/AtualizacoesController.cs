@@ -75,6 +75,10 @@ namespace Invictus.Api.Controllers
 
             // atualizar lista notas diariamente !?
 
+            // ver a turma e se todas as aulas já foram dadas e notas lançadas para mudar status para concluído
+
+            // criar os dados da Tabela TurmasPresencas diariamente
+
             return Ok();
         }
 

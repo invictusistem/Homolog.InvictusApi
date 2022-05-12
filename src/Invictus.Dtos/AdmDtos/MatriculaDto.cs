@@ -8,6 +8,7 @@ namespace Invictus.Dtos.AdmDtos
 {
     public class MatriculaDto
     {
+        public Guid id { get; set; }
         public Guid alunoId { get; set; }
         public string numeroMatricula { get; set; }
         public string nome { get; set; }

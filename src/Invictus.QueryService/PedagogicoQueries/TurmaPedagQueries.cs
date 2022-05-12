@@ -6,6 +6,7 @@ using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -114,13 +115,40 @@ namespace Invictus.QueryService.PedagogicoQueries
 
         public async Task<IEnumerable<TurmaNotasViewModel>> GetNotaAluno(Guid matriculaId)
         {
-            var query = @"select * from turmasNotas where TurmasNotas.MatriculaId = @matriculaId ";
+            //var query = @"select * from turmasNotas where TurmasNotas.MatriculaId = @matriculaId ";
+            var date = DateTime.Now;
+            //var hoje = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
 
-            var matriculaQuery = @"SELECT Matriculas.TurmaId, matriculas.alunoId FROM Matriculas WHERE Matriculas.Id = @matriculaId ";
+            var query = @" SELECT
+                        TurmasNotas.id,
+                        TurmasNotas.AvaliacaoUm,
+                        TurmasNotas.AvaliacaoDois,
+                        TurmasNotas.AvaliacaoTres,
+                        TurmasNotas.SegundaChamadaAvaliacaoUm,
+                        TurmasNotas.SegundaChamadaAvaliacaoDois,
+                        TurmasNotas.SegundaChamadaAvaliacaoTres,
+                        TurmasNotas.MateriaId,
+                        TurmasNotas.MateriaDescricao,
+                        TurmasNotas.Resultado,
+                        TurmasNotas.MatriculaId,
+                        TurmasNotas.TurmaId,
+                        TurmasMaterias.ordem
+                        FROM turmasNotas
+                        INNER JOIN TurmasMaterias on TurmasNotas.MateriaId = TurmasMaterias.Id
+                        WHERE TurmasNotas.MatriculaId = @matriculaId ";
 
-            var calendariosQuery = @"select * from calendarios where calendarios.turmaId = @turmaId ";
+            var queryPresencas = @"SELECT 
+                                Calendarios.MateriaId,
+                                TurmasPresencas.IsPresentToString
+                                FROM Calendarios
+                                INNER JOIN TurmasPresencas on Calendarios.Id = TurmasPresencas.CalendarioId
+                                WHERE TurmasPresencas.MatriculaId = @matriculaId
+                                AND Calendarios.DiaAula < @date ";
+            //var matriculaQuery = @"SELECT Matriculas.TurmaId, matriculas.alunoId FROM Matriculas WHERE Matriculas.Id = @matriculaId ";
 
-            var presencasQuery = @"SELECT * FROM TurmasPresencas WHERE calendarios.turmaId = @turmaId ";
+            // var calendariosQuery = @"select * from calendarios where calendarios.turmaId = @turmaId ";
+
+            //var presencasQuery = @"SELECT * FROM TurmasPresencas WHERE calendarios.turmaId = @turmaId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -129,15 +157,27 @@ namespace Invictus.QueryService.PedagogicoQueries
                 // as notas sao criadas ao matricular o aluno
                 var notas = await connection.QueryAsync<TurmaNotasViewModel>(query, new { matriculaId = matriculaId });
 
-                var matricula = await connection.QuerySingleAsync<MatriculaDto>(matriculaQuery, new { matriculaId = matriculaId });
+                var presencas = await connection.QueryAsync<TurmaPresencaViewModel>(queryPresencas, new { matriculaId = matriculaId, date = date });
+
+                foreach (var nota in notas)
+                {
+                    var presencasNaMateria = presencas.Where(p => p.materiaId == nota.materiaId & p.IsPresentToString == "F");
+
+                    nota.qntFaltas = presencasNaMateria.Count();
+
+
+                }
+                //foreach (var nota in notas)
+                //{
+                //    nota.ordem = await connection.QuerySingleAsync<int>(queryOrdem, new { materiaId = nota.materiaId });
+                //}
+                //var matricula = await connection.QuerySingleAsync<MatriculaDto>(matriculaQuery, new { matriculaId = matriculaId });
 
                 // var aulas = await connection.QueryAsync<CalendarioDto>(calendarios, new { turmaId = matricula.turmaId });
 
                 //var presencas = await connection.QueryAsync<Calenda rioDto>(presencasQuery, new { turmaId = matricula.turmaId });
 
-
-
-                return notas;
+                return notas.OrderBy(n => n.ordem);
 
             }
         }

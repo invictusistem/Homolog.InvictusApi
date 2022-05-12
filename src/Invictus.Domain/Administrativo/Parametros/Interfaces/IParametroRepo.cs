@@ -10,6 +10,7 @@ namespace Invictus.Domain.Administrativo.Parametros.Interfaces
     {
         Task AddParamValue(ParametrosValue parametro);
         Task EditParamValue(ParametrosValue parametro);
+        Task RemoveParamValue(Guid paramId);
         void Commit();
     }
 }

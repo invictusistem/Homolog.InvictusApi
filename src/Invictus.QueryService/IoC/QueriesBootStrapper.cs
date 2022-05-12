@@ -36,6 +36,7 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IPlanoPagamentoQueries, PlanoPagamentoQueries>();
             services.AddScoped<IProdutoQueries, ProdutoQueries>();
             services.AddScoped<IProfessorQueries, ProfessorQueries>();
+            services.AddScoped<IRequerimentoQueries, RequerimentoQueries>();
             services.AddScoped<ITemplateQueries, TemplateQueries>();
             services.AddScoped<IUnidadeQueries, UnidadeQueries>();
             services.AddScoped<ITurmaQueries, TurmaQueries>();
@@ -52,6 +53,7 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IAlunoSiaQueries, AlunoSiaQueries > ();
 
             //Financeiro
+            services.AddScoped<IFinConfigQueries, FinConfigQueries>();
             services.AddScoped<IBolsasQueries, BolsasQueries>();
             services.AddScoped<IFornecedorQueries, FornecedorQueries>();
             services.AddScoped<IFinanceiroQueries, FinancQueries>();

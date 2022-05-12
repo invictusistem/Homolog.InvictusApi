@@ -11,6 +11,7 @@ using Invictus.Data.Mapping.AdmMappings.ModelMapping;
 using Invictus.Data.Mapping.AdmMappings.PacoteMapping;
 using Invictus.Data.Mapping.AdmMappings.ParametrosMapping;
 using Invictus.Data.Mapping.AdmMappings.ProfessorMapping;
+using Invictus.Data.Mapping.AdmMappings.RequerimentoMapping;
 using Invictus.Data.Mapping.AdmMappings.ResponsavelMapping;
 using Invictus.Data.Mapping.AdmMappings.TurmaAggregateMapping;
 using Invictus.Data.Mapping.AdmMappings.UnidadeMapping;
@@ -51,6 +52,8 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new DisponibilidadeDbMapping());
             modelBuilder.ApplyConfiguration(new MateriaHabilitadaDbMapping());
             modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
+            modelBuilder.ApplyConfiguration(new RequerimentoDbMapping());
+            modelBuilder.ApplyConfiguration(new TipoRequerimentoDbMapping());
             modelBuilder.ApplyConfiguration(new ResponsavelDbMapping());
             modelBuilder.ApplyConfiguration(new HorariosDbMapping());
             modelBuilder.ApplyConfiguration(new PresencaDbMapping());

@@ -11,19 +11,19 @@ namespace Invictus.Domain.Padagogico.Estagio
         {
 
         }
-        public MatriculaEstagio(StatusMatricula status,
-                                //Guid alunoId,
-                                Guid matriculaId,
-                                Guid typeEstagioId
-                                )
-        {
-            //AlunoId = alunoId;
-            Status = status.DisplayName;
-            MatriculaId = matriculaId;
-            TypeEstagioId = typeEstagioId;
-            // EstagioId = estagioId;
-            Documentos = new List<DocumentoEstagio>();
-        }
+        //public MatriculaEstagio(StatusMatricula status,
+        //                        //Guid alunoId,
+        //                        Guid matriculaId,
+        //                        Guid typeEstagioId
+        //                        )
+        //{
+        //    //AlunoId = alunoId;
+        //    Status = status.DisplayName;
+        //    MatriculaId = matriculaId;
+        //    TypeEstagioId = typeEstagioId;
+        //    // EstagioId = estagioId;
+        //    Documentos = new List<DocumentoEstagio>();
+        //}
 
         //public Guid AlunoId { get; private set; }
         public string NumeroMatricula { get; private set; }
@@ -38,10 +38,10 @@ namespace Invictus.Domain.Padagogico.Estagio
         {
             var docs = new List<DocumentoEstagio>();
 
-            docs.Add(new DocumentoEstagio("Seguro contra acidentes pessoais", "Seguro contra acidentes pessoais", false, false, null, null, null, "", null));
-            docs.Add(new DocumentoEstagio("Cartão de vacinação", "Cartão de vacinação", false, false, null, null, null, "", null));
-            docs.Add(new DocumentoEstagio("Tipo sanguíneo", "Tipo sanguíneo", false, false, null, null, null, "", null));
-            docs.Add(new DocumentoEstagio("Beta HGC recente (expedido nos últimos 30 dias)", "Beta HGC recente (expedido nos últimos 30 dias)", false, false, null, null, null, "apenas para o sexo feminino", null));
+            docs.Add(new DocumentoEstagio("Seguro contra acidentes pessoais", "Seguro contra acidentes pessoais", false, false, null, null, null, "", StatusDocumento.NaoEnviado, null));
+            docs.Add(new DocumentoEstagio("Cartão de vacinação", "Cartão de vacinação", false, false, null, null, null, "", StatusDocumento.NaoEnviado, null));
+            docs.Add(new DocumentoEstagio("Tipo sanguíneo", "Tipo sanguíneo", false, false, null, null, null, "", StatusDocumento.NaoEnviado, null));
+            docs.Add(new DocumentoEstagio("Beta HGC recente (expedido nos últimos 30 dias)", "Beta HGC recente (expedido nos últimos 30 dias)", false, false, null, null, null, "apenas para o sexo feminino", StatusDocumento.NaoEnviado, null));
 
 
             var matriculaEstagio = new MatriculaEstagio()
@@ -55,6 +55,11 @@ namespace Invictus.Domain.Padagogico.Estagio
             };
 
             return matriculaEstagio;
+        }
+
+        public void ChangeStatusEstagioMatricula(StatusMatricula status)
+        {
+            Status = status.DisplayName;
         }
 
 

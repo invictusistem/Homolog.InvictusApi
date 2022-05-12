@@ -11,6 +11,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     public interface IMateriaTemplateQueries
     {
         Task<PaginatedItemsViewModel<MateriaTemplateDto>> GetMateriasTemplateList(int itemsPerPage, int currentPage);
+        Task<IEnumerable<MateriaTemplateDto>> GetAllMaterias();
         Task<IEnumerable<MateriaTemplateDto>> GetMateriaByTypePacoteId(Guid typePacoteId);
         Task<MateriaTemplateDto> GetMateriaTemplate(Guid materiaId);
         Task<IEnumerable<MateriaTemplateDto>> GetMateriasByListIds(List<Guid> listGuidMaterias);

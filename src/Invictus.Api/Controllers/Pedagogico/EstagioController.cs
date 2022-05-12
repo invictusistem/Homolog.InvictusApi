@@ -1,10 +1,14 @@
 ﻿using Invictus.Application.PedagApplication.Interfaces;
+using Invictus.Core.Enumerations;
+using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,11 +25,16 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly IEstagioApplication _estagioApp;
         private readonly IEstagioQueries _estagioQueries;
         private readonly IAlunoQueries _alunoQueries;
-        public EstagioController(IEstagioApplication estagioApp, IEstagioQueries estagioQueries, IAlunoQueries alunoQueries)
+        private readonly InvictusDbContext _db;
+        private readonly IAspNetUser _aspUser;
+        public EstagioController(IEstagioApplication estagioApp, IEstagioQueries estagioQueries, IAlunoQueries alunoQueries, InvictusDbContext db,
+            IAspNetUser aspUser)
         {
             _estagioApp = estagioApp;
             _estagioQueries = estagioQueries;
             _alunoQueries = alunoQueries;
+            _db = db;
+            _aspUser = aspUser;
         }
 
         [HttpGet]
@@ -94,6 +103,17 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { docs = documentos });
         }
 
+        [HttpGet]
+        [Route("document/{estagioDocId}")]
+        public async Task<ActionResult> GetFile(Guid estagioDocId)
+        {   
+            var doc = await _estagioQueries.GetDocumentById(estagioDocId);
+
+            var memory = new MemoryStream(doc.dataFile);
+
+            return File(memory, doc.contentArquivo, doc.nomeArquivo);
+        }
+
         [HttpPost]
         [Route("matricular")]
         public async Task<IActionResult> CreateEstagio([FromBody] LiberarEstagioCommand command)
@@ -116,6 +136,53 @@ namespace Invictus.Api.Controllers.Pedagogico
         public async Task<IActionResult> EstagioTypeCreate([FromBody] TypeEstagioDto typeEstagio)
         {
             await _estagioApp.CreateTypeEstagio(typeEstagio);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("documentacao/{documentoId}")]
+        public async Task<IActionResult> Index(Guid documentoId, IFormFile file)
+        {
+            // IMPORANTE VERIFICAR SE O ALUNO DO TOKEN É O MSM DO DOCUMENTID
+
+            var fileName = Path.GetFileName(file.FileName);
+
+            var fileExtension = Path.GetExtension(fileName);
+
+            var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
+
+            var documento = await _db.DocumentosEstagio.FindAsync(documentoId);
+
+            byte[] arquivo = null;
+
+            using (var target = new MemoryStream())
+            {
+                file.CopyTo(target);
+                arquivo = target.ToArray();
+            }
+
+            var userId = _aspUser.ObterUsuarioId();
+
+            documento.AddFileByUsuario(arquivo, file.ContentType, fileName, userId);
+
+            await _db.DocumentosEstagio.SingleUpdateAsync(documento);
+
+            _db.SaveChanges();
+
+            // verificar status matricula
+            var docs = await _db.DocumentosEstagio.Where(d => d.MatriculaEstagioId == documento.MatriculaEstagioId).ToListAsync();
+            var docsAprovados = docs.Where(d => d.Status == "Aprovado");
+            if(docsAprovados.Count() == docs.Count())
+            {
+                var estagioMatricula = await _db.MatriculasEstagios.FindAsync(documento.MatriculaEstagioId);
+
+                estagioMatricula.ChangeStatusEstagioMatricula(StatusMatricula.AguardoEscolha);
+
+                await _db.MatriculasEstagios.SingleUpdateAsync(estagioMatricula);
+
+                _db.SaveChanges();
+            }
 
             return Ok();
         }

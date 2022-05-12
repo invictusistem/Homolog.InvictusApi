@@ -13,6 +13,7 @@ using Invictus.Data.Context;
 using Invictus.Dtos;
 using Invictus.IoC;
 using Invictus.QueryService.IoC;
+using Invictus.ReportService.IoC;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -259,6 +260,7 @@ namespace Invictus.Api
         {
             NativeInjectorBootStrapper.RegisterServices(services);
             QueriesBootStrapper.RegisterServices(services);
+            ReportBootStrapper.RegisterServices(services);
             ApplicationBootStrapper.RegisterServices(services);
         }
     }

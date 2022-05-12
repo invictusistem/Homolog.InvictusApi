@@ -296,6 +296,41 @@ namespace Invictus.Api.Controllers
             return Ok();
         }
 
+        [HttpDelete]
+        [Route("{email}")]
+        public async Task<ActionResult> DeletarUsuario(string email)
+        {   
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            var deleteUser = await _userManager.DeleteAsync(user);
+
+            if (!deleteUser.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+
+           
+
+            //await _userManager.RemoveClaimAsync
+
+            //var siglaUnidade = await _unidadeQueries.GetUnidadeById(unidadeId);   //"ALC";
+            ///*
+            // trazer a lista de claims, excluindo a que foi SLELECIONADA
+            //entao pegar, dar um FORECH CASO o resultado seja maior que 0
+            // */
+            //var result = claims.Where(c => c.Type == "Unidade" & c.Value != siglaUnidade.sigla);
+
+
+            //var claim = usuario.
+            //await _userManager.RemoveClaimAsync()
+
+
+            return Ok();
+        }
+
         static string RemoveDiacritics(string text)
         {
             var normalizedString = text.Normalize(NormalizationForm.FormD);

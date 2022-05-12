@@ -11,6 +11,7 @@ namespace Invictus.Domain.Administrativo.MatTemplate.Interfaces
     {
         Task Save(MateriaTemplate materia);
         Task Edit(MateriaTemplate materia);
+        Task Remove(Guid materiaId);
         void Commit();
     }
 }

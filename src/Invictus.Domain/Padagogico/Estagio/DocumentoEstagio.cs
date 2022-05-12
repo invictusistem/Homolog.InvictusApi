@@ -1,4 +1,5 @@
 ﻿using Invictus.Core;
+using Invictus.Core.Enumerations;
 using System;
 
 namespace Invictus.Domain.Padagogico.Estagio
@@ -15,6 +16,7 @@ namespace Invictus.Domain.Padagogico.Estagio
                               string contentArquivo,
                               byte[] dataFile,
                               string observacao,
+                              StatusDocumento status,
                               DateTime? dataCriacao)
         {  
             Descricao = descricao;
@@ -25,6 +27,7 @@ namespace Invictus.Domain.Padagogico.Estagio
             ContentArquivo = contentArquivo;
             DataFile = dataFile;
             Observacao = observacao;
+            Status = status.DisplayName;
             DataCriacao = dataCriacao;
 
         }
@@ -42,6 +45,8 @@ namespace Invictus.Domain.Padagogico.Estagio
         public DateTime? DataCriacao { get; private set; }
         public string Observacao { get; private set; }
         public Guid MatriculaEstagioId { get; private set; }
+        public Guid ResponsavelAnalise { get; private set; }
+        public string Status { get; private set; }
         public virtual MatriculaEstagio MatriculaEstagio { get; private set; }
 
         //public void AddDataByte(byte[] bytes)
@@ -49,10 +54,22 @@ namespace Invictus.Domain.Padagogico.Estagio
         //    DataFile = bytes;
         //}
 
-        public void ValidarDoc(bool validado)
+
+
+        public void ValidarDoc(bool validado, Guid responsavelId)
         {
             Analisado = true;
             Validado = validado;
+            if(validado == true)
+            {
+                Status = StatusDocumento.Aprovado.DisplayName;
+            }
+            else
+            {
+                Status = StatusDocumento.Reprovado.DisplayName;
+            }
+
+            ResponsavelAnalise = responsavelId;
         }
 
         public void AddFileByAluno(byte[] dataFile, string content, string fileName)
@@ -61,6 +78,19 @@ namespace Invictus.Domain.Padagogico.Estagio
             DataFile = dataFile;
             ContentArquivo = content;
             NomeArquivo = fileName;
+            Status = StatusDocumento.AguardandoAnalise.DisplayName;
+        }
+
+        public void AddFileByUsuario(byte[] dataFile, string content, string fileName, Guid responsavelId)
+        {
+            DataCriacao = DateTime.Now;
+            DataFile = dataFile;
+            ContentArquivo = content;
+            NomeArquivo = fileName;
+            Analisado = true;
+            Validado = true;
+            ResponsavelAnalise = responsavelId;
+            Status = StatusDocumento.Aprovado.DisplayName;
         }
     }
 }

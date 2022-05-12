@@ -13,6 +13,7 @@ namespace Invictus.Core.Enumerations
         public static StatusMatricula Regular = new(3, "Regular");
         public static StatusMatricula Encerrada = new(4, "Encerrada");
         public static StatusMatricula AguardoDocumentacao = new(5, "Aguardando envio/análise documental");
+        public static StatusMatricula AguardoEscolha = new(6, "Aguardando escolha do aluno");
 
 
         //public static Status Encerrada = new(4, "Encerrada");

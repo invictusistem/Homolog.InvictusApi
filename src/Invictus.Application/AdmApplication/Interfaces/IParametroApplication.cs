@@ -11,5 +11,6 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
         Task SaveCargo(string key, ParametroValueDto paramValue);
         Task EditCargo(ParametroValueDto paramValue);
+        Task RemoeValueById(Guid paramId);
     }
 }

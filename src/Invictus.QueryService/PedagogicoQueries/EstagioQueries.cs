@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -19,10 +20,12 @@ namespace Invictus.QueryService.PedagogicoQueries
     {
         private readonly IConfiguration _config;
         private readonly IUnidadeQueries _unidadeQueries;
-        public EstagioQueries(IConfiguration config, IUnidadeQueries unidadeQueries)
+        private readonly IAspNetUser _aspNetUser;
+        public EstagioQueries(IConfiguration config, IUnidadeQueries unidadeQueries, IAspNetUser aspNetUser)
         {
             _config = config;
             _unidadeQueries = unidadeQueries;
+            _aspNetUser = aspNetUser;
         }
         public async Task<EstagioDto> GetEstagioById(Guid estagioId)
         {
@@ -223,11 +226,12 @@ namespace Invictus.QueryService.PedagogicoQueries
                         EstagioDocumentos.nomeArquivo,
                         EstagioDocumentos.ContentArquivo,
                         EstagioDocumentos.dataFile,
-                        EstagioDocumentos.DataCriacao
+                        EstagioDocumentos.DataCriacao,
+                        EstagioDocumentos.Status
                         FROM EstagiosMatriculas
                         INNER JOIN EstagioDocumentos ON EstagiosMatriculas.Id = EstagioDocumentos.MatriculaEstagioId
                         INNER JOIN Matriculas ON EstagiosMatriculas.MatriculaId = Matriculas.Id
-                        WHERE Matriculas.Id = 'D41BC26F-DC80-4F33-8EEC-3727B37846C0'";
+                        WHERE Matriculas.Id = @matriculaId";
 
 
             await using (var connection = new SqlConnection(
@@ -242,5 +246,28 @@ namespace Invictus.QueryService.PedagogicoQueries
                 return documentacao;
             }
         }
+
+        public async Task<DocumentoEstagioDto> GetDocumentById(Guid estagioDocId)
+        {
+            var user = _aspNetUser.ObterUsuarioId();
+
+            var query = @"SELECT * FROM EstagioDocumentos WHERE EstagioDocumentos.id = @estagioDocId";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QuerySingleAsync<DocumentoEstagioDto>(query, new { estagioDocId = estagioDocId });
+
+
+
+
+                return result;
+
+            }
+        }
+
+        
     }
 }

@@ -124,6 +124,40 @@ namespace Invictus.Application.ReportService
 
             return file;// File(file, "application/pdf");
         }
+
+        public async Task<byte[]> GenerateContratoExemplo(GenerateContratoDTO info, Guid contratoId)
+        {
+            var contrato = await _contratoQueries.GetContratoById(contratoId);
+
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PDF Report"
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = ContratoTemplate.GenerateExemplo(info, contrato),// _template.GetContratoHTMLString(conteudos),// TemplateGenerator.GetHTMLString(),//@"<div><div style=""color: red""> PDF </div></div>", //TemplateGenerator.GetHTMLString(),
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") }
+                //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "", Line = false },
+                //FooterSettings = { FontName = "Arial", FontSize = 9, Line = false, Center = "" }
+            };
+
+
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            var file = _converter.Convert(pdf);
+
+
+
+            return file;// File(file, "application/pdf");
+        }
     }
 
     public class GenerateFichaMatriculaDTO

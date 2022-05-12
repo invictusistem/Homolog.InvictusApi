@@ -10,6 +10,7 @@ namespace Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate.Interface
     {
         Task SaveDoc(DocumentacaoTemplate doc);
         Task EditDoc(DocumentacaoTemplate doc);
+        Task Delete(Guid documentoId);
         void Commit();
 
     }

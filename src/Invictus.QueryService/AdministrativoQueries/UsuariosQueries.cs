@@ -4,6 +4,7 @@ using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -66,8 +67,9 @@ namespace Invictus.QueryService.AdministrativoQueries
             if (param.nome != "") query.Append(" AND LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
             if (param.email != "") query.Append(" AND LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
             if (param.cpf != "") query.Append(" AND LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
+            if(param.todasUnidades == false) query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
             //if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
+            query.Append(" WHERE AspNetUserClaims.ClaimType = 'IsActive' ");
             query.Append(" ORDER BY Colaboradores.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
@@ -77,31 +79,32 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var alunoDictionary = new Dictionary<Guid, UsuarioDto>();
+                var usuarios = await connection.QueryAsync<UsuarioDto>(query.ToString());
 
-                var usuarios = connection.Query<UsuarioDto, Claims, UsuarioDto>(query.ToString(),
-                    (usuario, claim) =>
-                    {
-                        UsuarioDto usuarioentry;
+                //var alunoDictionary = new Dictionary<Guid, UsuarioDto>();
 
-                        if (!alunoDictionary.TryGetValue(usuario.id, out usuarioentry))
-                        {
-                            usuarioentry = usuario;
-                            usuarioentry.claims = new List<Claims>();
-                            alunoDictionary.Add(usuarioentry.id, usuarioentry);
-                        }
+                //var usuarios = connection.Query<UsuarioDto, Claims, UsuarioDto>(query.ToString(),
+                //    (usuario, claim) =>
+                //    {
+                //        UsuarioDto usuarioentry;
 
-                        return usuarioentry;
+                //        if (!alunoDictionary.TryGetValue(usuario.id, out usuarioentry))
+                //        {
+                //            usuarioentry = usuario;
+                //            usuarioentry.claims = new List<Claims>();
+                //            alunoDictionary.Add(usuarioentry.id, usuarioentry);
+                //        }
 
-                    }, splitOn: "ClamId").Distinct().ToList();
+                //        return usuarioentry;
 
-                connection.Close();
+                //    }, splitOn: "ClamId").DistinctBy(u => u.id).ToList();
 
-                foreach (var item in usuarios)
-                {
-                    //var claim = item.claims.Where(c => c.clamType == "IsActive").Select(c => c.clamKey).FirstOrDefault();
-                    item.ativo = await GetSesuarioEstaAtivo(item.id);
-                }
+                //connection.Close();
+
+                //foreach (var item in usuarios)
+                //{   
+                //    item.ativo = await GetSesuarioEstaAtivo(item.id);
+                //}
 
                 return usuarios;
 
@@ -138,9 +141,9 @@ namespace Invictus.QueryService.AdministrativoQueries
         private async Task<int> CountUsuariosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
             StringBuilder query = new StringBuilder();
-            query.Append(@"SELECT Count(DISTINCT Colaboradores.id)   
+            query.Append(@"SELECT Count(*)  
              from Colaboradores 
-             inner join Unidades on Colaboradores.UnidadeId = Unidades.Id 
+             inner join Unidades on Colaboradores.UnidadeId = Unidades.Id
              inner join AspNetUsers on Colaboradores.Email = AspNetUsers.Email  
              inner join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId 
              inner join AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId 
@@ -149,11 +152,10 @@ namespace Invictus.QueryService.AdministrativoQueries
             if (param.nome != "") query.Append(" AND LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
             if (param.email != "") query.Append(" AND LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
             if (param.cpf != "") query.Append(" AND LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
-            //if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
+            if (param.todasUnidades == false) query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
+            query.Append(" WHERE AspNetUserClaims.ClaimType = 'IsActive' ");
             //query.Append(" ORDER BY Colaboradores.Nome ");
-            //query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
-
+            
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -165,7 +167,6 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return countItems;
-
             }
         }
 

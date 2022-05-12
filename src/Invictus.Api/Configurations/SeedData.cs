@@ -50,7 +50,7 @@ namespace Invictus.Api.Configurations
                         parmKey = new ParametrosKey("Cargo", null, true);
                         context.ParametrosKeys.Add(parmKey);
 
-                        paramValue = new ParametrosValue("Desenvolvedor", null, null, parmKey.Id);
+                        paramValue = new ParametrosValue("Desenvolvedor", null, null, true, parmKey.Id);
                         context.ParametrosValues.Add(paramValue);
 
                         context.SaveChanges();

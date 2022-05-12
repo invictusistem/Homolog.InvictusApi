@@ -39,6 +39,7 @@ namespace Invictus.Application.AdmApplication
     public class MatriculaApplication : IMatriculaApplication
     {
         private readonly IPlanoPagamentoQueries _planoQueries;
+        private readonly ICalendarioQueries _calendQueries;
         private readonly IColaboradorQueries _colabQueries;
         private readonly IBoletoService _boletoService;
         private readonly IAlunoQueries _alunoQueries;
@@ -79,7 +80,7 @@ namespace Invictus.Application.AdmApplication
             IMatriculaQueries matQueries, IRespRepo respRepo, IAspNetUser aspNetUser, IAlunoPedagRepo alunoPedagRepo,
             IBoletoService boletoService, IDebitosRepos debitoRepos, BackgroundWorkerQueue backgroundWorkerQueue, ILogger<MatriculaApplication> logger,
             InvictusDbContext db, IServiceScopeFactory serviceScopeFactory, IColaboradorQueries colabQueries,
-            IReportServices reportService, IUnidadeQueries unidadeQueries, UserManager<IdentityUser> userManager)
+            IReportServices reportService, IUnidadeQueries unidadeQueries, UserManager<IdentityUser> userManager, ICalendarioQueries calendQueries)
         {
             _colabQueries = colabQueries;
             _planoQueries = planoQueries;
@@ -115,6 +116,7 @@ namespace Invictus.Application.AdmApplication
             _db = db;
             _serviceScopeFactory = serviceScopeFactory;
             _userManager = userManager;
+            _calendQueries = calendQueries;
         }
 
         public void AddParams(Guid turmaId, Guid alunoId, MatriculaCommand command) { _turmaId = turmaId; _alunoId = alunoId; _command = command; }
@@ -152,6 +154,8 @@ namespace Invictus.Application.AdmApplication
 
             await CreateNotasDoAlunoNaTurma();
 
+            await CreateListaPresencas();
+
             await CreateResponsaveis();
 
             await SaveFichaMatricula();
@@ -184,8 +188,9 @@ namespace Invictus.Application.AdmApplication
             await GenerateAlunoLogin();
 
             return _newMatriculaId;
-        }
-        
+        }        
+
+
         private async Task<bool> VerificarSeConfirmacaoMatricula()
         {
             if (_command.plano.confirmacaoPagmMat)
@@ -302,6 +307,23 @@ namespace Invictus.Application.AdmApplication
             }
 
             await _turmaNotasRepo.SaveList(_turmaNotas);
+        }
+
+        private async Task CreateListaPresencas()
+        {
+            var calendarios = await _calendQueries.GetCalendarioByTurmaId(_turmaId);
+
+            var presencas = new List<Presenca>();
+
+            foreach (var calendario in calendarios)
+            {
+                var presenca = new Presenca(calendario.id, null, _alunoId, _newMatriculaId, null);
+
+                presencas.Add(presenca);
+
+            }
+
+            await _turmaRepo.SaveListPresencas(presencas);
         }
 
         private async Task CreateResponsaveis()

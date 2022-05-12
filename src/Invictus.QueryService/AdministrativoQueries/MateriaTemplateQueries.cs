@@ -132,5 +132,33 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return resultado.OrderBy(r => r.nome);
             }
         }
+
+        public async Task<IEnumerable<MateriaTemplateDto>> GetAllMaterias()
+        {
+            var query = @"SELECT 
+                        MateriasTemplate.id,
+                        MateriasTemplate.nome,
+                        MateriasTemplate.descricao,
+                        MateriasTemplate.modalidade,
+                        MateriasTemplate.CargaHoraria,
+                        MateriasTemplate.Ativo,
+                        MateriasTemplate.TypePacoteId,
+                        TypePacote.nome as typePacoteNome
+                        FROM MateriasTemplate 
+                        INNER JOIN TypePacote on MateriasTemplate.TypePacoteId = TypePacote.Id
+                        ORDER BY MateriasTemplate.Nome";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var resultado = await connection.QueryAsync<MateriaTemplateDto>(query);
+
+                connection.Close();
+
+                return resultado.OrderBy(r => r.nome);
+            }
+        }
     }
 }

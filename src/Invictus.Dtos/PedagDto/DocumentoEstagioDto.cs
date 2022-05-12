@@ -11,9 +11,12 @@ namespace Invictus.Dtos.PedagDto
         public bool validado { get; set; }
         public string tipoArquivo { get; set; }
         public string contentArquivo { get; set; }
-        public string nomeArquivo { get; private set; }
+        public string nomeArquivo { get; set; }
         public byte[] dataFile { get; set; }
         public DateTime? dataCriacao { get; set; }
-        public string observacao { get; set; }  
+        public string observacao { get; set; }
+        public string status { get; set; }
+        public Guid matriculaEstagioId { get; set; }
+        public Guid responsavelAnalise { get; set; }
     }
 }

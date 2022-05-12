@@ -20,6 +20,7 @@ namespace Invictus.Dtos.AdmDtos
         //public string cargo { get; set; }
         public Guid cargoId { get; set; }
         public Guid unidadeId { get; set; }
+        public string unidadeSigla { get; set; }
         public string numero { get; set; }
         public bool isProfessor { get; set; }
         public bool isColaborador { get; set; }

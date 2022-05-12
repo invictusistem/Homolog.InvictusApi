@@ -38,5 +38,11 @@ namespace Invictus.Data.Repositories.Administrativo
         {
             _db.SaveChanges();
         }
+
+        public async Task Remove(Guid materiaId)
+        {
+            var materia = await _db.MateriasTemplates.FindAsync(materiaId);
+            await _db.MateriasTemplates.SingleDeleteAsync(materia);
+        }
     }
 }

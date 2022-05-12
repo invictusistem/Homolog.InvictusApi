@@ -11,6 +11,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
         Task AddMateria(MateriaTemplateDto materia);
         Task EditMateria(MateriaTemplateDto materia);
+        Task DeleteMateria(Guid materiaId);
 
     }
 }

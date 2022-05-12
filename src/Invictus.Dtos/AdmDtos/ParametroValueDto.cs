@@ -12,6 +12,7 @@ namespace Invictus.Dtos.AdmDtos
         public string value { get; set; }
         public string descricao { get; set; }
         public string comentario { get; set; }
+        public bool ativo { get; set; }
         public Guid parametrosKeyId { get; set; }
 
     }

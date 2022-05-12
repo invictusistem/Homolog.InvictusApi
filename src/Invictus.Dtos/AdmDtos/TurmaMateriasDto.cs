@@ -14,6 +14,7 @@ namespace Invictus.Dtos.AdmDtos
         public string modalidade { get; set; }
         public int cargaHoraria { get; set; }
         public bool ativo { get; set; }
+        public int ordem { get; set; }
         public Guid materiaId { get; set; }
         public Guid typePacoteId { get; set; }
         public Guid professorId { get; set; }

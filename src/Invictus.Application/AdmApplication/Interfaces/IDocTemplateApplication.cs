@@ -11,6 +11,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
         Task AddDoc(DocumentacaoTemplateDto doc);
         Task EditDoc(DocumentacaoTemplateDto doc);
+        Task RemoveDoc(Guid documentoId);
 
     }
 }

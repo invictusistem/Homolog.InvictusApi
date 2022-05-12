@@ -42,6 +42,7 @@
 		<ProjectReference Include="..\Invictus.Data\Invictus.Data.csproj" />
 		<ProjectReference Include="..\Invictus.Dtos\Invictus.Dtos.csproj" />
 		<ProjectReference Include="..\Invictus.IoC\Invictus.IoC.csproj" />
+		<ProjectReference Include="..\Invictus.ReportService\Invictus.ReportService.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

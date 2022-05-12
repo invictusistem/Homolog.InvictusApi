@@ -10,5 +10,8 @@ namespace Invictus.QueryService.AlunoSia.Interfaces
     public interface IAlunoSiaQueries
     {
         Task<IEnumerable<DocumentoEstagioDto>> GetDocumentosEstagio(Guid matriculaId);
+        Task<IEnumerable<TypeEstagioDto>> GetEstagiosTiposLiberadosDoAluno(Guid matriculaId);
+        Task<IEnumerable<EstagioDto>> GetEstagiosLiberados(Guid tipoEstagioId);
+        Task<EstagioDto> GetEstagio(Guid estagioId);
     }
 }

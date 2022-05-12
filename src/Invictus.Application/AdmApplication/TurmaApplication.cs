@@ -76,8 +76,21 @@ namespace Invictus.Application.AdmApplication
             return dia;
         }
 
+        public string FixHour(string timeStamp)
+        {
+            string hour = timeStamp.Substring(0, 2) + ":" + timeStamp.Substring(2, 2);
+
+            return hour;
+        }
+
         public async Task CreateTurma(CreateTurmaCommand command)
         {
+
+            foreach (var dia in command.diasSemana)
+            {
+                dia.horarioInicio = FixHour(dia.horarioInicio);
+                dia.horarioFim = FixHour(dia.horarioFim);
+            }
             command.diasSemana = SetMinutosTotaisDaAula(command.diasSemana);
             var sala = await _unidadeQueries.GetSala(command.salaId);
             var siglaUnidade = _aspNetUser.ObterUnidadeDoUsuario();
@@ -147,7 +160,7 @@ namespace Invictus.Application.AdmApplication
                         calend.SetMateriaId(pacote.materiaId);
 
                         calendarios.Add(calend);
-                        
+
 
                         if (command.diasSemana.Count() == 1)
                         {
@@ -157,7 +170,7 @@ namespace Invictus.Application.AdmApplication
                         {
                             qntDiasSemana++;
 
-                            if(qntDiasSemana == command.diasSemana.Count())
+                            if (qntDiasSemana == command.diasSemana.Count())
                             {
                                 qntDiasSemana = 0;
                             }
@@ -168,7 +181,7 @@ namespace Invictus.Application.AdmApplication
                     {
                         var ultimoDia = calendarios.Last();
                         var dia = calendarios.Last().DiaAula.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[qntDiasSemana].diaSemana));
-                        
+
                         var calend = new Calendario(dia,
                                         command.diasSemana[qntDiasSemana].diaSemana,
                                         command.diasSemana[qntDiasSemana].horarioInicio,
@@ -181,7 +194,7 @@ namespace Invictus.Application.AdmApplication
                         calend.SetMateriaId(pacote.materiaId);
 
                         calendarios.Add(calend);
-                        
+
                         if (command.diasSemana.Count() == 1)
                         {
                             qntDiasSemana = 0;
@@ -208,6 +221,7 @@ namespace Invictus.Application.AdmApplication
 
             _turmaRepo.Commit();
 
+           
 
             var colab = _aspNetUser.ObterUsuarioId();
             var commandJson = JsonConvert.SerializeObject(command);
@@ -215,124 +229,9 @@ namespace Invictus.Application.AdmApplication
 
             _db.LogTurmas.Add(log);
             _db.SaveChanges();
-            
-
-            // setando o primeiro dia do calendario
-
-            //if(command.prevInicio_1.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana))
-            //{
-            //    calendarios.Add(new CalendarioDto() { diaAula = command.prevInicio_1 });
-            //}
-            //else
-            //{
-            //    var diaInicial = command.prevInicio_1.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana));
-            //    calendarios.Add(new CalendarioDto() { diaAula = command.prevInicio_1 });
-            //}
-
-            //calendarios.Add(command.prevInicio_1.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana)));
-
-            //var startDay = command.prevInicio_1.DayOfWeek == DiaDaSemana.TryParseToDayofWeek(command.diasSemana[0].diaSemana);
-            //calendarios.
-
-            //var AulaAtual = Guid.NewGuid();
-            //var diaInicial = command.prevInicio_1.AddDays(-1);
-            //var totalMinutes = 0;
-            //for (int dias = 0; dias < pacotesMaterias.Count(); dias++)
-            //{
-            //    while (totalMinutes > 0)
-            //    {
 
 
-            //    }
-
-            //    foreach (var diaSemana in command.diasSemana)
-            //    {
-            //        if (calendarios.Count() == 0)
-            //        {
-            //            calendarios.Add(new CalendarioDto()
-            //            {
-            //                diaAula = diaInicial.GetTheNexDayOfTheWeekByWeek(DiaDaSemana.TryParseToDayofWeek(diaSemana.diaSemana)),
-            //                diaDaSemana = "x",
-            //                materiaId = AulaAtual,
-            //                horaInicial = "x",
-            //                horaFinal = "x"
-            //            });
-            //        }
-            //    }
-
-
-
-
-            //    //var dia = calendarios.Last();
-
-            //}
-
-
-            // OLD
-            // CreateCalendarioDaTurma()
-            /*
-            var datas = command.prevInicio_1.EachDay(command.prevTermino_3);
-            var datasFiltradas = new List<DateTime>();
-            foreach (var dia in command.diasSemana)
-            {
-                var diaSemana = DiaDaSemana.TryParseToDayofWeek(dia.diaSemana);
-                datasFiltradas.AddRange(datas.Where(d => d.DayOfWeek == diaSemana));
-            }
-
-            var todasDatas = datasFiltradas.OrderBy(d => d.Date);
-
-            var calendarios = new List<Calendario>();
-
-            var i = 0;
-            foreach (var dat in todasDatas)
-            {  
-                if (i == command.diasSemana.Count()) { i = 0; }
-
-                calendarios.Add(new Calendario(dat, DiaDaSemana.TryParse(dat.DayOfWeek).DisplayName, command.diasSemana[i].horarioInicio, command.diasSemana[i].horarioFim, turma.Id, unidade.id, false, false, command.salaId));
-
-                i++;
-            }
-
-            //foreach (var item in feriados)
-            //{
-            //    calendarios.RemoveAll(c => c.DiaAula.Day == item.Day & c.DiaAula.Month == item.Month);
-            //}
-
-
-            var pacotesMaterias = await _pacoteQueries.GetMateriasPacote(command.pacoteId);
-
-            var aulasPresenciais = pacotesMaterias.Where(p => p.modalidade == "Presencial").ToList();
-
-            var diaCalendario = 0;
-            for (int mat = 0; mat < aulasPresenciais.Count(); mat++)
-            {
-                double horasTotaisDaMateriaEmMinutos = aulasPresenciais[mat].cargaHoraria * 60;
-
-                while (!DoubleExtensions.NegativeOrZero(horasTotaisDaMateriaEmMinutos))
-                {
-                    if (diaCalendario >= calendarios.Count()) return;
-                    calendarios[diaCalendario].SetMateriaId(aulasPresenciais[mat].materiaId);
-
-                    var horaIni = calendarios[diaCalendario].HoraInicial.Split(":");
-                    var horaInicial = new DateTime(2020, 1, 1, Convert.ToInt32(horaIni[0]), Convert.ToInt32(horaIni[1]), 0);
-
-                    var horaFim = calendarios[diaCalendario].HoraFinal.Split(":");
-                    var horaFinal = new DateTime(2020, 1, 1, Convert.ToInt32(horaFim[0]), Convert.ToInt32(horaFim[1]), 0);
-
-                    TimeSpan totalMinutos = horaFinal - horaInicial;
-
-                    double minutos = totalMinutos.TotalMinutes;
-
-                    horasTotaisDaMateriaEmMinutos -= minutos;
-
-                    diaCalendario++;
-                }
-            }
-
-            await _calendarioRepo.SaveCalendarios(calendarios);
-
-            _turmaRepo.Commit();
-            */
+           
         }
 
         private List<DiasSemanaCommand> SetMinutosTotaisDaAula(List<DiasSemanaCommand> diasSemana)
@@ -515,7 +414,8 @@ namespace Invictus.Application.AdmApplication
 
             foreach (var presenca in presencaList)
             {
-                presenca.SetPresenca(presenca.IsPresentToString);
+                if (!String.IsNullOrEmpty(presenca.IsPresentToString))
+                    presenca.SetPresenca(presenca.IsPresentToString);
             }
 
             //var calendarioDto = await _calendarioQueries.GetCalendarioById(saveCommand.aulaViewModel.id);// _context.Calendarios.Find(savePresencaCommand.calendarId);

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Invictus.Dtos.AdmDtos
 {
@@ -14,6 +10,7 @@ namespace Invictus.Dtos.AdmDtos
         public string modalidade { get; set; }
         public int cargaHoraria { get; set; }
         public Guid typePacoteId { get; set; }
+        public string typePacoteNome { get; set; }
         public bool ativo { get; set; }
 
     }

@@ -33,6 +33,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IPlanoPagamentoApplication, PlanoPagamentoApplication>();
             services.AddScoped<IProdutoApplication, ProdutoApplication>();
             services.AddScoped<IProfessorApplication, ProfessorApplication>();
+            services.AddScoped<IRequerimentoService, RequerimentoService>();
             services.AddScoped<ITurmaApplication, TurmaApplication>();
             services.AddScoped<IUnidadeApplication, UnidadeApplication>();
             services.AddScoped<IUsuarioApplication, UsuarioApplication>();
@@ -45,6 +46,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IReportServices, ReportServices>();
             services.AddScoped<IPDFDesigns, PDFDesigns>();
             // Financ
+            services.AddScoped<IFinancConfigApp, FinancConfigApp > ();
             services.AddScoped<IBolsasApp, BolsasApp>();
             services.AddScoped<IFornecedorApp, FornecedorApp>();
         }

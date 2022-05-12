@@ -2,9 +2,6 @@
 using Invictus.Domain.Administrativo.Parametros;
 using Invictus.Domain.Administrativo.Parametros.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.Data.Repositories.Administrativo
@@ -34,6 +31,13 @@ namespace Invictus.Data.Repositories.Administrativo
         public async Task EditParamValue(ParametrosValue parametro)
         {
             await _db.ParametrosValues.SingleUpdateAsync(parametro);
+        }
+
+        public async Task RemoveParamValue(Guid paramId)
+        {
+            var paramValue = await _db.ParametrosValues.FindAsync(paramId);
+
+            await _db.ParametrosValues.SingleDeleteAsync(paramValue);
         }
     }
 }

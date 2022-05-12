@@ -121,7 +121,7 @@ namespace Invictus.QueryService.FinanceiroQueries
 
                 var debitos = await connection.QueryAsync<BoletoDto>(query, new { matriculaId = matriculaId });
 
-                return debitos;
+                return debitos.OrderBy(c => c.vencimento);
 
             }
         }

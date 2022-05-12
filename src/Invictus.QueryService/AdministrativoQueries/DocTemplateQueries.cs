@@ -39,7 +39,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<DocumentacaoTemplateDto> GetById(Guid documentacaoId)
         {
-            var query = "SELECT * from DocumentoesTemplate WHERE DocumentoesTemplate.id = @documentacaoId";
+            var query = "SELECT * from DocumentacaoTemplate WHERE DocumentacaoTemplate.id = @documentacaoId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

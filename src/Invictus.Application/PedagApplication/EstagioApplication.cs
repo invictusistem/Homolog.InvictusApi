@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
 using Invictus.Application.PedagApplication.Interfaces;
+using Invictus.Core.Enumerations;
+using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.Estagio.Interfaces;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Application.PedagApplication
@@ -15,24 +19,44 @@ namespace Invictus.Application.PedagApplication
         private readonly IMapper _mapper;
         private readonly IEstagioRepo _estagioRepo;
         private readonly IPedagMatriculaQueries _pedagQueries;
+        private readonly IAspNetUser _aspNetUser;
         private readonly InvictusDbContext _db;
-        public EstagioApplication(IMapper mapper, IEstagioRepo estagioRepo, IPedagMatriculaQueries pedagQueries, InvictusDbContext db)
+        public EstagioApplication(IMapper mapper, IEstagioRepo estagioRepo, IPedagMatriculaQueries pedagQueries, InvictusDbContext db, IAspNetUser aspNetUser)
         {
             _mapper = mapper;
             _estagioRepo = estagioRepo;
             _pedagQueries = pedagQueries;
             _db = db;
+            _aspNetUser = aspNetUser;
         }
 
         public async Task AprovarDocumento(Guid documentoId, bool aprovar)
         {
             var doc = await _db.DocumentosEstagio.FindAsync(documentoId);
 
-            doc.ValidarDoc(aprovar);
+            var userId = _aspNetUser.ObterUsuarioId();
+
+            doc.ValidarDoc(aprovar, userId);
 
             await _db.DocumentosEstagio.SingleUpdateAsync(doc);
 
             _db.SaveChanges();
+
+            // verificar status matricula
+            var docs = await _db.DocumentosEstagio.Where(d => d.MatriculaEstagioId == doc.MatriculaEstagioId).ToListAsync();
+
+            var docsAprovados = docs.Where(d => d.Status == "Aprovado");
+            if (docsAprovados.Count() == docs.Count())
+            {
+                var estagioMatricula = await _db.MatriculasEstagios.FindAsync(doc.MatriculaEstagioId);
+
+                estagioMatricula.ChangeStatusEstagioMatricula(StatusMatricula.AguardoEscolha);
+
+                await _db.MatriculasEstagios.SingleUpdateAsync(estagioMatricula);
+
+                _db.SaveChanges();
+            }
+            
         }
 
         public async Task CreateEstagio(EstagioDto estagioDto)

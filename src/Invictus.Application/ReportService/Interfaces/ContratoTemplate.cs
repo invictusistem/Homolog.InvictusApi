@@ -63,5 +63,45 @@ namespace Invictus.Application.ReportService.Interfaces
 
             return sb.ToString();
         }
+
+
+        public static string GenerateExemplo(GenerateContratoDTO info, ContratoDto contrato)
+        {
+
+            //var conteudo = "";
+
+            //foreach (var item in contrato.conteudos.OrderBy(c => c.order))
+            //{
+            //    conteudo += item.content;
+            //}
+
+            //conteudo = conteudo.Remove(0, 5);
+
+            //var conteudoDois = "";
+            //conteudoDois += conteudo;
+           
+            var sb = new StringBuilder();
+            sb.AppendLine(@"<html><head></head><body>");
+            sb.AppendLine(@"<div style='padding: 15px;'>Contrato que celebram entre si Sistema de Ensino Invictus, CNPJ: " + info.cnpj + @", situada 
+            à " + info.logradouro + @", " + info.numero + @" nesta cidade de " + info.cidade + @", Estado do Rio de Janeiro, 
+            neste ato, doravante denominada CONTRATADA, e o aluno acima identificado, doravante denominado CONTRATANTE, 
+            conforme as cláusulas seguintes.</div>");
+            //sb.AppendLine(@"<div style='text-align: justify; text-justify: inter-word; padding: 15px;' >");
+            sb.AppendLine(contrato.conteudo);
+
+            //sb.AppendLine(@"</div>");
+            //sb.AppendLine(@"<br><br><br><br>
+            //<div style='text-align: center;' > ___________________________________________________<br>
+            //<div style='font-weight: bold;' >" + info.nome + @"</div>
+  
+            //<div style='font-weight: bold;' >" + info.cpf + @"</div>
+            //</div>");
+
+
+            sb.AppendLine(@" </body></html>");
+
+
+            return sb.ToString();
+        }
     }
 }

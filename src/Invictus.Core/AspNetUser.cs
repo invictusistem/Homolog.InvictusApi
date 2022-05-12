@@ -12,7 +12,6 @@ namespace Invictus.Core
     public class AspNetUser : IAspNetUser
     {
         private readonly IHttpContextAccessor _accessor;
-
         public AspNetUser(IHttpContextAccessor accessor)
         {
             _accessor = accessor;

@@ -16,6 +16,7 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate
                                 int cargaHoraria,
                                 Guid typePacoteId,
                                 Guid materiaId,
+                                int ordem,
                                 bool ativo
                                 )
         {
@@ -25,37 +26,38 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate
             CargaHoraria = cargaHoraria;
             TypePacoteId = typePacoteId;
             MateriaId = materiaId;
+            Ordem = ordem;
             Ativo = ativo;
 
         }
 
-        public TurmaMaterias(string nome,
-                                string descricao,
-                                ModalidadeCurso modalidade,
-                                int cargaHoraria,
-                                bool ativo,
-                                Guid typePacoteId,
-                                Guid turmaId,
-                                Guid materiaId
-                                //bool ativo
-                                )
-        {
-            Nome = nome;
-            Descricao = descricao;
-            Modalidade = modalidade.DisplayName;
-            CargaHoraria = cargaHoraria;
-            Ativo = ativo;
-            TypePacoteId = typePacoteId;
-            TurmaId = turmaId;
-            MateriaId = materiaId;
+        //public TurmaMaterias(string nome,
+        //                        string descricao,
+        //                        ModalidadeCurso modalidade,
+        //                        int cargaHoraria,
+        //                        bool ativo,
+        //                        Guid typePacoteId,
+        //                        Guid turmaId,
+        //                        Guid materiaId
+        //                        )
+        //{
+        //    Nome = nome;
+        //    Descricao = descricao;
+        //    Modalidade = modalidade.DisplayName;
+        //    CargaHoraria = cargaHoraria;
+        //    Ativo = ativo;
+        //    TypePacoteId = typePacoteId;
+        //    TurmaId = turmaId;
+        //    MateriaId = materiaId;
             
 
-        }
+        //}
         public string Nome { get; private set; }
         public string Descricao { get; private set; }
         public string Modalidade { get; private set; }
         public int CargaHoraria { get; private set; }
         public bool Ativo { get; private set; }
+        public int Ordem { get; private set; }
         public Guid TypePacoteId { get; private set; }
         public Guid TurmaId { get; private set; }
         public Guid ProfessorId { get; private set; }

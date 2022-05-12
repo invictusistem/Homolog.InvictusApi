@@ -1,16 +1,19 @@
 ﻿using Invictus.Core;
+using System;
 
 namespace Invictus.Domain.Padagogico.Estagio
 {
     public class TypeEstagio : Entity
     {
         public TypeEstagio(
+            Guid id,
             string nome,
             string observacao,
             string nivel,
             bool ativo
             )
         {
+            Id = id;
             Nome = nome;
             Observacao = observacao;
             Nivel = nivel;

@@ -132,6 +132,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                             PacotesMaterias.nome,
                             PacotesMaterias.CargaHoraria,
                             PacotesMaterias.modalidade,
+                            PacotesMaterias.Ordem,
                             MateriasTemplate.id as materiaId, 
                             MateriasTemplate.nome,
                             MateriasTemplate.typepacoteId
@@ -697,7 +698,7 @@ order by DiaAula
 
             string calendarioDoDiaQuery = @"SELECT id, turmaId FROM Calendarios WHERE Calendarios.Id = @calendarioId";
 
-            string alunosDaTurmaQuerie = @"SELECT alunoId FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
+            string alunosDaTurmaQuerie = @"SELECT id, alunoId FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
 
             // OLD
             string infoAulaQuery = @"select
@@ -752,7 +753,7 @@ order by DiaAula
 
                     foreach (var aluno in alunosDaTurma)
                     {
-                        var presenca = new Presenca(calendarioId, null, aluno.alunoId, null);
+                        var presenca = new Presenca(calendarioId, null, aluno.alunoId,aluno.id, null);;
                         turmaPresencaList.Add(presenca);
                     }
 
@@ -923,6 +924,7 @@ order by DiaAula
         public Guid calendarioId { get; set; }
         public bool? isPresent { get; set; }
         public string isPresentToString { get; set; }
+        public Guid matriculaId { get; set; }
         public Guid alunoId { get; set; }
     }
 }
