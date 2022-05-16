@@ -15,6 +15,21 @@ namespace Invictus.Domain.Financeiro.Configuracoes.Interfaces
         Task AddPlanoConta(PlanoConta banco);
         Task AddSubConta(SubConta banco);
 
+        Task EditBanco(Banco banco);
+        Task EditCentroCusto(CentroCusto centroCusto);
+        Task EditFormaRecebimento(FormaRecebimento formareceb);
+        Task EditMeioPagamento(MeioPagamento meioPgm);
+        Task EditPlanoConta(PlanoConta plano);
+        Task EditSubConta(SubConta subconta);
+
+
+        Task DeleteBanco(Guid bancoId);
+        Task DeleteCentroCusto(Guid centroCustoId);
+        Task DeleteFormaRecebimento(Guid formarecebId);
+        Task DeleteMeioPagamento(Guid meioPgmId);
+        Task DeletePlanoConta(Guid planoId);
+        Task DeleteSubConta(Guid subcontaId);
+
         void Commit();
 
     }

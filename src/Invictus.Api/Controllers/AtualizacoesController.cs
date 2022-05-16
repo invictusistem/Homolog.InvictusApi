@@ -79,6 +79,8 @@ namespace Invictus.Api.Controllers
 
             // criar os dados da Tabela TurmasPresencas diariamente
 
+            // Ao criar app. Unidade, criar a caixa da escola
+
             return Ok();
         }
 

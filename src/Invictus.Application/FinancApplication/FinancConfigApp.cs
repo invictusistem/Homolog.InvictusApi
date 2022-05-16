@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Invictus.Application.FinancApplication.Interfaces;
+using Invictus.Core.Interfaces;
 using Invictus.Domain.Financeiro.Configuracoes;
 using Invictus.Domain.Financeiro.Configuracoes.Interfaces;
 using Invictus.Dtos.Financeiro.Configuracoes;
@@ -15,13 +16,119 @@ namespace Invictus.Application.FinancApplication
     {
         private readonly IFinanceiroConfigRepo _configRepo;
         private readonly IMapper _mapper;
-        public FinancConfigApp(IFinanceiroConfigRepo configRepo, IMapper mapper)
+        private readonly IAspNetUser _aspNetUser;
+        public FinancConfigApp(IFinanceiroConfigRepo configRepo, IMapper mapper, IAspNetUser aspNetUser)
         {
             _configRepo = configRepo;
             _mapper = mapper;
+            _aspNetUser = aspNetUser;
         }
+
+        // DELETE 
+        public async Task DeleteBanco(Guid bancoId)
+        {
+            await _configRepo.DeleteBanco(bancoId);
+
+            _configRepo.Commit();
+        }
+
+        public async Task DeleteCentroDeCusto(Guid centroCustoId)
+        {
+            await _configRepo.DeleteCentroCusto(centroCustoId);
+
+            _configRepo.Commit();
+        }
+
+        public async Task DeleteFormaRecebimento(Guid formarecebimentoId)
+        {
+            await _configRepo.DeleteFormaRecebimento(formarecebimentoId);
+
+            _configRepo.Commit();
+        }
+
+        public async Task DeleteMeioDePagamento(Guid meioPgmId)
+        {
+            await _configRepo.DeleteMeioPagamento(meioPgmId);
+
+            _configRepo.Commit();
+        }
+
+        public async Task DeletePlanoDeConta(Guid planoId)
+        {
+            await _configRepo.DeletePlanoConta(planoId);
+
+            _configRepo.Commit();
+        }
+
+        public async Task DeleteSubConta(Guid subContaId)
+        {
+            await _configRepo.DeleteSubConta(subContaId);
+
+            _configRepo.Commit();
+        }
+
+        // EDIT
+
+        public async Task EditBanco(BancoDto bancoDto)
+        {
+            var banco = _mapper.Map<Banco>(bancoDto);
+
+            await _configRepo.EditBanco(banco);
+
+            _configRepo.Commit();
+        }
+
+        public async Task EditCentroDeCusto(CentroCustoDto centroCustoDto)
+        {
+            var centroCusto = _mapper.Map<CentroCusto>(centroCustoDto);
+
+            await _configRepo.EditCentroCusto(centroCusto);
+
+            _configRepo.Commit();
+        }
+
+        public async Task EditFormaRecebimento(FormaRecebimentoDto editedFormaRecebimento)
+        {
+            var forma = _mapper.Map<FormaRecebimento>(editedFormaRecebimento);
+
+            await _configRepo.EditFormaRecebimento(forma);
+
+            _configRepo.Commit();
+        }
+
+        public async Task EditMeioDePagamento(MeioPagamentoDto meioPgmDto)
+        {
+            var meioPgm = _mapper.Map<MeioPagamento>(meioPgmDto);
+
+            await _configRepo.EditMeioPagamento(meioPgm);
+
+            _configRepo.Commit();
+        }
+
+        public async Task EditPlanoDeConta(PlanoContaDto planoDto)
+        {
+            var plano = _mapper.Map<PlanoConta>(planoDto);
+
+            await _configRepo.EditPlanoConta(plano);
+
+            _configRepo.Commit();
+        }
+
+        public async Task EditSubConta(SubContaDto subContaDto)
+        {
+            var subConta = _mapper.Map<SubConta>(subContaDto);
+
+            await _configRepo.EditSubConta(subConta);
+
+            _configRepo.Commit();
+        }
+
         public async Task SaveBanco(BancoDto bancoDto)
         {
+            bancoDto.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            bancoDto.dataCadastro = DateTime.Now;
+
             var banco = _mapper.Map<Banco>(bancoDto);
 
             await _configRepo.AddBanco(banco);
@@ -31,9 +138,23 @@ namespace Invictus.Application.FinancApplication
 
         public async Task SaveCentroDeCusto(CentroCustoDto centroCustoDto)
         {
+            centroCustoDto.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
             var centro = _mapper.Map<CentroCusto>(centroCustoDto);
 
             await _configRepo.AddCentroCusto(centro);
+
+            _configRepo.Commit();
+        }
+
+        public async Task SaveFormRecebimento(FormaRecebimentoDto newFormaRecebimento)
+        {
+            newFormaRecebimento.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            //bancoDto.dataCadastro = DateTime.Now;
+
+            var forma = _mapper.Map<FormaRecebimento>(newFormaRecebimento);
+
+            await _configRepo.AddFormaRecebimento(forma);
 
             _configRepo.Commit();
         }

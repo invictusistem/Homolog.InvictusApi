@@ -15,6 +15,7 @@ namespace Invictus.Core.Interfaces
         string ObterUnidadeDoUsuario();
         //string ObterUserToken();
         //string ObterUserRefreshToken();
+        Guid GetUnidadeIdDoUsuario();
         Guid ObterUsuarioId();
         bool EstaAutenticado();
         bool PossuiRole(string role);

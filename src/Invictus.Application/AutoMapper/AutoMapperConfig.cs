@@ -163,6 +163,8 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<SubContaDto, SubConta>();
 
+            CreateMap<FormaRecebimentoDto, FormaRecebimento>();
+
             CreateMap<BolsaDto, Bolsa>();
 
             CreateMap<ContratoDto, Contrato>();

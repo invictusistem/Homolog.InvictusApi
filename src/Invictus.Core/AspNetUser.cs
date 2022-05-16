@@ -1,7 +1,10 @@
-﻿using Invictus.Core.Interfaces;
+﻿using Dapper;
+using Invictus.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -12,9 +15,11 @@ namespace Invictus.Core
     public class AspNetUser : IAspNetUser
     {
         private readonly IHttpContextAccessor _accessor;
-        public AspNetUser(IHttpContextAccessor accessor)
+        private readonly IConfiguration _config;
+        public AspNetUser(IHttpContextAccessor accessor, IConfiguration config)
         {
             _accessor = accessor;
+            _config = config;
         }
 
         public string Name => _accessor.HttpContext.User.Identity.Name;
@@ -57,6 +62,26 @@ namespace Invictus.Core
         public HttpContext ObterHttpContext()
         {
             return _accessor.HttpContext;
+        }
+
+        public Guid GetUnidadeIdDoUsuario()
+        {
+            var unidadeSigla = _accessor.HttpContext.User.FindFirst("Unidade").Value;
+
+            var query = @"select Unidades.Id from Unidades Where Unidades.Sigla = @sigla";
+
+            using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var unidadeId = connection.QuerySingle<Guid>(query, new { sigla = unidadeSigla });
+
+                connection.Close();
+
+                return unidadeId;
+
+            }
         }
 
         public string ObterUnidadeDoUsuario()
