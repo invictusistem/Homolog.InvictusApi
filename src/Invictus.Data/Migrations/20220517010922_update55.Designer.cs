@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220517010922_update55")]
+    partial class update55
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1495,8 +1497,8 @@ namespace Invictus.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
+                    b.Property<string>("Ativo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("BancoPermitidoParaCreditoId")
                         .HasColumnType("uniqueidentifier");
@@ -1510,7 +1512,7 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DiasParaCompensacao")
+                    b.Property<int>("DiasParaCompensacao")
                         .HasColumnType("int");
 
                     b.Property<bool>("EhCartao")
@@ -1519,13 +1521,13 @@ namespace Invictus.Data.Migrations
                     b.Property<Guid?>("FornecedorTaxaVinculadaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("PermiteParcelamento")
+                    b.Property<bool>("PermiteParcelamento")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("SubcontaTaxaVinculadaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("Taxa")
+                    b.Property<decimal>("Taxa")
                         .HasPrecision(11, 2)
                         .HasColumnType("decimal(11,2)");
 

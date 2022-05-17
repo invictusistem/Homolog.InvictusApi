@@ -89,6 +89,18 @@ namespace Invictus.Application.FinancApplication
 
         public async Task EditFormaRecebimento(FormaRecebimentoDto editedFormaRecebimento)
         {
+            if (!editedFormaRecebimento.ehCartao)
+            {   
+                editedFormaRecebimento.taxa = null;
+                editedFormaRecebimento.diasParaCompensacao = null;
+                editedFormaRecebimento.permiteParcelamento = null;
+                editedFormaRecebimento.centroDeCustoTaxaVinculadaId = null;
+                editedFormaRecebimento.bancoPermitidoParaCreditoId = null;
+                editedFormaRecebimento.compensarAutomaticamenteId = null;
+                editedFormaRecebimento.fornecedorTaxaVinculadaId = null;
+                editedFormaRecebimento.subcontaTaxaVinculadaId = null;
+            }
+
             var forma = _mapper.Map<FormaRecebimento>(editedFormaRecebimento);
 
             await _configRepo.EditFormaRecebimento(forma);
@@ -151,6 +163,18 @@ namespace Invictus.Application.FinancApplication
             newFormaRecebimento.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
             //bancoDto.dataCadastro = DateTime.Now;
+
+            if (!newFormaRecebimento.ehCartao)
+            {
+                newFormaRecebimento.taxa = null;
+                newFormaRecebimento.diasParaCompensacao = null;
+                newFormaRecebimento.permiteParcelamento = null;
+                newFormaRecebimento.centroDeCustoTaxaVinculadaId = null;
+                newFormaRecebimento.bancoPermitidoParaCreditoId = null;
+                newFormaRecebimento.compensarAutomaticamenteId = null;
+                newFormaRecebimento.fornecedorTaxaVinculadaId = null;
+                newFormaRecebimento.subcontaTaxaVinculadaId = null;
+            }
 
             var forma = _mapper.Map<FormaRecebimento>(newFormaRecebimento);
 

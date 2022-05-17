@@ -221,7 +221,7 @@ namespace Invictus.QueryService.FinanceiroQueries
 
         public async Task<SubContaDto> GetSubContasById(Guid id)
         {
-            var query = @"";
+            var query = @"SELECT * FROM SubContas WHERE Subcontas.id = @id";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

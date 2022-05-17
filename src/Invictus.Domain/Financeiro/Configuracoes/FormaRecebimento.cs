@@ -6,8 +6,8 @@ namespace Invictus.Domain.Financeiro.Configuracoes
     public class FormaRecebimento : Entity
     {
         public FormaRecebimento(string descricao,
-                                  string ativo,
-                                  string ehCartao
+                                  bool ativo,
+                                  bool ehCartao
                                     )
         {
             Descricao = descricao;
@@ -16,16 +16,16 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         }
 
         public FormaRecebimento(string descricao,
-                                string ativo,
-                                string ehCartao,
-                                int diasParaCompensacao,
-                                decimal taxa,
-                                bool permiteParcelamento,
-                                Guid bancoPermitidoParaCreditoId,
-                                Guid subcontaTaxaVinculadaId,
-                                Guid fornecedorTaxaVinculadaId,
-                                Guid centroDeCustoTaxaVinculadaId,
-                                Guid compensarAutomaticamenteId,
+                                bool ativo,
+                                bool ehCartao,
+                                int? diasParaCompensacao,
+                                decimal? taxa,
+                                bool? permiteParcelamento,
+                                Guid? bancoPermitidoParaCreditoId,
+                                Guid? subcontaTaxaVinculadaId,
+                                Guid? fornecedorTaxaVinculadaId,
+                                Guid? centroDeCustoTaxaVinculadaId,
+                                Guid? compensarAutomaticamenteId,
                                 Guid unidadeId
                                 )
         {
@@ -44,16 +44,16 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         }
 
         public string Descricao { get; private set; }
-        public string Ativo { get; private set; }
-        public string EhCartao { get; private set; }
-        public int DiasParaCompensacao { get; private set; }
-        public decimal Taxa { get; private set; }
-        public bool PermiteParcelamento { get; private set; }
-        public Guid BancoPermitidoParaCreditoId { get; private set; }
-        public Guid SubcontaTaxaVinculadaId { get; private set; }
-        public Guid FornecedorTaxaVinculadaId { get; private set; }
-        public Guid CentroDeCustoTaxaVinculadaId { get; private set; }
-        public Guid CompensarAutomaticamenteId { get; private set; }
+        public bool Ativo { get; private set; }
+        public bool EhCartao { get; private set; }
+        public int? DiasParaCompensacao { get; private set; }
+        public decimal? Taxa { get; private set; }
+        public bool? PermiteParcelamento { get; private set; }
+        public Guid? BancoPermitidoParaCreditoId { get; private set; }
+        public Guid? SubcontaTaxaVinculadaId { get; private set; }
+        public Guid? FornecedorTaxaVinculadaId { get; private set; }
+        public Guid? CentroDeCustoTaxaVinculadaId { get; private set; }
+        public Guid? CompensarAutomaticamenteId { get; private set; }
         public Guid UnidadeId { get; private set; }
 
         protected FormaRecebimento()
