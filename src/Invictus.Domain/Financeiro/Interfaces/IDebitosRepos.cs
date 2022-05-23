@@ -8,7 +8,9 @@ namespace Invictus.Domain.Financeiro.Interfaces
 {
     public interface IDebitosRepos : IDisposable
     {
-        Task SaveInfoFinanceira(InformacaoDebito infoDebito);
+        //Task SaveInfoFinanceira(InformacaoDebito infoDebito);
+        Task SaveBoleto(Boleto boleto);
+        Task SaveBoletos(IEnumerable<Boleto> boleto);
         void Commit();
     }
 }

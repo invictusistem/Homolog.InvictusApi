@@ -6,6 +6,7 @@ using Invictus.Application.PedagApplication;
 using Invictus.Application.PedagApplication.Interfaces;
 using Invictus.Application.ReportService;
 using Invictus.Application.ReportService.Interfaces;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,13 @@ namespace Invictus.Application.Ioc
             // ASPNET
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            //services.AddMassTransit(x =>
+            //{
+            //    x.UsingInMemory((context, cfg) =>
+            //    {
+            //        cfg.ConfigureEndpoints(context);
+            //    });
+            //});
             // app application            
             services.AddScoped<IAgendaTriApplication, AgendaTriApplication>();
             services.AddScoped<IAlunoApplication, AlunoApplication>();
@@ -49,6 +57,7 @@ namespace Invictus.Application.Ioc
             services.AddScoped<IFinancConfigApp, FinancConfigApp > ();
             services.AddScoped<IBolsasApp, BolsasApp>();
             services.AddScoped<IFornecedorApp, FornecedorApp>();
+            services.AddScoped<IFinanceiroApp, FinanceiroApp>();
         }
     }
 }

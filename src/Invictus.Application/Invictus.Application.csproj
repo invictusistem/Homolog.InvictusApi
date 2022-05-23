@@ -5,6 +5,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
+		<PackageReference Include="MassTransit" Version="8.0.3-develop.455" />
 		<PackageReference Include="morelinq" Version="3.3.2" />
 		<PackageReference Include="DinkToPdf" Version="1.0.8" />
 		<PackageReference Include="ExcelDataReader" Version="3.6.0" />

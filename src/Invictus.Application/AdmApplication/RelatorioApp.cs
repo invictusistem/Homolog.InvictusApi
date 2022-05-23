@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ExcelDataReader;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Dtos.PedagDto;
@@ -20,21 +21,25 @@ namespace Invictus.Application.AdmApplication
         private readonly IMapper _mapper;
         private readonly InvictusDbContext _db;
         private readonly IMatriculaApplication _matriculaApplication;
-        public RelatorioApp(IMapper mapper, InvictusDbContext db, IMatriculaApplication matriculaApplication)
+        private readonly IAspNetUser _aspNetUser;
+        public RelatorioApp(IMapper mapper, InvictusDbContext db, IMatriculaApplication matriculaApplication, IAspNetUser aspNetUser)
         {
             _mapper = mapper;
             _db = db;
             _matriculaApplication = matriculaApplication;
+            _aspNetUser = aspNetUser;
         }
 
-        public List<MatriculaCommand> MatriculaExcel()
+        public List<MatriculaCommand> MatriculaExcel(MatriculaPlanilha matricula)
         {
             List<AlunoExcelDto> alunosDto = new List<AlunoExcelDto>();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            var unidade = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
-           // var turmaId = new Guid("7104d99b-142d-4d1c-9c41-f7c1dde52b0d");
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var userId = _aspNetUser.ObterUsuarioId();
+            //var unida de = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
+            // var turmaId = new Guid("7104d99b-142d-4d1c-9c41-f7c1dde52b0d");
             //using (var stream = new MemoryStream())
-            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 04.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open(matricula.planilhaNome, FileMode.Open, FileAccess.Read))
             {
                 //file.CopyTo(stream);
                 stream.Position = 1;
@@ -71,7 +76,7 @@ namespace Invictus.Application.AdmApplication
 
                             DataCadastro = Convert.ToDateTime("01/08/2021"),
                             Ativo = true,
-                            UnidadeId = unidade,
+                            UnidadeId = unidadeId,
 
                             Bairro = reader?.GetValue(6)?.ToString(),
                             CEP = reader?.GetValue(9)?.ToString(),
@@ -131,8 +136,8 @@ namespace Invictus.Application.AdmApplication
                    null, item.TelCelular, item.TelResidencial, item.TelWhatsapp, endereco);
 
                 alunoAdd.AtivarAluno();
-                alunoAdd.SetColaboradorResponsavelPeloCadastro(new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8"));
-                alunoAdd.SetUnidadeId(unidade);
+                alunoAdd.SetColaboradorResponsavelPeloCadastro(userId);
+                alunoAdd.SetUnidadeId(unidadeId);
                 var data = new DateTime(2021, 7, 1, 0, 0, 0);
                 alunoAdd.SetDataCadastro(data);
 
@@ -155,7 +160,7 @@ namespace Invictus.Application.AdmApplication
             //var listaNomes = new List<string>();
             var listaFin = new List<PlanilhafinDto>();
 
-            using (var stream = File.Open("FINANCEIRO ENF 04.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open(matricula.planilhaFin, FileMode.Open, FileAccess.Read))
             {
                 stream.Position = 1;
 
@@ -187,7 +192,7 @@ namespace Invictus.Application.AdmApplication
             //var nomesDistinct = listaNomes.Distinct();
             //var grege = alunos.Count();
 
-            var plano = _db.PlanosPgmTemplate.Find(new Guid("b5d92e45-ab36-4cc0-80e9-08d9b5b78d2a"));
+            var plano = _db.PlanosPgmTemplate.Find(matricula.planoId);
 
             var commands = new List<MatriculaCommand>();
 
@@ -219,8 +224,8 @@ namespace Invictus.Application.AdmApplication
                 command.alunoId = alunoId;
                 
 
-                var turmaId = new Guid("f6a79467-b929-4d33-bcd1-6e2f482c264a");
-                command.turmaId = turmaId;
+                //var turmaId = new Guid("7a76c44a-e294-488f-a57c-6edd5abfb8ec");
+                command.turmaId = matricula.turmaId;
                 //_matriculaApplication.AddParams(turmaId, alunoId, command);
                 //_matriculaApplication.Matricular().ConfigureAwait(true);
 
@@ -234,10 +239,11 @@ namespace Invictus.Application.AdmApplication
         {
             List<AlunoExcelDto> alunosDto = new List<AlunoExcelDto>();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            var unidade = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
-            var turmaId = new Guid("7104d99b-142d-4d1c-9c41-f7c1dde52b0d");
+
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var turmaId = new Guid("65779718-15aa-430d-a10a-e68686bff3b6");
             //using (var stream = new MemoryStream())
-            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 03.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 01.xlsx", FileMode.Open, FileAccess.Read))
             {
                 //file.CopyTo(stream);
                 stream.Position = 1;
@@ -274,7 +280,7 @@ namespace Invictus.Application.AdmApplication
 
                             DataCadastro = Convert.ToDateTime("01/08/2021"),
                             Ativo = true,
-                            UnidadeId = unidade,
+                            UnidadeId = unidadeId,
 
                             Bairro = reader?.GetValue(6)?.ToString(),
                             CEP = reader?.GetValue(9)?.ToString(),
@@ -335,7 +341,7 @@ namespace Invictus.Application.AdmApplication
 
                 alunoAdd.AtivarAluno();
                 alunoAdd.SetColaboradorResponsavelPeloCadastro(new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8"));
-                alunoAdd.SetUnidadeId(unidade);
+                alunoAdd.SetUnidadeId(unidadeId);
                 var data = new DateTime(2021, 7, 1, 0, 0, 0);
                 alunoAdd.SetDataCadastro(data);
 
@@ -349,7 +355,7 @@ namespace Invictus.Application.AdmApplication
             //var listaNomes = new List<string>();
             var listaFin = new List<PlanilhafinDto>();
 
-            using (var stream = File.Open("FINANCEIRO ENF 03.xlsx", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open("FINANCEIRO ENF 01.xlsx", FileMode.Open, FileAccess.Read))
             {
                 stream.Position = 1;
 

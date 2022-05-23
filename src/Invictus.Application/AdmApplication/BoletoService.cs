@@ -107,7 +107,7 @@ namespace Invictus.Application.AdmApplication
             return boletosResponse.ToList();
         }
 
-        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicos(List<Parcela> boletos, decimal valorBonusPontualidade, DadosPessoaDto pessoa, int qndBoletosSalvos)
+        public async Task<List<BoletoLoteResponse>> GerarBoletosUnicosEmLista(List<Parcela> boletos, decimal valorBonusPontualidade, DadosPessoaDto pessoa, int qndBoletosSalvos)
         {
             _logger.LogInformation($"Start to create boletos at {DateTime.UtcNow.TimeOfDay}");
 
@@ -128,7 +128,7 @@ namespace Invictus.Application.AdmApplication
 
                 var parametross = new Dictionary<string, string>();
                 parametross.Add("vencimento", boletos[i].vencimento.ToString("MM/dd/yyyy"));   // "12/30/2021");
-                parametross.Add("valor", boletos[i].valor.ToString());
+                parametross.Add("valor", boletos[i].valor.ToString(config));
                 parametross.Add("juros", "1");
                 parametross.Add("juros_fixo", "0");
                 parametross.Add("multa", "0");
@@ -192,7 +192,7 @@ namespace Invictus.Application.AdmApplication
             return boletosResponse;
         }
         //  Task<BoletoLoteResponse> GerarBoleto(decimal valor, DateTime vencimento, DadosPessoaDto pessoa);
-        public async Task<BoletoLoteResponse> GerarBoleto(decimal valor, DateTime vencimento, DadosPessoaDto pessoa, int numeroPedido)
+        public async Task<BoletoLoteResponse> GerarBoleto(decimal valor, decimal valorBonusPontualidade, DateTime vencimento, DadosPessoaDto pessoa, int numeroPedido)
         {
 
             _logger.LogInformation($"Start to create boletos at {DateTime.UtcNow.TimeOfDay}");
@@ -212,12 +212,12 @@ namespace Invictus.Application.AdmApplication
 
                 var parametross = new Dictionary<string, string>();
                 parametross.Add("vencimento", vencimento.ToString("MM/dd/yyyy"));   // "12/30/2021");
-                parametross.Add("valor", valor.ToString());
+                parametross.Add("valor", valor.ToString(config));
                 parametross.Add("juros", "1");
                 parametross.Add("juros_fixo", "0");
                 parametross.Add("multa", "0");
                 parametross.Add("multa_fixo", "0");
-                parametross.Add("desconto", 0.ToString(config)); // colocar bonus pontualidade AQUI
+                parametross.Add("desconto", valorBonusPontualidade.ToString(config)); // colocar bonus pontualidade AQUI
                 parametross.Add("diasdesconto1", "");
                 parametross.Add("desconto2", "");
                 parametross.Add("diasdesconto2", "");
@@ -248,7 +248,7 @@ namespace Invictus.Application.AdmApplication
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
 
-                    HttpResponseMessage response = client.PostAsync(url, new FormUrlEncodedContent(parametross)).Result;
+                    HttpResponseMessage response = await client.PostAsync(url, new FormUrlEncodedContent(parametross));
 
                     var retorno = response.Content.ReadAsStringAsync().Result;
 

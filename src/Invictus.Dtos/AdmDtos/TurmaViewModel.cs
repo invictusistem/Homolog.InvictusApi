@@ -17,6 +17,7 @@ namespace Invictus.Dtos.AdmDtos
         public string previsaoInfo { get; set; }
         public DateTime previsaoAtual { get; set; }
         public DateTime previsaoTerminoAtual { get; set; }
+        public Guid typePacoteId { get; set; }
         public int vagas { get; set; }
 
         //public Guid UnidadeId { get; private set; }

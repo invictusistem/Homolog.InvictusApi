@@ -52,7 +52,7 @@ namespace Invictus.Application.AdmApplication
 
             foreach (var item in pacote.Materias)
             {
-                item.SetOrdem(i);
+                item.SetOrdem(i+1);
                 i++;
             }
             pacote.SetCreateDate();

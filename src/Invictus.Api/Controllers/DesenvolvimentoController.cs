@@ -24,7 +24,7 @@ namespace Invictus.Api.Controllers
             UserManager = userMgr;
             _unidadeQueries = unidadeQueries;
         }
-
+       
         [HttpDelete]
         [Route("deletar-turma/{turmaId}")]
         public async Task<IActionResult> DeleteTurma(Guid turmaId)
@@ -48,8 +48,7 @@ namespace Invictus.Api.Controllers
 
             var calendarios = await _db.Calendarios.Where(c => c.TurmaId == turmaId).ToListAsync();
 
-            //List<int> Ids = searchList.Select(o => o.Id).ToList();
-            //var customerList = this.GetQuery<Customer>().Any(c => Ids.Contains(c.ID)).ToList();
+           
             var listCalendId = calendarios.Select(c => c.Id);
             var turmasPresencas = _db.Presencas.Where(p => listCalendId.Contains(p.CalendarioId)).ToList();
 
@@ -59,30 +58,19 @@ namespace Invictus.Api.Controllers
             var turma = await _db.Turmas.Where(c => c.Id == turmaId).FirstOrDefaultAsync();
             if (turma != null) _db.Turmas.Remove(turma);
 
-            //await _db.SaveChangesAsync();
+           
 
             var logTurma = await _db.LogTurmas.Where(t => t.TurmaId == turmaId).ToListAsync();
             _db.LogTurmas.RemoveRange(logTurma);
             _db.SaveChanges();
 
-            /*
-             Tabelas:
-                Turmas
-                TurmasHorarios
-                TurmasMaterias
-                TurmasNotas                
-                TurmasPrevisoes
-                TurmasProfessores
-                
-                Calendarios
-                TurmasPresencas (alunoId - CalendarioId)
-            */
+         
 
             var mat = await _db.Matriculas.Where(m => m.TurmaId == turmaId).ToListAsync();
 
             if (mat.Any())
             {
-                //remover usuario do Identity
+               
                 foreach (var item in mat)
                 {
                     var aluno = await _db.Alunos.Where(a => a.Id == item.AlunoId).FirstOrDefaultAsync();
@@ -112,31 +100,28 @@ namespace Invictus.Api.Controllers
                 var alunosDocs = await _db.AlunosDocs.Where(m => listMatIds.Contains(m.MatriculaId)).ToListAsync();
 
                 var alunosPlanos = await _db.AlunoPlanos.Where(m => listMatIds.Contains(m.MatriculaId)).ToListAsync();
-                var infoDebitos = new List<InformacaoDebito>();
-                try
-                {
-                    infoDebitos = await _db.InformacoesDebito.Where(m => listMatIds.Contains(m.MatriculaId)).ToListAsync();
-                }
-                catch (Exception ex)
-                {
+                //var infoDebitos = new List<InformacaoDebito>();
+                //try
+                //{
+                //    infoDebitos = await _db.InformacoesDebito.Where(m => listMatIds.Contains(m.MatriculaId)).ToListAsync();
+                //}
+                //catch (Exception ex)
+                //{
 
-                }
-                var listInfoDebsIds = infoDebitos.Select(c => c.Id);
+                //}
+                //var listInfoDebsIds = infoDebitos.Select(c => c.Id);
 
-                var boletos = await _db.Boletos.Where(m => listInfoDebsIds.Contains(m.InformacaoDebitoId)).ToListAsync();
+                var boletos = await _db.Boletos.Where(m => m.Id == new Guid("00000000-0000-0000-0000-000000000000")).ToListAsync();
 
                 var listBoletosId = boletos.Select(c => c.Id);
-                //var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
-
-
-               // _db.LogBoletos.RemoveRange(logBoletos);
+              
                 _db.Boletos.RemoveRange(boletos);
-                _db.InformacoesDebito.RemoveRange(infoDebitos);
+               // _db.InformacoesDebito.RemoveRange(infoDebitos);
 
                 _db.AlunoPlanos.RemoveRange(alunosPlanos);
                 _db.AlunosDocs.RemoveRange(alunosDocs);
 
-                //_db.LogMatriculas.RemoveRange(logMat);
+              
 
                 _db.Matriculas.RemoveRange(mat);
 
@@ -149,18 +134,7 @@ namespace Invictus.Api.Controllers
 
                 _db.SaveChanges();
             }
-            /*
-            Removendo as matrículas delas
-                Matriculas  (turmaId) -
-                LogMatriculas (matriculaId) -
-                AlunosDocumentos (matriculaId)  -
-                AlunosPlanoPagamento (matriculaId) -
-                InformãcoesDebitos (matriculaId) -
-                Boletos (informacaoDebitoId)
-                LogBoletos (boletoId)
-                
-             */
-
+          
 
             return Ok();
 
@@ -181,24 +155,24 @@ namespace Invictus.Api.Controllers
             return Ok();
 
         }
-
+        
         [HttpDelete]
         [Route("deletar-matricula/{matId}")]
         public async Task<IActionResult> DeleteMatricula(Guid matId)
         {
-            // get matricula
+            
             var mat = await _db.Matriculas.Where(m => m.Id == matId).FirstOrDefaultAsync();
-            /*
-             -TurmasPresencas (alunoId e CalendId-DA TURMA)
-             -TurmasNotas (matriculaId)
-             Responsaveis (matriculaId)
-             LogMatriculas (matriculaId)
-             LogBoleos (boletoId)
-             InformacoesDebitos (matriculaId)
-             EstagiosMatricula (matriculaId)
-             Boletos (informacoesDebitoId)
-             AlunosDocumentos
-             */
+            
+             //-TurmasPresencas (alunoId e CalendId-DA TURMA)
+             //-TurmasNotas (matriculaId)
+             //Responsaveis (matriculaId)
+             //LogMatriculas (matriculaId)
+             //LogBoleos (boletoId)
+             //InformacoesDebitos (matriculaId)
+             //EstagiosMatricula (matriculaId)
+             //Boletos (informacoesDebitoId)
+             //AlunosDocumentos
+             
           
             var calendarios = await _db.Calendarios.Where(c => c.TurmaId == mat.TurmaId).ToListAsync();
 
@@ -213,47 +187,42 @@ namespace Invictus.Api.Controllers
             await _db.SaveChangesAsync();
 
 
-            /*
-             Tabelas:
-                Turmas
-                TurmasHorarios
-                TurmasMaterias
-                TurmasNotas                
-                TurmasPrevisoes
-                TurmasProfessores
+            
+             //Tabelas:
+             //   Turmas
+             //   TurmasHorarios
+             //   TurmasMaterias
+             //   TurmasNotas                
+             //   TurmasPrevisoes
+             //   TurmasProfessores
                 
-                Calendarios
-                TurmasPresencas (alunoId - CalendarioId)
-            */
-            /*
-             - TurmasPresencas(alunoId e CalendId - DA TURMA)
-             - TurmasNotas(matriculaId)
-             - Responsaveis(matriculaId)
-             - LogMatriculas(matriculaId)
-             - LogBoleos(boletoId)
-             - InformacoesDebitos(matriculaId)
-             EstagiosMatricula(matriculaId)
-             Estagiodocumentos 
-             - Boletos(informacoesDebitoId)
-             AlunosDocumentos
-             AlunoAnotacoes
-            */
+             //   Calendarios
+             //   TurmasPresencas (alunoId - CalendarioId)
+           
+             //- TurmasPresencas(alunoId e CalendId - DA TURMA)
+             //- TurmasNotas(matriculaId)
+             //- Responsaveis(matriculaId)
+             //- LogMatriculas(matriculaId)
+             //- LogBoleos(boletoId)
+             //- InformacoesDebitos(matriculaId)
+             //EstagiosMatricula(matriculaId)
+             //Estagiodocumentos 
+             //- Boletos(informacoesDebitoId)
+             //AlunosDocumentos
+             //AlunoAnotacoes
+            
 
-
-            // var listMatIds = mat.Select(c => c.Id);
 
             var resps = await _db.Responsaveis.Where(m => m.MatriculaId == mat.Id).ToListAsync();
 
             var logMat = await _db.LogMatriculas.Where(m => m.MatriculaId == mat.Id).ToListAsync();
 
-            var infoDebitos = await _db.InformacoesDebito.Where(m => m.MatriculaId == mat.Id).ToListAsync();
+            //var infoDebitos = await _db.InformacoesDebito.Where(m => m.MatriculaId == mat.Id).ToListAsync();
 
-            var listInfoDebsIds = infoDebitos.Select(c => c.Id);
+            //var listInfoDebsIds = infoDebitos.Select(c => c.Id);
 
-            var boletos = await _db.Boletos.Where(m => listInfoDebsIds.Contains(m.InformacaoDebitoId)).ToListAsync();
-
-            //var listBoletosId = boletos.Select(c => c.Id);
-            //var logBoletos = _db.LogBoletos.Where(p => listBoletosId.Contains(p.BoletoId)).ToList();
+            //var boletos = await _db.Boletos.Where(m => listInfoDebsIds.Contains(m.InformacaoDebitoId)).ToListAsync(); matId
+                var boletos = await _db.Boletos.Where(m => m.PessoaId == matId).ToListAsync();
 
 
             var alunoAnots = await _db.AlunosAnotacoes.Where(m => m.MatriculaId == mat.Id).ToListAsync();
@@ -281,14 +250,12 @@ namespace Invictus.Api.Controllers
             
 
 
-            //_db.LogBoletos.RemoveRange(logBoletos);
+            
             _db.Boletos.RemoveRange(boletos);
-            _db.InformacoesDebito.RemoveRange(infoDebitos);
+           // _db.InformacoesDebito.RemoveRange(infoDebitos);
 
             _db.AlunoPlanos.RemoveRange(alunosPlanos);
             _db.AlunosDocs.RemoveRange(alunosDocs);
-
-            //_db.LogMatriculas.RemoveRange(logMat);
 
             _db.Matriculas.RemoveRange(mat);
 
@@ -307,17 +274,17 @@ namespace Invictus.Api.Controllers
 
             }
 
-            /*
-            Removendo as matrículas delas
-                Matriculas  (turmaId) -
-                LogMatriculas (matriculaId) -
-                AlunosDocumentos (matriculaId)  -
-                AlunosPlanoPagamento (matriculaId) -
-                InformãcoesDebitos (matriculaId) -
-                Boletos (informacaoDebitoId)
-                LogBoletos (boletoId)
+            
+            //Removendo as matrículas delas
+            //    Matriculas  (turmaId) -
+            //    LogMatriculas (matriculaId) -
+            //    AlunosDocumentos (matriculaId)  -
+            //    AlunosPlanoPagamento (matriculaId) -
+            //    InformãcoesDebitos (matriculaId) -
+            //    Boletos (informacaoDebitoId)
+            //    LogBoletos (boletoId)
                 
-             */
+             
 
 
             return Ok();

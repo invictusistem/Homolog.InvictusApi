@@ -49,17 +49,15 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<SalaDto>> GetSalasByUserUnidade()
         {
-
-            var siglaUnidade = _aspNetUser.ObterUnidadeDoUsuario();
-            var unidade = await GetUnidadeBySigla(siglaUnidade);
-            var salas = await GetSalas(unidade.id);
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var salas = await GetSalas(unidadeId);
 
             return salas;
         }
 
         public async Task<IEnumerable<SalaDto>> GetSalas(Guid unidadeId)
         {
-            string query = @"SELECT * FROM UnidadesSalas WHERE UnidadesSalas.unidadeId = @unidadeId";
+            string query = @"SELECT * FROM UnidadesSalas WHERE UnidadesSalas.unidadeId = @unidadeId AND UnidadesSalas.Ativo = 'True'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

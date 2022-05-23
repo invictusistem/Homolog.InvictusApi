@@ -1,5 +1,6 @@
 ﻿using Invictus.Application.AdmApplication;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.FinancApplication.Interfaces;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
@@ -25,13 +26,14 @@ namespace Invictus.Api.Controllers.Financeiro
     public class FinanceiroController : ControllerBase
     {
         private readonly IFinanceiroQueries _finQueries;
+        private readonly IFinanceiroApp _financApp;
         private readonly IBoletoService _boletoService;
         private readonly IAspNetUser _aspNetUser;
         private readonly ITurmaPedagQueries _turmaQueries;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly InvictusDbContext _db;
         public FinanceiroController(IFinanceiroQueries finQueries, ITurmaPedagQueries turmaQueries, InvictusDbContext db, IAspNetUser aspNetUser,
-            IUnidadeQueries unidadeQueries, IBoletoService boletoService)
+            IUnidadeQueries unidadeQueries, IBoletoService boletoService, IFinanceiroApp financApp)
         {
             _finQueries = finQueries;
             _boletoService = boletoService;
@@ -39,6 +41,7 @@ namespace Invictus.Api.Controllers.Financeiro
             _db = db;
             _aspNetUser = aspNetUser;
             _unidadeQueries = unidadeQueries;
+            _financApp = financApp;
         }
 
 
@@ -82,7 +85,7 @@ namespace Invictus.Api.Controllers.Financeiro
 
             return Ok(registros);
         }
-
+        /*
         [HttpPost]
         [Route("reparcelar")]
         public async Task<IActionResult> SaveReparcelas([FromBody] ReparcelaCommand reparcelasCommand)
@@ -187,9 +190,24 @@ namespace Invictus.Api.Controllers.Financeiro
             _db.SaveChanges();
 
             return Ok();
+        }*/
+        [HttpGet]
+        [Route("contas/receber/{start}/{end}")]
+        public async Task<IActionResult> Criar(Guid? meioPagamentoId, DateTime start, DateTime end)
+        {
+            await _finQueries.GetContasReceber(start, end);//.CadastrarContaReceber(command);
+
+            return Ok();
         }
 
+        [HttpPost]
+        [Route("contas/receber")]
+        public async Task<IActionResult> Criar([FromBody] CadastrarContaReceberCommand command)
+        {
+            await _financApp.CadastrarContaReceber(command);
 
+            return Ok();
+        }
 
         [HttpPut]
         [Route("boleto-pagar")]

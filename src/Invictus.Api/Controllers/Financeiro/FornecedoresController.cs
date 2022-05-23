@@ -35,6 +35,17 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpGet]
+        [Route("todos")]
+        public async Task<ActionResult<PaginatedItemsViewModel<FornecedorDto>>> GetAllFornecedores()
+        {
+            var fornecedores = await _fornecedorqueries.GetAllFornecedores();
+
+            //if (!fornecedores.Count() == 0) return NotFound();
+
+            return Ok(new { fornecedores = fornecedores });
+        }
+
+        [HttpGet]
         [Route("{fornecedorId}")]
         public async Task<IActionResult> GetFornecedor(Guid fornecedorId)
         {

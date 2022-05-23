@@ -24,7 +24,7 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new BolsaDbMapping());
             modelBuilder.ApplyConfiguration(new CaixaDbMapping());
             modelBuilder.ApplyConfiguration(new FornecedorDbMapping());
-            modelBuilder.ApplyConfiguration(new InformacaoDebitoDbMapping());
+            //modelBuilder.ApplyConfiguration(new InformacaoDebitoDbMapping());
             modelBuilder.ApplyConfiguration(new ReparceladoDbMapping());
         }
     }

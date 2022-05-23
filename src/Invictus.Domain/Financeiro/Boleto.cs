@@ -3,22 +3,7 @@ using Invictus.Core.Enumerations;
 using System;
 
 namespace Invictus.Domain.Financeiro
-{
-    public class Reparcelado : Entity
-    {
-        public Reparcelado(string listBoletoReparceladoId,
-                           string listNewBoletoId)
-        {
-            ListBoletoReparceladoId = listBoletoReparceladoId;
-            ListNewBoletoId = listNewBoletoId;
-
-        }
-
-        public string ListBoletoReparceladoId { get; private set; }
-        public string ListNewBoletoId { get; private set; }
-    }
-
-
+{    
     public class Boleto : Entity
     {
 
@@ -36,7 +21,7 @@ namespace Invictus.Domain.Financeiro
                     StatusPagamento statusBoleto,
                     //Guid reparcelamentoId,
                     Guid centroCustoUnidadeId,
-                    Guid informacaoDebitoId,
+                    //Guid informacaoDebitoId,
                     Guid responsavelCadastroId,
                     BoletoResponseInfo infoBoletos,
                     DateTime dataCadastro)
@@ -54,7 +39,7 @@ namespace Invictus.Domain.Financeiro
             DiasDesconto = diasDesconto;
             StatusBoleto = statusBoleto.DisplayName;
             CentroCustoUnidadeId = centroCustoUnidadeId;
-            InformacaoDebitoId = informacaoDebitoId;
+            //InformacaoDebitoId = informacaoDebitoId;
             ResponsavelCadastroId = responsavelCadastroId;
             InfoBoletos = infoBoletos;
             DataCadastro = dataCadastro;
@@ -74,15 +59,108 @@ namespace Invictus.Domain.Financeiro
         public string StatusBoleto { get; private set; }
         public string Historico { get; private set; }
         public string SubConta { get; private set; }
+        public Guid? SubContaId { get; private set; }
+        public Guid? BancoId { get; private set; }
+        public Guid? CentrocustoId { get; private set; }
+        public Guid? MeioPagamentoId { get; private set; }
         public string FormaPagamento { get; private set; }
         public string DigitosCartao { get; private set; }
+        public bool EhFornecedor { get; private set; }
+        public Guid PessoaId { get; private set; } // colaborador ou matricula
         public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
         public Guid CentroCustoUnidadeId { get; private set; }
-        public Guid InformacaoDebitoId { get; private set; }
+        //public Guid InformacaoDebitoId { get; private set; }
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
+        public static Boleto CadastrarBoletoMatriculaFactory(DateTime vencimento,
+                   decimal valor,
+                   //int juros,
+                  // int jurosFixo,
+                  // string multa,
+                   //string multaFixo,
+                   string desconto,
+                   TipoLancamento tipo,
+                   string diasDesconto,
+                   //StatusPagamento statusBoleto,
+                   //bool ehFornecedor,
+                   Guid pessoaId,
+                   Guid centroCustoUnidadeId,
+                   Guid responsavelCadastroId,
+                   string historico,
+                   Guid? subcontaId,
+                   Guid? bancoId)
+        {
+            var boleto = new Boleto()
+            {
+                Vencimento = vencimento,
+                Valor = valor,
+                Juros = 0,
+                JurosFixo = 0,
+                Multa = "",
+                MultaFixo = "",
+                Desconto = desconto,
+                Tipo = tipo.DisplayName,
+                DiasDesconto = diasDesconto,
+                StatusBoleto = StatusPagamento.EmAberto.DisplayName,
+                Historico = historico,
+                SubContaId = subcontaId,
+                BancoId = bancoId,
+                EhFornecedor = false,
+                PessoaId = pessoaId,
+                CentroCustoUnidadeId = centroCustoUnidadeId,
+                ResponsavelCadastroId = responsavelCadastroId,
+                DataCadastro = DateTime.Now
+
+            };
+
+            return boleto;
+        }
+
+        public static Boleto CadastrarContaReceberFactory(DateTime vencimento,
+                    decimal valor,
+                    int juros,
+                    int jurosFixo,
+                    string multa,
+                    string multaFixo,
+                    string desconto,
+                    TipoLancamento tipo,
+                    string diasDesconto,
+                    StatusPagamento statusBoleto,
+                    bool ehFornecedor,
+                    Guid pessoaId,
+                    Guid centroCustoUnidadeId,                    
+                    Guid responsavelCadastroId,
+                    string historico,
+                    Guid? subcontaId,
+                    Guid? bancoId)
+        {
+            var boleto = new Boleto()
+            {
+                Vencimento = vencimento,
+                Valor = valor,
+                Juros = juros,
+                JurosFixo = jurosFixo,
+                Multa = multa,
+                MultaFixo = multaFixo,
+                Desconto = desconto,
+                Tipo = tipo.DisplayName,
+                DiasDesconto = diasDesconto,
+                StatusBoleto = statusBoleto.DisplayName,
+                Historico = historico,
+                SubContaId = subcontaId,
+                BancoId = bancoId,
+                EhFornecedor = ehFornecedor,
+                PessoaId = pessoaId,
+                CentroCustoUnidadeId = centroCustoUnidadeId,
+                ResponsavelCadastroId = responsavelCadastroId,
+                DataCadastro = DateTime.Now
+
+            };
+
+            return boleto;
+        }
         public void SetInfoBoletos(BoletoResponseInfo infoBoletos)
         {
             InfoBoletos = infoBoletos;
@@ -131,6 +209,11 @@ namespace Invictus.Domain.Financeiro
             SubConta = subConta;
         }
 
+        public void SetSubContaId(Guid subcontaId)
+        {
+            SubContaId = subcontaId;
+        }
+
         public void SetHistorico(string historico)
         {
             Historico = historico;
@@ -138,62 +221,10 @@ namespace Invictus.Domain.Financeiro
 
         #region EF
 
-        public Boleto() { }
-        public virtual InformacaoDebito InformacaoDebito { get; private set; }
+        protected Boleto() { }
+        //public virtual InformacaoDebito InformacaoDebito { get; private set; }
 
         #endregion
 
-    }
-
-    public class BoletoResponseInfo //: Entity
-    {
-        public BoletoResponseInfo(string id_unico,
-                                string id_unico_original,
-                                 string status,
-                                string msg,
-                                string nossonumero,
-                                string linkBoleto,
-                                 string linkGrupo,
-                                string linhaDigitavel,
-                                string pedido_numero,
-                                string banco_numero,
-                                string token_facilitador,
-                                string credencial
-                                )
-        {
-            Id_unico = id_unico;
-            Id_unico_original = id_unico_original;
-            Status = status;
-            Msg = msg;
-            Nossonumero = nossonumero;
-            LinkBoleto = linkBoleto;
-            LinkGrupo = linkGrupo;
-            LinhaDigitavel = linhaDigitavel;
-            Pedido_numero = pedido_numero;
-            Banco_numero = banco_numero;
-            Token_facilitador = token_facilitador;
-            Credencial = credencial;
-
-        }
-        public string Id_unico { get; private set; }
-        public string Id_unico_original { get; private set; }
-        public string Status { get; private set; }
-        public string Msg { get; private set; }
-        public string Nossonumero { get; private set; }
-        public string LinkBoleto { get; private set; }
-        public string LinkGrupo { get; private set; }
-        public string LinhaDigitavel { get; private set; }
-        public string Pedido_numero { get; private set; }
-        public string Banco_numero { get; private set; }
-        public string Token_facilitador { get; private set; }
-        public string Credencial { get; private set; }
-
-        #region EF
-
-        public Guid BoletoId { get; private set; }
-        public virtual Boleto Boleto { get; private set; }
-        public BoletoResponseInfo() { }
-
-        #endregion
     }
 }

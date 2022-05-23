@@ -16,5 +16,7 @@ namespace Invictus.Dtos.AdmDtos
         public int cargaHoraria { get; set; }
         public string modalidade { get; set; }
         public Guid pacoteId { get; set; }
+
+       
     }
 }

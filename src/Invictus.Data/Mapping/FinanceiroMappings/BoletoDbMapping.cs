@@ -65,9 +65,9 @@ namespace Invictus.Data.Mapping.FinanceiroMappings
             builder.OwnsOne(h => h.InfoBoletos)
                .Property(h => h.Credencial).HasColumnName("Credencial");
             //.HasColumnName("nvarchar(150)");           
-            builder.HasOne(c => c.InformacaoDebito)
-                .WithMany(c => c.Boletos)
-                .HasForeignKey(m => m.InformacaoDebitoId);
+            //builder.HasOne(c => c.InformacaoDebito)
+            //    .WithMany(c => c.Boletos)
+            //    .HasForeignKey(m => m.InformacaoDebitoId);
 
             builder.ToTable("Boletos");
         }

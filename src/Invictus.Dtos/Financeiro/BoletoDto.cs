@@ -16,6 +16,7 @@ namespace Invictus.Dtos.Financeiro
         public int juros { get; set; }
         public int jurosFixo { get; set; }
         public string multa { get; set; }
+        public string nome { get; set; }
         public string multaFixo { get; set; }
         public string desconto { get; set; }
         public string diasDesconto { get; set; }
@@ -23,6 +24,8 @@ namespace Invictus.Dtos.Financeiro
         public Guid reparcelamentoId { get; set; }
         public Guid centroCustoUnidadeId { get; set; }
         public Guid informacaoDebitoId { get; set; }
+        public Guid pessoaId { get; set; }
+        public bool ehFornecedor { get; set; }
         
         //public BoletoResponseInfo InfoBoletos { get; private set; }
         public string id_unico { get; set; }

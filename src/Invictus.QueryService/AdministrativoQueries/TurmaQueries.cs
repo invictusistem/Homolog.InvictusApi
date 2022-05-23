@@ -643,6 +643,7 @@ order by DiaAula
                         Turmas.PrevisaoInfo, 
                         Turmas.PrevisaoAtual, 
                         Turmas.minimoAlunos, 
+                        Turmas.typePacoteId, 
                         Turmas.PrevisaoTerminoAtual, 
                         UnidadesSalas.Capacidade as Vagas 
                         From Turmas 

@@ -57,7 +57,7 @@ namespace Invictus.Domain.Administrativo.PacoteAggregate
 
         public void SetOrdem(int ordem)
         {
-            Ordem = ordem;
+            Ordem = ordem + 1;
         }
         public void SetModalidadeCurso(string mod)
         {

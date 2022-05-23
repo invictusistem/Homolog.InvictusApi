@@ -48,12 +48,20 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("anotacao/{matriculaId}")]
         public async Task<IActionResult> GetInformacoesAluno(Guid matriculaId)
         {
-            // cadastro aluno baseado na matricula
 
             var anotacoes = await _pedagMatriculaQueries.GetAnotacoesMatricula(matriculaId);
           
 
             return Ok(new { anotacoes = anotacoes });
+        }
+
+        [HttpGet]
+        //[Route("anotacao")]
+        public async Task<IActionResult> GetMatriculadosFromUnidade()
+        {
+            var matriculados = await _pedagMatriculaQueries.GetMatriculadosFromUnidade();
+
+            return Ok(new { matriculados = matriculados });
         }
 
         [HttpGet]

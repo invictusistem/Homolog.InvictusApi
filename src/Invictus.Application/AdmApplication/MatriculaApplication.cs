@@ -68,6 +68,7 @@ namespace Invictus.Application.AdmApplication
         private List<TurmaNotas> _turmaNotas;
         private Guid _newMatriculaId;
         private Guid _pacoteId;
+        private Guid _userId;
         private Guid _responsavelMatricula;
         private bool _temRespMenor;
         private bool _temRespFinanc;
@@ -75,6 +76,7 @@ namespace Invictus.Application.AdmApplication
         private readonly IServiceScopeFactory _serviceScopeFactory;
         public int _qntBolatos;
         public string _numeroMatricula;
+        private List<Boleto> _boletos;//; = new List<Boleto>();
         public MatriculaApplication(IPlanoPagamentoQueries planoQueries, IAlunoQueries alunoQueries, ITurmaQueries turmaQueries, IMapper mapper,
             IPacoteQueries pacoteQueries, ITurmaRepo turmaRepo, IMatriculaRepo matRepo, IAlunoRepo alunoRepo, ITurmaNotasRepo turmaNotasRepo,
             IMatriculaQueries matQueries, IRespRepo respRepo, IAspNetUser aspNetUser, IAlunoPedagRepo alunoPedagRepo,
@@ -100,6 +102,7 @@ namespace Invictus.Application.AdmApplication
             _unidadeQueries = unidadeQueries;
             _turmaId = Guid.NewGuid();
             _alunoId = Guid.NewGuid();
+            _userId = Guid.NewGuid();
             _responsavelMatricula = Guid.NewGuid();
             _newMatriculaId = Guid.NewGuid();
             _pacoteId = Guid.NewGuid();
@@ -117,20 +120,22 @@ namespace Invictus.Application.AdmApplication
             _serviceScopeFactory = serviceScopeFactory;
             _userManager = userManager;
             _calendQueries = calendQueries;
+            _boletos = new List<Boleto>();
         }
 
         public void AddParams(Guid turmaId, Guid alunoId, MatriculaCommand command) { _turmaId = turmaId; _alunoId = alunoId; _command = command; }
 
         public async Task<Guid> Matricular()
         {
-            var boletoCount = _db.ParametrosValues.Where(l => l.ParametrosKeyId == new Guid("e27ae51b-2974-4cc5-b9e1-6acc7aa8d8a6")).FirstOrDefault();
-            _qntBolatos = Convert.ToInt32(boletoCount.Value);
-            var total = Convert.ToInt32(boletoCount.Value) + _command.plano.infoParcelas.Count();
-            boletoCount.SetValue(total.ToString());
+            _userId = _aspNetUser.ObterUsuarioId();
+            //var boletoCount = _db.ParametrosValues.Where(l => l.ParametrosKeyId == new Guid("e27ae51b-2974-4cc5-b9e1-6acc7aa8d8a6")).FirstOrDefault();
+            //_qntBolatos = Convert.ToInt32(boletoCount.Value);
+            //var total = Convert.ToInt32(boletoCount.Value) + _command.plano.infoParcelas.Count();
+            //boletoCount.SetValue(total.ToString());
 
-            _db.ParametrosValues.Update(boletoCount);
+            //_db.ParametrosValues.Update(boletoCount);
 
-            _db.SaveChanges();
+            //_db.SaveChanges();
             // verificar confirmação matrícula
             // acima, gerr apenas a primeira parcela
             // paa a primeira, gerar as demais parcela
@@ -163,8 +168,8 @@ namespace Invictus.Application.AdmApplication
             await SaveContratoAluno();
 
             //await ProcurarPorLead();
-            
-            
+
+
 
             //var boletoLog = new LogBoletos(Guid.NewGuid(), "", DateTime.Now);
 
@@ -173,22 +178,133 @@ namespace Invictus.Application.AdmApplication
             //_db.SaveChanges();
             // TODO
             //await CreateInfoFinanceirasDoAluno(_turmaId, _newMatriculaId, _alunoId, _command);
-            _backgroundWorkerQueue.QueueBackgroundWorkItem(async token =>
-            {
 
-                await CreateInfoFinanceirasDoAluno(_turmaId, _newMatriculaId, _alunoId, _command);
-                _logger.LogInformation($"Done at {DateTime.UtcNow.TimeOfDay}");
-            });
+            // REFACT
 
-            //await CreateInfoFinanceirasDoAluno();
+            await CreateInfoFinanceirasDoAluno(_turmaId, _newMatriculaId, _alunoId, _command);
 
             await _turmaRepo.Edit(_turma);
+            
             _matRepo.Commit();
 
             await GenerateAlunoLogin();
 
+            // await GenerateBoletos()
+            //try
+            //{
+            //    _backgroundWorkerQueue.QueueBackgroundWorkItem(async token =>
+            //    {
+            //        await GenerateBoletos(_command, _alunoId, _boletos);
+            //        _logger.LogInformation($"Done at {DateTime.UtcNow.TimeOfDay}");
+            //    });
+            //}
+            //catch(Exception ex)
+            //{
+            //}
             return _newMatriculaId;
-        }        
+        }
+
+        private async Task GenerateBoletos(MatriculaCommand command, Guid alunoId, List<Boleto> listaBoletos)
+        {
+            var responsavelNoBoleto = await GerarDadosDoresponsavelPeloBoleto(alunoId, command);
+
+            var i = 1;
+
+            foreach (var boleto in listaBoletos)
+            {
+                var boletosResponse = await _boletoService.GerarBoleto(boleto.Valor,Convert.ToDecimal(boleto.Desconto), boleto.Vencimento, responsavelNoBoleto, _qntBolatos + i);
+
+                var boletoInfo = new BoletoResponseInfo(
+                    boletosResponse.id_unico, 
+                    boletosResponse.id_unico_original,
+                    boletosResponse.status, 
+                    boletosResponse.msg, 
+                    boletosResponse.nossonumero,
+                    boletosResponse.linkBoleto, 
+                    boletosResponse.linkGrupo, 
+                    boletosResponse.linhaDigitavel, 
+                    boletosResponse.pedido_numero, 
+                    boletosResponse.banco_numero,
+                    boletosResponse.token_facilitador, 
+                    boletosResponse.credencial);
+
+                boleto.SetInfoBoletos(boletoInfo);
+
+                i++;
+            }
+
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetService<InvictusDbContext>();
+                try
+                {
+                    db.Boletos.UpdateRange(listaBoletos);
+                }catch(Exception ex)
+                {
+
+                }
+
+                db.SaveChanges();
+            }
+
+        }
+
+        private async Task<DadosPessoaDto> GerarDadosDoresponsavelPeloBoleto(Guid alunoId, MatriculaCommand command)
+        {
+            
+            var menorDeIdade = await _alunoQueries.GetIdadeAluno(alunoId);
+            int age = 0;
+            age = DateTime.Now.Subtract(menorDeIdade).Days;
+            age = age / 365;
+            var menor = true;
+            if (age >= 18) menor = false;
+            
+            var pessoa = new DadosPessoaDto();
+            // definir resp no boleto
+            
+            if (command.temRespFin)
+            {
+                pessoa.nome = command.respFin.nome;
+                pessoa.telefone = command.respFin?.telCelular;
+                pessoa.cpf = command.respFin.cpf;
+                pessoa.logradouro = command.respFin.logradouro;
+                pessoa.bairro = command.respFin.bairro;
+                pessoa.cidade = command.respFin.cidade;
+                pessoa.estado = command.respFin.uf;
+                pessoa.cep = command.respFin.cep;
+
+            }
+            else
+            {
+                if (menor)
+                {
+                    pessoa.nome = command.respMenor.nome;
+                    pessoa.telefone = command.respMenor?.telCelular;
+                    pessoa.cpf = command.respMenor.cpf;
+                    pessoa.logradouro = command.respMenor.logradouro;
+                    pessoa.bairro = command.respMenor.bairro;
+                    pessoa.cidade = command.respMenor.cidade;
+                    pessoa.estado = command.respMenor.uf;
+                    pessoa.cep = command.respMenor.cep;
+                }
+                else
+                {
+                    var aluno = await _alunoQueries.GetAlunoById(alunoId);
+
+                    pessoa.nome = aluno.nome;
+                    pessoa.telefone = aluno?.telCelular;
+                    pessoa.cpf = aluno.cpf;
+                    pessoa.logradouro = aluno.logradouro;
+                    pessoa.bairro = aluno.bairro;
+                    pessoa.cidade = aluno.cidade;
+                    pessoa.estado = aluno.uf;
+                    pessoa.cep = aluno.cep;
+                }
+
+            }
+
+            return pessoa;
+        } 
 
 
         private async Task<bool> VerificarSeConfirmacaoMatricula()
@@ -225,7 +341,7 @@ namespace Invictus.Application.AdmApplication
         {
             _turma = _mapper.Map<Turma>(await _turmaQueries.GetTurma(_turmaId));
            // _turma.AddAlunoNaTurma();
-            await _turmaRepo.Edit(_turma);
+            //await _turmaRepo.Edit(_turma);
             _pacoteId = _turma.PacoteId;
         }
 
@@ -234,10 +350,8 @@ namespace Invictus.Application.AdmApplication
 
             var qntMatriculasNaBase = _db.LogMatriculas.Where(l => l.DataCriacao.Year == DateTime.Now.Year).Count();
 
-
-
             var aluno = await _alunoQueries.GetAlunoById(_alunoId);
-            var status = SetMatriculaStatus(_command.plano.confirmacaoPagmMat);
+            var status = Matricula.SetMatriculaStatus(_command.plano.confirmacaoPagmMat);
             var newMatricula = new Matricula(_alunoId, aluno.nome, aluno.cpf, status, _turmaId);
             newMatricula.SetDiaMatricula();
             // var totalMatriculados = await _matQueries.TotalMatriculados();
@@ -252,16 +366,16 @@ namespace Invictus.Application.AdmApplication
             _newMatriculaId = newMatricula.Id;
             var commandJson = JsonConvert.SerializeObject(_command);
             await _db.LogMatriculas.AddAsync(new LogMatriculas(_newMatriculaId, _responsavelMatricula, DateTime.Now, commandJson));
-            
         }
 
         private async Task CreatePlanoDePagamentoDoAluno()
         {
             var plano = await _planoQueries.GetPlanoById(_command.plano.planoId);
+            
             var newPlanoAluno = new AlunoPlanoPagamento(plano.descricao, plano.valor, _command.plano.taxaMatricula, _command.plano.parcelas, plano.materialGratuito, plano.valorMaterial,
                 _command.plano.bonusPontualidade, _newMatriculaId);
+            
             await _alunoRepo.SaveAlunoPlano(newPlanoAluno);
-
         }
 
         private async Task CreateDocsDoAlunosNaMatricula()
@@ -358,18 +472,18 @@ namespace Invictus.Application.AdmApplication
         public async Task CreateInfoFinanceirasDoAluno(Guid turmaId, Guid newMatriculaId, Guid alunoId, MatriculaCommand comand)
         {
             var turma = await _turmaQueries.GetTurma(turmaId);
-            var infoFin = new InformacaoDebito(comand.plano.parcelas, comand.plano.valor, "", StatusPagamento.EmAberto, DebitoOrigem.Curso, turma.id, "", newMatriculaId, DateTime.Now);
-
+            //var infoFin = new InformacaoDebito(comand.plano.parcelas, comand.plano.valor, "", StatusPagamento.EmAberto, DebitoOrigem.Curso, turma.id, "", newMatriculaId, DateTime.Now);
+            /*
             var menorDeIdade = await _alunoQueries.GetIdadeAluno(alunoId);
             int age = 0;
             age = DateTime.Now.Subtract(menorDeIdade).Days;
             age = age / 365;
             var menor = true;
             if (age >= 18) menor = false;
-
-            var pessoa = new DadosPessoaDto();
+            */
+            //var pessoa = new DadosPessoaDto();
             // definir resp no boleto
-
+            /*
             if (comand.temRespFin)
             {
                 pessoa.nome = comand.respFin.nome;
@@ -382,7 +496,7 @@ namespace Invictus.Application.AdmApplication
                 pessoa.cep = comand.respFin.cep;
 
             }
-            else// if(menor)
+            else
             {
                 if (menor)
                 {
@@ -410,49 +524,64 @@ namespace Invictus.Application.AdmApplication
                 }
 
             }
-            
-            
-            var boletosResponse = await _boletoService.GerarBoletosUnicos(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa, _qntBolatos);
-            var turmaX = await _turmaQueries.GetTurma(turmaId);
-            var boletos = new List<Boleto>();
+            */
+            // Aqui que fica em backgroud e nao o boleto em si = aqui é só a resposta do "Boleto"
+            //var boletosResponse = await _boletoService.GerarBoletosUnicosEmLista(comand.plano.infoParcelas, comand.plano.bonusPontualidade, pessoa, _qntBolatos);
 
-            var boletosOderByDate = boletosResponse.OrderBy(b => b.vencimento).ToList();
+            //var turmaX = await _turmaQueries.GetTurma(turmaId);
+
+
+
+            //var boletosOderByDate = boletosResponse.OrderBy(b => b.vencimento).ToList();
 
             for (int i = 1; i <= comand.plano.infoParcelas.Count(); i++)
             {
-                var boletoResp = boletosOderByDate[i - 1];//.Where(b => b.pedido_numero == i.ToString()).FirstOrDefault();
+                //var boletoResp = boletosOderByDate[i - 1];                
                 
-                //var boleto = _mapper.Map<BoletoResponseInfo>(boletoResp);
-                //var boleto = _mapper.Map<BoletoResponseInfo>(boletosResponse[i - 1]);
-                //var boletoResp = boletosResponse[i - 1];
-                var boleto = new BoletoResponseInfo(boletoResp.id_unico, boletoResp.id_unico_original, boletoResp.status, boletoResp.msg, boletoResp.nossonumero,
-                    boletoResp.linkBoleto, boletoResp.linkGrupo, boletoResp.linhaDigitavel, boletoResp.pedido_numero, boletoResp.banco_numero,
-                    boletoResp.token_facilitador, boletoResp.credencial);                
+                //var boleto = new BoletoResponseInfo(boletoResp.id_unico, boletoResp.id_unico_original, boletoResp.status, boletoResp.msg, boletoResp.nossonumero,
+                //    boletoResp.linkBoleto, boletoResp.linkGrupo, boletoResp.linhaDigitavel, boletoResp.pedido_numero, boletoResp.banco_numero,
+                //    boletoResp.token_facilitador, boletoResp.credencial);                
 
                 var parc = i.ToString();
 
                 var parcela = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();
 
-                var boletoNew = new Boleto(parcela.vencimento, parcela.valor, 0, 0, "", "",
-                    comand.plano.bonusPontualidade.ToString(),TipoLancamento.Credito, "", StatusPagamento.EmAberto, turmaX.unidadeId, infoFin.Id, _responsavelMatricula, boleto, DateTime.Now);
-                string historico = i + "/" + boletosOderByDate.Count() + " MENSALIDADE";
-                boletoNew.SetHistorico(historico);
+                var newBoleto = Boleto.CadastrarBoletoMatriculaFactory(
+                    parcela.vencimento, 
+                    parcela.valor,
+                    comand.plano.bonusPontualidade.ToString(), 
+                    TipoLancamento.Credito,
+                    "",
+                    _newMatriculaId,
+                    _turma.UnidadeId,
+                    _userId,
+                    i + "/" + comand.plano.infoParcelas.Count() + " MENSALIDADE",
+                    new Guid("71216182-0c9b-4dc3-c343-08da3822cd55"),
+                    null);
+                
+                //string historico = i + "/" + boletosOderByDate.Count() + " MENSALIDADE";
+               // string historico = i + "/" + "" + " MENSALIDADE";
 
-                boletos.Add(boletoNew);
+                //boletoNew.SetHistorico(historico);
+                
+                //boletoNew.SetSubContaId(new Guid("71216182-0c9b-4dc3-c343-08da3822cd55"));
+
+                _boletos.Add(newBoleto);
 
             }
 
-            infoFin.AddBoletos(boletos);
-            //try
+            //infoFin.AddBoletos(boletos);
+
+            await _debitoRepos.SaveBoletos(_boletos);
+
+            //using (var scope = _serviceScopeFactory.CreateScope())
             //{
+            //    var db = scope.ServiceProvider.GetService<InvictusDbContext>();
+                
+            //    db.Boletos.AddRange(_boletos);
 
-
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetService<InvictusDbContext>();
-                db.InformacoesDebito.Add(infoFin);
-                db.SaveChanges();
-            }
+            //    db.SaveChanges();
+            //}
             //await _debi toRepos.SaveInfoFinanceira(infoFin);
             //_db.InformacoesDebito.Add(infoFin);
             //}catch(Exception ex)
@@ -470,13 +599,13 @@ namespace Invictus.Application.AdmApplication
 
 
 
-        private StatusMatricula SetMatriculaStatus(bool status)
-        {
-            if (status) return StatusMatricula.AguardoConfirmacao;
+        //private StatusMatricula SetMatriculaStatus(bool status)
+        //{
+        //    if (status) return StatusMatricula.AguardoConfirmacao;
 
-            return StatusMatricula.Regular;
+        //    return StatusMatricula.Regular;
 
-        }
+        //}
 
         public async Task SetAnotacao(AnotacaoDto anotacao)
         {
@@ -530,11 +659,8 @@ namespace Invictus.Application.AdmApplication
         }
 
         private async Task SaveContratoAluno()
-        {
-            //var usuarioId = _aspNetUser.ObterUsuarioId();
+        {   
             var unidade = await _unidadeQueries.GetUnidadeById(_turma.UnidadeId);
-            // var colaborador = await _colabQueries.GetColaboradoresById(usuarioId);
-            //var aluno = await _alunoQueries.GetAlunoById(_alunoId);
             var menorDeIdade = await _alunoQueries.GetIdadeAluno(_alunoId);
             int age = 0;
             age = DateTime.Now.Subtract(menorDeIdade).Days;
@@ -569,8 +695,11 @@ namespace Invictus.Application.AdmApplication
             var contratoFile = await _reportService.GenerateContrato(infosToPrintPDF, _turma.TypePacoteId);
 
             var doc = new AlunoDocumento(_newMatriculaId, "contrato", "contrato", true, true, true, 0, _turmaId);
+           
             doc.AddDocumento(contratoFile, "contrato", ".pdf", "application/pdf", contratoFile.Length);
+           
             doc.SetDataCriacao();
+            
             doc.SetDocClassificacao(ClassificacaoDoc.Outros);
 
             await _alunoRepo.SaveAlunoDoc(doc);

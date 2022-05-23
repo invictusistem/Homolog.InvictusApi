@@ -52,6 +52,14 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
             Status = StatusMatricula.TryParse(status).DisplayName;
         }
 
+        public static StatusMatricula SetMatriculaStatus(bool status)
+        {
+            if (status) return StatusMatricula.AguardoConfirmacao;
+
+            return StatusMatricula.Regular;
+
+        }
+
         public void SetCiencia(string ciencia, string alunoId = null)
         {
             Ciencia = ciencia;

@@ -2,6 +2,7 @@
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Invictus.Data.Repositories.Financeiro
@@ -24,10 +25,17 @@ namespace Invictus.Data.Repositories.Financeiro
              _db.DisposeAsync();
         }
 
-        public async Task SaveInfoFinanceira(InformacaoDebito infoDebito)
+        public async Task SaveBoleto(Boleto boleto)
         {
-            await _db.InformacoesDebito.AddAsync(infoDebito);
+            await _db.Boletos.AddAsync(boleto);
         }
+
+        public async Task SaveBoletos(IEnumerable<Boleto> boleto)
+        {
+            await _db.Boletos.AddRangeAsync(boleto);
+        }
+
+        
 
        
     }

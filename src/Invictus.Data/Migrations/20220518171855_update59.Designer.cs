@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220518171855_update59")]
+    partial class update59
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1324,6 +1326,9 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Historico")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("InformacaoDebitoId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Juros")
                         .HasColumnType("int");
 
@@ -1374,6 +1379,8 @@ namespace Invictus.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CentroCustoUnidadeId");
+
+                    b.HasIndex("InformacaoDebitoId");
 
                     b.HasIndex("StatusBoleto");
 
@@ -1666,6 +1673,51 @@ namespace Invictus.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Fornecedores");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("FornecedorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Historico")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MatriculaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("NumeroParcelas")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Origem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StatusPagamento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubConta")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tipo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UnidadeCusto")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ValorTotal")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("decimal(11,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InformacoesDebitos");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Financeiro.Reparcelado", b =>
@@ -2306,6 +2358,12 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Financeiro.Boleto", b =>
                 {
+                    b.HasOne("Invictus.Domain.Financeiro.InformacaoDebito", "InformacaoDebito")
+                        .WithMany("Boletos")
+                        .HasForeignKey("InformacaoDebitoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Invictus.Domain.Financeiro.BoletoResponseInfo", "InfoBoletos", b1 =>
                         {
                             b1.Property<Guid>("BoletoId")
@@ -2370,6 +2428,8 @@ namespace Invictus.Data.Migrations
                         });
 
                     b.Navigation("InfoBoletos");
+
+                    b.Navigation("InformacaoDebito");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Financeiro.Configuracoes.SubConta", b =>
@@ -2477,6 +2537,11 @@ namespace Invictus.Data.Migrations
             modelBuilder.Entity("Invictus.Domain.Financeiro.Configuracoes.PlanoConta", b =>
                 {
                     b.Navigation("Subcontas");
+                });
+
+            modelBuilder.Entity("Invictus.Domain.Financeiro.InformacaoDebito", b =>
+                {
+                    b.Navigation("Boletos");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.MatriculaEstagio", b =>

@@ -11,6 +11,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
     public interface IFornecedorQueries
     {
         Task<PaginatedItemsViewModel<FornecedorDto>> GetFornecedores(int itemsPerPage, int currentPage, string paramsJson);
+        Task<IEnumerable<FornecedorDto>> GetAllFornecedores();
         Task<FornecedorDto>  GetFornecedor(Guid fornecedorId);
     }
 }

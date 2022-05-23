@@ -11,11 +11,13 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
     public interface IFinConfigQueries
     {
         Task<IEnumerable<BancoDto>> GetAllBancos();
+        Task<IEnumerable<BancoDto>> GetAllBancosAtivosFromUnidade();
         Task<IEnumerable<MeioPagamentoDto>> GetAllMeiosPagamento();
         Task<IEnumerable<PlanoContaDto>> GetAllPlanos();
         Task<IEnumerable<CentroCustoDto>> GetAllCentroCusto();
         Task<IEnumerable<FormaRecebimentoDto>> GetAllFormasRecebimentos();
         Task<IEnumerable<SubContaDto>> GetAllSubContas();
+        Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas();
         Task<IEnumerable<FornecedorDto>> GetFornecedoresForCreateFormaRecebimento();
 
 

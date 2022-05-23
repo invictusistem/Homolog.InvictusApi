@@ -25,9 +25,18 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("banco")]
-        public async Task<IActionResult> GetBanco()
+        public async Task<IActionResult> GetBancos()
         {
             var result = await _finConfigQuereis.GetAllBancos();
+
+            return Ok(new { result = result });
+        }
+
+        [HttpGet]
+        [Route("banco/ativos")]
+        public async Task<IActionResult> GetBancosAtivos()
+        {
+            var result = await _finConfigQuereis.GetAllBancosAtivosFromUnidade();
 
             return Ok(new { result = result });
         }
@@ -64,6 +73,15 @@ namespace Invictus.Api.Controllers.Financeiro
         public async Task<IActionResult> GetSubConta()
         {
             var result = await _finConfigQuereis.GetAllSubContas();
+
+            return Ok(new { result = result });
+        }
+
+        [HttpGet]
+        [Route("subconta/ativas")]
+        public async Task<IActionResult> GetSubContasAtivas()
+        {
+            var result = await _finConfigQuereis.GetAllSubContasAtivas();
 
             return Ok(new { result = result });
         }

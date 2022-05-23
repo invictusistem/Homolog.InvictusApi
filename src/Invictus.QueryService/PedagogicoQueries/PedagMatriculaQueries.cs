@@ -136,6 +136,31 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<IEnumerable<MatriculaViewModel>> GetMatriculadosFromUnidade()
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();           
+
+            var query = @"SELECT 
+                        Matriculas.Id as matriculaId,
+                        Alunos.Nome as alunoNome
+                        FROM Matriculas
+                        INNER JOIN Alunos on Matriculas.alunoId = Alunos.Id
+                        WHERE Alunos.UnidadeId = @unidadeId
+                        ORDER BY Alunos.Nome ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var matriculas = await connection.QueryAsync<MatriculaViewModel>(query, new { unidadeId = unidadeId });
+
+                connection.Close();
+
+                return matriculas;
+            }
+        }
+
         public async Task<IEnumerable<MatriculaViewModel>> GetRelatorioMatriculas(string param)
         {
             var parametro = JsonConvert.DeserializeObject<MatriculaRelatorioParam>(param);
@@ -175,11 +200,12 @@ namespace Invictus.QueryService.PedagogicoQueries
             {
                 connection.Open();
 
-                if(parametro.opcao == "periodo") 
+                if (parametro.opcao == "periodo")
                 {
                     matriculas = await connection.QueryAsync<MatriculaViewModel>(matriculaDateRangeQuery, new { rangeIni = parametro.inicio, rangeFinal = parametro.fim, unidadeId = unidade.id });
- 
-                } else
+
+                }
+                else
                 {
                     matriculas = await connection.QueryAsync<MatriculaViewModel>(matriculaTurmaQuery, new { turmaId = parametro.turmaId, unidadeId = unidade.id });
                 }
@@ -203,7 +229,7 @@ namespace Invictus.QueryService.PedagogicoQueries
 
                 var result = await connection.QueryAsync<ResponsavelDto>(query, new { matriculaId = matriculaId });
 
-               // connection.Close();
+                // connection.Close();
 
                 return result.FirstOrDefault();
 

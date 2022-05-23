@@ -5,6 +5,7 @@ using Invictus.Api.Helpers;
 using Invictus.Api.HuSignalR;
 using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.ReportService.Interfaces;
+using Invictus.Application.Services;
 using Invictus.BackgroundTasks;
 using Invictus.Core.Enums;
 using Invictus.Data.Context;
@@ -15,6 +16,8 @@ using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
+using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +45,7 @@ namespace Invictus.Api.Controllers
         private IMapper _mapper;
         private readonly IRelatorioApp _relatorioApp;
         private readonly IPDFDesigns _pdfDesign;
+        //readonly IBus _bus;
         public RoleManager<IdentityRole> RoleManager { get; set; }
         private IConverter _converter;
         private readonly ITemplate _template;
@@ -50,12 +54,14 @@ namespace Invictus.Api.Controllers
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<TestController> _logger;
         private readonly IMatriculaApplication _matriculaApplication;
+        private readonly ITurmaQueries _turmaQueries;
 
         public TestController(
+            ITurmaQueries turmaQueries,
             IRelatorioApp relatorioApp,
             IHubContext<ChartHub> hub,
-           BackgroundWorkerQueue backgroundWorkerQueue,
-           ILogger<TestController> logger,
+            BackgroundWorkerQueue backgroundWorkerQueue,
+            ILogger<TestController> logger,
             IServiceScopeFactory serviceScopeFactory,
             InvictusDbContext db,
             ITemplate template,
@@ -64,8 +70,11 @@ namespace Invictus.Api.Controllers
             IMapper mapper,
             RoleManager<IdentityRole> roleMgr,
             IPDFDesigns pdfDesign,
+            //IBus bus,
             IMatriculaApplication matriculaApplication)
         {
+            //_bus = bus;
+            _turmaQueries = turmaQueries;
             _relatorioApp = relatorioApp;
             _hub = hub;
             _mapper = mapper;
@@ -83,6 +92,17 @@ namespace Invictus.Api.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [Route("mass-transit")]
+        public async Task<IActionResult> MassTransit()
+        {
+            //await _bus.Publish(new GettingStarted { Value = $"The time is {DateTimeOffset.Now}" });
+
+            return Ok();
+        }
+
+
+        [HttpGet]
+        [AllowAnonymous]
         [Route("calendario/{calendarioId}")]
         public IActionResult UpdateCalendario(Guid calendarioId)
         {
@@ -95,7 +115,7 @@ namespace Invictus.Api.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("calendario")]        
+        [Route("calendario")]
         public IActionResult UpdateCalendario([FromBody] TurmaCalendarioViwModel calendDto)
         {
             var calend = _mapper.Map<Calendario>(calendDto);
@@ -371,7 +391,7 @@ namespace Invictus.Api.Controllers
         [Route("teste-get")]
         public async Task<IActionResult> TesteGet()
         {
-            
+
             return Ok();
         }
 
@@ -379,7 +399,7 @@ namespace Invictus.Api.Controllers
         [Route("teste-post")]
         public async Task<IActionResult> TestePost()
         {
-            
+
             return Ok();
         }
 
@@ -398,7 +418,7 @@ namespace Invictus.Api.Controllers
             var email = "andrietograce@gmail.com";
             var usuario = await UserManager.FindByEmailAsync(email);
 
-            if(usuario != null) await UserManager.DeleteAsync(usuario);
+            if (usuario != null) await UserManager.DeleteAsync(usuario);
 
 
             return Ok();
@@ -413,10 +433,19 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
-        [Route("matricular-registros")]
-        public IActionResult MatriculaExcel()
+        [Route("matricula-lotes-dados")]
+        public async Task<IActionResult> GetDados()
         {
-            var commands = _relatorioApp.MatriculaExcel();
+            var turmas = await _turmaQueries.GetTurmas();
+
+            return Ok(new { turmas = turmas });
+        }
+
+        [HttpPost]
+        [Route("matricular-registros")]
+        public IActionResult MatriculaExcel([FromBody] MatriculaPlanilha matricula)
+        {
+            var commands = _relatorioApp.MatriculaExcel(matricula);
             return Ok(new { commands = commands });
         }
 
@@ -537,6 +566,8 @@ namespace Invictus.Api.Controllers
             return Ok();
         }
     }
+
+    
 
     public class Testando
     {

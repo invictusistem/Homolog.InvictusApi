@@ -110,9 +110,7 @@ namespace Invictus.QueryService.FinanceiroQueries
         public async Task<IEnumerable<BoletoDto>> GetDebitoAlunos(Guid matriculaId)
         {
 
-            var query = @"select * from Boletos where Boletos.InformacaoDebitoId = (
-                        select id from InformacoesDebitos where InformacoesDebitos.MatriculaId = @matriculaId 
-                        )";
+            var query = @"SELECT * FROM Boletos WHERE Boletos.PessoaId = @matriculaId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -239,6 +237,48 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Close();
 
                 return count;
+            }
+        }
+
+        public async Task<IEnumerable<BoletoDto>> GetContasReceber(DateTime start, DateTime end)
+        {
+            //StringBuilder query = new StringBuilder();
+            var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
+            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+            var query = @"SELECT * FROM Boletos WHERE Vencimento >= @inicio AND Vencimento <= @fim AND Tipo = 'Crédito'";
+
+            var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome WHERE Fornecedores.id = @id";
+
+            var alunoQuery = @"SELECT 
+                            Alunos.Nome 
+                            FROM Alunos
+                            INNER JOIN Matriculas on Alunos.Id = Matriculas.AlunoId
+                            WHERE Matriculas.Id = @id ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                // itemsPerPage currentPage  param   unidadeId
+
+                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim });
+
+                foreach (var boleto in boletos)
+                {
+                    if (boleto.ehFornecedor)
+                    {
+                        boleto.nome = await connection.QuerySingleAsync<string>(fornecedorQuery, new { id = boleto.pessoaId });
+                    }
+                    else
+                    {
+                        boleto.nome = await connection.QuerySingleAsync<string>(alunoQuery, new { id = boleto.pessoaId });
+                    }
+                }
+
+
+                connection.Close();
+
+                return boletos;
             }
         }
     }

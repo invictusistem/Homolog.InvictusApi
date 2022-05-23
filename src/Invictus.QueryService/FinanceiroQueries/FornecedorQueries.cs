@@ -25,6 +25,24 @@ namespace Invictus.QueryService.FinanceiroQueries
             //_aspNetUser = aspNetUser;
         }
 
+        public async Task<IEnumerable<FornecedorDto>> GetAllFornecedores()
+        {
+            var query = "SELECT * FROM Fornecedores WHERE Fornecedores.ativo = 'True' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var fornecedores = await connection.QueryAsync<FornecedorDto>(query);
+
+                connection.Close();
+
+                return fornecedores;
+
+            }
+        }
+
         public async Task<FornecedorDto> GetFornecedor(Guid fornecedorId)
         {
             var query = "SELECT * from Fornecedores where Fornecedores.Id = @fornecedorId ";

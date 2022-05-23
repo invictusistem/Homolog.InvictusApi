@@ -40,6 +40,25 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
+        public async Task<IEnumerable<BancoDto>> GetAllBancosAtivosFromUnidade()
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            var query = @"SELECT * FROM Bancos WHERE Bancos.UnidadeId = @unidadeId
+                        AND Bancos.Ativo = 'True' ORDER BY Bancos.EhCaixaEscola DESC";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var bancos = await connection.QueryAsync<BancoDto>(query, new { unidadeId = unidadeId });
+
+                return bancos;
+
+            }
+        }
+
         public async Task<IEnumerable<CentroCustoDto>> GetAllCentroCusto()
         {
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
@@ -109,6 +128,22 @@ namespace Invictus.QueryService.FinanceiroQueries
         public async Task<IEnumerable<SubContaDto>> GetAllSubContas()
         {
             var query = @"SELECT * FROM SubContas";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var bancos = await connection.QueryAsync<SubContaDto>(query);
+
+                return bancos;
+
+            }
+        }
+
+        public async Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas()
+        {
+            var query = @"SELECT * FROM SubContas WHERE Subcontas.Ativo = 'True'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

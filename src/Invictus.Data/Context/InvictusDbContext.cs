@@ -93,7 +93,7 @@ namespace Invictus.Data.Context
         public DbSet<Bolsa> Bolsas { get; set; }
         public DbSet<Caixa> Caixas { get; set; }
         public DbSet<Fornecedor> Fornecedors { get; set; }
-        public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
+        //public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
         public DbSet<Reparcelado> Reparcelamentos { get; set; }
 
 
