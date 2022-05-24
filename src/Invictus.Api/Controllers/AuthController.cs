@@ -71,7 +71,22 @@ namespace Invictus.Api.Controllers
                 await _userManager.AddToRoleAsync(user, newuser.Role);
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", newuser.IsActive.ToString()));
                 await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Unidade", unidade.sigla));
+                //var acessos = new { configuracoes = [ bancos = [] ] }
+                await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Acessos", unidade.sigla));
 
+                /*
+`{
+    "financeiro":[
+      "configuracoes":[
+        "bancos":[
+          "create":true,
+          "edit": false
+        ]
+      ]
+    ]    
+    }`
+
+*/
                 return CustomResponse();
             }
 

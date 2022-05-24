@@ -104,7 +104,7 @@ namespace Invictus.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdatePacote([FromBody] PacoteDto editedPacote)
         {
-            //await _pacoteApplication.EditPacote(editedPacote);
+            await _pacoteApplication.EditPacote(editedPacote);
 
             return Ok();
 

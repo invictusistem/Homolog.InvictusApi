@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace Invictus.Api.Controllers.Financeiro
 {
     [Route("api/financeiro")]
@@ -192,12 +193,18 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok();
         }*/
         [HttpGet]
-        [Route("contas/receber/{start}/{end}")]
-        public async Task<IActionResult> Criar(Guid? meioPagamentoId, DateTime start, DateTime end)
+        [Route("contas/receber")]
+        public async Task<IActionResult> Criar([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            await _finQueries.GetContasReceber(start, end);//.CadastrarContaReceber(command);
+            var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end);//.CadastrarContaReceber(command);
 
-            return Ok();
+            if (!contas.Any()) return NotFound();
+
+            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName).Select(c => c.valor).Sum();
+
+            var totalreceber = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName).Select(c => c.valor).Sum();
+            
+            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalreceber = totalreceber });
         }
 
         [HttpPost]

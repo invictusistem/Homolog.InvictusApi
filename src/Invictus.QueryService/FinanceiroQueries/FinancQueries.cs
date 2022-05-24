@@ -204,7 +204,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                     itemsPerPage = itemsPerPage
                 });
 
-                connection.Close();                
+                connection.Close();
 
                 return boletos;
             }
@@ -240,12 +240,25 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<BoletoDto>> GetContasReceber(DateTime start, DateTime end)
+        public async Task<IEnumerable<BoletoDto>> GetContasReceber(string meioPagamentoId, DateTime start, DateTime end)
         {
             //StringBuilder query = new StringBuilder();
             var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
             var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+            var meioPgmId = Guid.NewGuid();
+            if (meioPagamentoId == "null")
+            {
+
+            }
+            else
+            {
+                meioPgmId = new Guid(meioPagamentoId);
+            }
             var query = @"SELECT * FROM Boletos WHERE Vencimento >= @inicio AND Vencimento <= @fim AND Tipo = 'Crédito'";
+
+            if (meioPagamentoId != "null") query =  query + " AND MeioPagamentoId = '"+ meioPgmId + "'";
+
+            query = query + " ORDER BY Boletos.Vencimento";
 
             var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome WHERE Fornecedores.id = @id";
 

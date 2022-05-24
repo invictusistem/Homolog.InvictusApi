@@ -181,7 +181,7 @@ namespace Invictus.Application.AdmApplication
 
             // REFACT
 
-            await CreateInfoFinanceirasDoAluno(_turmaId, _newMatriculaId, _alunoId, _command);
+            await CreateInfoFinanceirasDoAluno();
 
             await _turmaRepo.Edit(_turma);
             
@@ -469,9 +469,9 @@ namespace Invictus.Application.AdmApplication
         }
 
 
-        public async Task CreateInfoFinanceirasDoAluno(Guid turmaId, Guid newMatriculaId, Guid alunoId, MatriculaCommand comand)
+        public async Task CreateInfoFinanceirasDoAluno()
         {
-            var turma = await _turmaQueries.GetTurma(turmaId);
+            //var turma = await _turmaQueries.GetTurma(turmaId);
             //var infoFin = new InformacaoDebito(comand.plano.parcelas, comand.plano.valor, "", StatusPagamento.EmAberto, DebitoOrigem.Curso, turma.id, "", newMatriculaId, DateTime.Now);
             /*
             var menorDeIdade = await _alunoQueries.GetIdadeAluno(alunoId);
@@ -534,7 +534,7 @@ namespace Invictus.Application.AdmApplication
 
             //var boletosOderByDate = boletosResponse.OrderBy(b => b.vencimento).ToList();
 
-            for (int i = 1; i <= comand.plano.infoParcelas.Count(); i++)
+            for (int i = 1; i <= _command.plano.infoParcelas.Count(); i++)
             {
                 //var boletoResp = boletosOderByDate[i - 1];                
                 
@@ -544,18 +544,18 @@ namespace Invictus.Application.AdmApplication
 
                 var parc = i.ToString();
 
-                var parcela = comand.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();
+                var parcela = _command.plano.infoParcelas.Where(i => i.parcelaNo == parc).FirstOrDefault();
 
                 var newBoleto = Boleto.CadastrarBoletoMatriculaFactory(
                     parcela.vencimento, 
                     parcela.valor,
-                    comand.plano.bonusPontualidade.ToString(), 
+                    _command.plano.bonusPontualidade.ToString(), 
                     TipoLancamento.Credito,
                     "",
                     _newMatriculaId,
                     _turma.UnidadeId,
                     _userId,
-                    i + "/" + comand.plano.infoParcelas.Count() + " MENSALIDADE",
+                    i + "/" + _command.plano.infoParcelas.Count() + " MENSALIDADE",
                     new Guid("71216182-0c9b-4dc3-c343-08da3822cd55"),
                     null);
                 
