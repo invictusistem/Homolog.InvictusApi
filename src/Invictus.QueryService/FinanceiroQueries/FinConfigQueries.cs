@@ -95,14 +95,15 @@ namespace Invictus.QueryService.FinanceiroQueries
 
         public async Task<IEnumerable<MeioPagamentoDto>> GetAllMeiosPagamento()
         {
-            var query = @"SELECT * FROM MeioPagamentos";
+            var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
+            var query = @"SELECT * FROM MeioPagamentos WHERE MeioPagamentos.unidadeId = @unidadeId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var meiosPgm = await connection.QueryAsync<MeioPagamentoDto>(query);
+                var meiosPgm = await connection.QueryAsync<MeioPagamentoDto>(query, new { unidadeId = unidadeIdDoUsuario });
 
                 return meiosPgm;
 
@@ -111,14 +112,15 @@ namespace Invictus.QueryService.FinanceiroQueries
 
         public async Task<IEnumerable<PlanoContaDto>> GetAllPlanos()
         {
-            var query = @"SELECT * FROM PlanoContas";
+            var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
+            var query = @"SELECT * FROM PlanoContas WHERE PlanoContas.UnidadeId = @unidadeId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var bancos = await connection.QueryAsync<PlanoContaDto>(query);
+                var bancos = await connection.QueryAsync<PlanoContaDto>(query, new { unidadeId  = unidadeIdDoUsuario } );
 
                 return bancos;
 
@@ -127,14 +129,25 @@ namespace Invictus.QueryService.FinanceiroQueries
 
         public async Task<IEnumerable<SubContaDto>> GetAllSubContas()
         {
-            var query = @"SELECT * FROM SubContas";
+            var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            var query = @"SELECT 
+                        SubContas.Id,
+                        SubContas.Descricao,
+                        SubContas.Tipo,
+                        SubContas.Ativo,
+                        SubContas.PlanoContaId
+                        FROM PlanoContas
+                        INNER JOIN SubContas on PlanoContas.Id = SubContas.PlanoContaId
+                        WHERE SubContas.Ativo = 'True' 
+                        AND PlanoContas.UnidadeId = @unidadeId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var bancos = await connection.QueryAsync<SubContaDto>(query);
+                var bancos = await connection.QueryAsync<SubContaDto>(query, new { unidadeId  = unidadeIdDoUsuario });
 
                 return bancos;
 
@@ -143,14 +156,15 @@ namespace Invictus.QueryService.FinanceiroQueries
 
         public async Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas()
         {
-            var query = @"SELECT * FROM SubContas WHERE Subcontas.Ativo = 'True'";
+            var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
+            var query = @"SELECT * FROM SubContas WHERE SubContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var bancos = await connection.QueryAsync<SubContaDto>(query);
+                var bancos = await connection.QueryAsync<SubContaDto>(query, new { unidadeId = unidadeIdDoUsuario });
 
                 return bancos;
 
@@ -208,7 +222,8 @@ namespace Invictus.QueryService.FinanceiroQueries
         public async Task<IEnumerable<FornecedorDto>> GetFornecedoresForCreateFormaRecebimento()
         {
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
-            var query = @"SELECT Fornecedores.id, Fornecedores.RazaoSocial FROM Fornecedores WHERE Fornecedores.id = @unidadeId AND Fornecedores.Ativo = 'True'";
+
+            var query = @"SELECT Fornecedores.id, Fornecedores.RazaoSocial FROM Fornecedores WHERE Fornecedores.unidadeId = @unidadeId AND Fornecedores.Ativo = 'True'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

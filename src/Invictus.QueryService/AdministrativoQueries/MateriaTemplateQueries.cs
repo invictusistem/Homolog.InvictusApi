@@ -160,5 +160,27 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return resultado.OrderBy(r => r.nome);
             }
         }
+
+        public async Task<IEnumerable<MateriaTemplateDto>> GetMateriasByTypePacoteLiberadoParaOProfessor(Guid typePacoteId, Guid professorId)
+        {
+            var query = @"SELECT * FROM MateriasTemplate 
+                        WHERE MateriasTemplate.typepacoteid = @typePacoteId 
+                        AND MateriasTemplate.Id NOT IN (
+                        SELECT ProfessoresMaterias.PacoteMateriaId FROM ProfessoresMaterias 
+                        WHERE ProfessoresMaterias.ProfessorId = @professorId
+                        )";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var resultado = await connection.QueryAsync<MateriaTemplateDto>(query, new { typePacoteId = typePacoteId, professorId = professorId });
+
+                connection.Close();
+
+                return resultado;
+            }
+        }
     }
 }

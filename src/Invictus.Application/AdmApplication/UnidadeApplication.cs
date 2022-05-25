@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Application.FinancApplication.Interfaces;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate.Interfaces;
+using Invictus.Domain.Financeiro.Configuracoes;
+using Invictus.Domain.Financeiro.Configuracoes.Interfaces;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.Financeiro.Configuracoes;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,6 +21,7 @@ namespace Invictus.Application.AdmApplication
         private readonly IMapper _mapper;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly IUnidadeRepository _unidadeRepo;
+        private readonly IFinanceiroConfigRepo _configRepo;
         //private readonly IColaboradorRepository _colaboradorRepo;
         //private readonly IContratoRepository _contratoRepo;
         public UnidadeApplication(
@@ -24,7 +29,8 @@ namespace Invictus.Application.AdmApplication
             IMapper mapper,
             IUnidadeRepository unidadeRepo,
             //IColaboradorRepository colaboradorRepo,
-            IUnidadeQueries unidadeQueries
+            IUnidadeQueries unidadeQueries,
+            IFinanceiroConfigRepo configRepo
             )
         {
             _mapper = mapper;
@@ -32,7 +38,9 @@ namespace Invictus.Application.AdmApplication
             //_colaboradorRepo = colaboradorRepo;
             //_contratoRepo = contratoRepo;
             _unidadeQueries = unidadeQueries;
-            
+            _configRepo = configRepo;
+
+
         }
 
         public async Task AddSala(SalaDto newSala)
@@ -56,6 +64,17 @@ namespace Invictus.Application.AdmApplication
 
             _unidadeRepo.Save();
 
+            var bancoDto = new BancoDto();
+            bancoDto.ativo = true;
+            bancoDto.dataCadastro = DateTime.Now;
+            bancoDto.ehCaixaEscola = true;
+            bancoDto.unidadeId = unidade.Id;
+            bancoDto.nome = "CAIXA DA ESCOLA";
+
+            var banco = _mapper.Map<Banco>(bancoDto);
+
+            await _configRepo.AddBanco(banco);
+            _configRepo.Commit();
         }
 
         public async Task EditUnidade(UnidadeDto editedUnidade)

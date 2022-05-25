@@ -347,15 +347,13 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        private async Task<List<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
-        {
+        private async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
+        {/*
             StringBuilder profsDisponiveis = new StringBuilder();
             profsDisponiveis.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
             profsDisponiveis.Append("inner join Professores on ProfessoresDisponibilidades.PessoaId = Professores.Id where ");
             profsDisponiveis.Append(" ProfessoresDisponibilidades.UnidadeId = '" + unidadeId + "'");
             profsDisponiveis.Append(" AND Professores.ativo = 'True' AND ");
-            //profsDisponiveis.Append(" AND ProfessoresDisponibilidades.PessoaId not in ");
-            //profsDisponiveis.Append(" (select TurmasProfessores.ProfessorId from TurmasProfessores where TurmasProfessores.TurmaId = '" + turmaId + "') AND ");
 
             if (diasSemana.Count() == 1)
             {
@@ -401,6 +399,29 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return professores.ToList();
+            }
+            */
+
+            var query = @"SELECT 
+                        Professores.Id,                        
+                        Professores.Nome
+                        FROM Professores
+                        INNER JOIN ProfessoresDisponibilidades ON Professores.Id = ProfessoresDisponibilidades.PessoaId
+                        WHERE ProfessoresDisponibilidades.UnidadeId = @unidadeId
+                        AND Professores.id NOT IN (
+                        SELECT TurmasProfessores.ProfessorId FROM TurmasProfessores WHERE TurmasProfessores.TurmaId = @turmaId
+                        ) ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ProfessorDto>(query, new { unidadeId = unidadeId, turmaId = turmaId });                
+
+                connection.Close();
+
+                return result;
             }
         }
 

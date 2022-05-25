@@ -12,12 +12,13 @@ namespace Invictus.Domain.Financeiro.Configuracoes
             Descricao = descricao;
             Tipo = tipo;
             Ativo = ativo;
-
+            //UnidadeId = unidadeId;
         }
         public string Descricao { get; private set; }
         public string Tipo { get; private set; }
         public bool Ativo { get; private set; }
         public Guid PlanoContaId { get; private set; }
+       //public Guid UnidadeId { get; private set; }
         public virtual PlanoConta PlanoConta { get; private set; }
 
         protected SubConta()

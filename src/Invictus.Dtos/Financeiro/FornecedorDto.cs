@@ -24,6 +24,7 @@ namespace Invictus.Dtos.Financeiro
         public string uf { get; set; }
         public string bairro { get; set; }
         public bool ativo { get; set; }
+        public string unidadeSigla { get; set; }
         public Guid unidadeId { get; set; }
 
     }

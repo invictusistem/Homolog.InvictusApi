@@ -18,11 +18,11 @@ namespace Invictus.Api.Controllers.Administrativo
         [HttpGet]
         public IActionResult GetAcessos()
         {
-            var jsonAcessos = @"{""financeiro"":[""configuracoes"":[""bancos"":[""create"":true,""edit"": false]]],""formarecebimento"": null }";
+            //var jsonAcessos = @"{""financeiro"":[""configuracoes"":[""bancos"":[""create"":true,""edit"": false]]],""formarecebimento"": null }";
 
-            var acessos = JsonConvert.DeserializeObject<object>(jsonAcessos);
+            //var acessos = JsonConvert.DeserializeObject<object>(jsonAcessos);
 
-            return Ok(new { acessos = acessos });
+            return Ok();
         }
 
     }

@@ -75,6 +75,19 @@ namespace Invictus.Api.Controllers
             return Ok(new { materias = materias });
         }
 
+        [HttpGet]
+        [Route("materia-liberada/{typePacoteId}/{professorId}")]
+        public async Task<IActionResult> GetMateriaLiberadas(Guid typePacoteId, Guid professorId)
+        {
+
+            var materias = await _materiaQueries.GetMateriasByTypePacoteLiberadoParaOProfessor(typePacoteId, professorId);
+
+            // var cargos = await _db.Cargos.ToListAsync();
+            if (materias == null) return NotFound();
+
+            return Ok(new { materias = materias });
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveMateria([FromBody] MateriaTemplateDto materia)
         {

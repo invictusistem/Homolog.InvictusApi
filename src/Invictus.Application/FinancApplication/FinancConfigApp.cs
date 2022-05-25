@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Invictus.Application.FinancApplication.Interfaces;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Domain.Financeiro.Configuracoes;
 using Invictus.Domain.Financeiro.Configuracoes.Interfaces;
@@ -185,6 +186,8 @@ namespace Invictus.Application.FinancApplication
 
         public async Task SaveMeioDePagamento(MeioPagamentoDto meioPgmDto)
         {
+            meioPgmDto.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            
             var meioPgm = _mapper.Map<MeioPagamento>(meioPgmDto);
 
             await _configRepo.AddMeioPagamento(meioPgm);
@@ -194,6 +197,8 @@ namespace Invictus.Application.FinancApplication
 
         public async Task SavePlanoDeConta(PlanoContaDto planoDto)
         {
+            planoDto.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
             var plano = _mapper.Map<PlanoConta>(planoDto);
 
             await _configRepo.AddPlanoConta(plano);
@@ -203,6 +208,8 @@ namespace Invictus.Application.FinancApplication
 
         public async Task SaveSubConta(SubContaDto subContaDto)
         {
+            subContaDto.tipo = TipoLancamento.TryParse(subContaDto.tipo).DisplayName;
+            
             var subConta = _mapper.Map<SubConta>(subContaDto);
 
             await _configRepo.AddSubConta(subConta);
