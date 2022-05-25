@@ -157,7 +157,15 @@ namespace Invictus.QueryService.FinanceiroQueries
         public async Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas()
         {
             var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
-            var query = @"SELECT * FROM SubContas WHERE SubContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True'";
+            var query = @"SELECT 
+                        SubContas.id,
+                        SubContas.Descricao,
+                        SubContas.Tipo,
+                        SubContas.Ativo,
+                        SubContas.PlanoContaId
+                        FROM PlanoContas
+                        INNER JOIN SubContas ON PlanoContas.Id = SubContas.PlanoContaId 
+                        WHERE PlanoContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

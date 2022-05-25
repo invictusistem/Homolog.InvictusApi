@@ -81,6 +81,11 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 var usuarios = await connection.QueryAsync<UsuarioDto>(query.ToString());
 
+                foreach (var user in usuarios)
+                {
+                    user.ativo = user.clamKey;
+                }
+
                 //var alunoDictionary = new Dictionary<Guid, UsuarioDto>();
 
                 //var usuarios = connection.Query<UsuarioDto, Claims, UsuarioDto>(query.ToString(),
