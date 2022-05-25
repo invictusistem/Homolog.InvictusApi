@@ -242,7 +242,7 @@ namespace Invictus.Api.Controllers
                 return BadRequest();
             }
             
-            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br> https://www.cursosinvict.com/user/login <br>Login: " + colaborador.email + "<br>Senha: " + senha + "<br> :)";
+            var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br> https://www.cursosinvict.com/user/login <br>Login: " + email + "<br>Senha: " + senha + "<br> :)";
             
 
             await _email.SendEmailAsync(user.Email, "Invictus Login", mensagem);
