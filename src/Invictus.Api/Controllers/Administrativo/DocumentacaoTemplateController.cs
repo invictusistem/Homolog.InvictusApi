@@ -47,7 +47,7 @@ namespace Invictus.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveDocumentacao([FromBody] DocumentacaoTemplateDto doc)
         {
-            await _docTemplateApplication.AddDoc(doc);
+            //await _docTemplateApplication.AddDoc(doc);
 
             return Ok();
         }

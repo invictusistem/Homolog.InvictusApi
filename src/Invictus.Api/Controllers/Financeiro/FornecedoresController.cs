@@ -36,13 +36,24 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("todos")]
-        public async Task<ActionResult<PaginatedItemsViewModel<FornecedorDto>>> GetAllFornecedores()
+        public async Task<IActionResult> GetAllFornecedores()
         {
             var fornecedores = await _fornecedorqueries.GetAllFornecedores();
 
             //if (!fornecedores.Count() == 0) return NotFound();
 
             return Ok(new { fornecedores = fornecedores });
+        }
+
+        [HttpGet]
+        [Route("colaboradores-e-professores")]
+        public async Task<IActionResult> GetAllFornecedoresAndProfessores()
+        {
+            var colaboradores = await _fornecedorqueries.GetAllColaboradoresAndProfessores();
+
+            //if (!fornecedores.Count() == 0) return NotFound();
+
+            return Ok(new { colaboradores = colaboradores });
         }
 
         [HttpGet]

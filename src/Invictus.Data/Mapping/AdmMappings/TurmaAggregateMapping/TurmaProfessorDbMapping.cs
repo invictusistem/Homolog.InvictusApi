@@ -13,9 +13,7 @@ namespace Invictus.Data.Mapping.AdmMappings.TurmaAggregateMapping
     {
         public void Configure(EntityTypeBuilder<TurmaProfessor> builder)
         {
-            builder.HasKey(c => c.Id);
-
-            
+            builder.HasKey(c => c.Id);            
 
             builder.ToTable("TurmasProfessores");
         }

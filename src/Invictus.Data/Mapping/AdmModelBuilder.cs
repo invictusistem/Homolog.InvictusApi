@@ -5,6 +5,7 @@ using Invictus.Data.Mapping.AdmMappings.CalendarioMapping;
 using Invictus.Data.Mapping.AdmMappings.ColaboradorMapping;
 using Invictus.Data.Mapping.AdmMappings.ContratoMapping;
 using Invictus.Data.Mapping.AdmMappings.DocumentacaoTemplateMapping;
+using Invictus.Data.Mapping.AdmMappings.FuncionarioMapping;
 using Invictus.Data.Mapping.AdmMappings.LogMapping;
 using Invictus.Data.Mapping.AdmMappings.MatriculaMapping;
 using Invictus.Data.Mapping.AdmMappings.ModelMapping;
@@ -35,6 +36,8 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentacaoTemplateDbMapping());
+            modelBuilder.ApplyConfiguration(new EnderecoDbMapping());
+            modelBuilder.ApplyConfiguration(new FuncionarioDbMapping());
             modelBuilder.ApplyConfiguration(new MateriaTemplateDbMapping());
             modelBuilder.ApplyConfiguration(new MatriculaDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentaoExigenciaDbMapping());

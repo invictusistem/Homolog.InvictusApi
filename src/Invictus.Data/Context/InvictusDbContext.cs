@@ -8,6 +8,7 @@ using Invictus.Domain.Administrativo.ColaboradorAggregate;
 using Invictus.Domain.Administrativo.ContratoAggregate;
 using Invictus.Domain.Administrativo.ContratosAggregate;
 using Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
 using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
@@ -50,6 +51,8 @@ namespace Invictus.Data.Context
         public DbSet<Conteudo> Conteudos { get; set; }
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<DocumentacaoTemplate> DocumentacoesTemplate { get; set; }
+        public DbSet<Domain.Administrativo.FuncionarioAggregate.Endereco> Enderecos { get; set; }
+        public DbSet<Funcionario> Funcionarios { get; set; }
         public DbSet<LogBoletos> LogBoletos { get; set; }
         public DbSet<LogCalendario> LogCalendarios { get; set; }
         public DbSet<LogLogin> LogLogins { get; set; }
@@ -64,8 +67,8 @@ namespace Invictus.Data.Context
         public DbSet<ParametrosValue> ParametrosValues { get; set; }
         public DbSet<PlanoPagamentoTemplate> PlanosPgmTemplate { get; set; }
         public DbSet<Produto> Produtos { get; set; }
-        public DbSet<Disponibilidade> Disponibilidades { get; set; }
-        public DbSet<MateriaHabilitada> MateriasHabilitadas { get; set; }
+        public DbSet<Domain.Administrativo.ProfessorAggregate.Disponibilidade> Disponibilidades { get; set; }
+        public DbSet<Domain.Administrativo.ProfessorAggregate.MateriaHabilitada> MateriasHabilitadas { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Requerimento> Requerimentos { get; set; }
         public DbSet<TipoRequerimento> TypeRequerimentos { get; set; }

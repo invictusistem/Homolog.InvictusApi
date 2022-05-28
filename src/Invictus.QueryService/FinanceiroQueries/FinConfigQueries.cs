@@ -165,7 +165,34 @@ namespace Invictus.QueryService.FinanceiroQueries
                         SubContas.PlanoContaId
                         FROM PlanoContas
                         INNER JOIN SubContas ON PlanoContas.Id = SubContas.PlanoContaId 
-                        WHERE PlanoContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True'";
+                        WHERE PlanoContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True' 
+                        AND Subcontas.Tipo = 'Crédito'";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var bancos = await connection.QueryAsync<SubContaDto>(query, new { unidadeId = unidadeIdDoUsuario });
+
+                return bancos;
+
+            }
+        }
+
+        public async Task<IEnumerable<SubContaDto>> GetAllSubContasAtivasDebitos()
+        {
+            var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();
+            var query = @"SELECT 
+                        SubContas.id,
+                        SubContas.Descricao,
+                        SubContas.Tipo,
+                        SubContas.Ativo,
+                        SubContas.PlanoContaId
+                        FROM PlanoContas
+                        INNER JOIN SubContas ON PlanoContas.Id = SubContas.PlanoContaId 
+                        WHERE PlanoContas.unidadeId = @unidadeId AND Subcontas.Ativo = 'True' 
+                        AND Subcontas.Tipo = 'Débito'";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

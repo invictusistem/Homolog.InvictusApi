@@ -25,6 +25,8 @@ namespace Invictus.Dtos.Financeiro
         public Guid centroCustoUnidadeId { get; set; }
         public Guid informacaoDebitoId { get; set; }
         public Guid pessoaId { get; set; }
+        public Guid bancoId { get; set; }
+        public string banco { get; set; }
         public bool ehFornecedor { get; set; }
         
         //public BoletoResponseInfo InfoBoletos { get; private set; }

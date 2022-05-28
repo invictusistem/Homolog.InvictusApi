@@ -2,8 +2,6 @@
 using Invictus.Dtos.Financeiro.Configuracoes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.FinanceiroQueries.Interfaces
@@ -18,6 +16,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
         Task<IEnumerable<FormaRecebimentoDto>> GetAllFormasRecebimentos();
         Task<IEnumerable<SubContaDto>> GetAllSubContas();
         Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas();
+        Task<IEnumerable<SubContaDto>> GetAllSubContasAtivasDebitos();
         Task<IEnumerable<FornecedorDto>> GetFornecedoresForCreateFormaRecebimento();
 
 

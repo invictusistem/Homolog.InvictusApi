@@ -8,9 +8,7 @@ namespace Invictus.Domain.Financeiro
     {
 
         public Boleto(DateTime vencimento,
-                    // DateTime dataPagamento,
                     decimal valor,
-                    // decimal valorPago,
                     int juros,
                     int jurosFixo,
                     string multa,
@@ -19,17 +17,13 @@ namespace Invictus.Domain.Financeiro
                     TipoLancamento tipo,
                     string diasDesconto,
                     StatusPagamento statusBoleto,
-                    //Guid reparcelamentoId,
                     Guid centroCustoUnidadeId,
-                    //Guid informacaoDebitoId,
                     Guid responsavelCadastroId,
                     BoletoResponseInfo infoBoletos,
                     DateTime dataCadastro)
         {
             Vencimento = vencimento;
-            //  DataPagamento = dataPagamento;
             Valor = valor;
-            //  ValorPago = valorPago;
             Juros = juros;
             JurosFixo = jurosFixo;
             Multa = multa;
@@ -39,7 +33,6 @@ namespace Invictus.Domain.Financeiro
             DiasDesconto = diasDesconto;
             StatusBoleto = statusBoleto.DisplayName;
             CentroCustoUnidadeId = centroCustoUnidadeId;
-            //InformacaoDebitoId = informacaoDebitoId;
             ResponsavelCadastroId = responsavelCadastroId;
             InfoBoletos = infoBoletos;
             DataCadastro = dataCadastro;
@@ -61,11 +54,12 @@ namespace Invictus.Domain.Financeiro
         public string SubConta { get; private set; }
         public Guid? SubContaId { get; private set; }
         public Guid? BancoId { get; private set; }
-        public Guid? CentrocustoId { get; private set; }
+        public Guid? CentroCustoId { get; private set; }
         public Guid? MeioPagamentoId { get; private set; }
         public string FormaPagamento { get; private set; }
         public string DigitosCartao { get; private set; }
         public bool EhFornecedor { get; private set; }
+        public string TipoPessoa { get; private set; }
         public Guid PessoaId { get; private set; } // colaborador ou matricula
         public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
@@ -74,6 +68,21 @@ namespace Invictus.Domain.Financeiro
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
+        public void SetMeioPgm(Guid meioPgmId)
+        {
+            MeioPagamentoId = meioPgmId;
+        }
+
+        public void SetTipoPessoa(string pessoa)
+        {
+            TipoPessoa = pessoa;
+        }
+
+
+        public void SetCentroCustoId(Guid centroCustoId)
+        {
+            CentroCustoId = centroCustoId;
+        }
         public static Boleto CadastrarBoletoMatriculaFactory(DateTime vencimento,
                    decimal valor,
                    //int juros,
@@ -112,6 +121,54 @@ namespace Invictus.Domain.Financeiro
                 CentroCustoUnidadeId = centroCustoUnidadeId,
                 ResponsavelCadastroId = responsavelCadastroId,
                 DataCadastro = DateTime.Now
+
+            };
+
+            return boleto;
+        }
+
+        public static Boleto CadastrarContaPagarFactory(DateTime vencimento,
+                    decimal valor,
+                    int juros,
+                    int jurosFixo,
+                    string multa,
+                    string multaFixo,
+                    string desconto,
+                    TipoLancamento tipo,
+                    string diasDesconto,
+                    StatusPagamento statusBoleto,
+                    bool ehFornecedor,
+                    Guid pessoaId,
+                    Guid centroCustoUnidadeId,
+                    Guid responsavelCadastroId,
+                    string historico,
+                    Guid? subcontaId,
+                    Guid? bancoId,
+                    Guid? meioPgmId,
+                    Guid? centroCustoId)
+        {
+            var boleto = new Boleto()
+            {
+                Vencimento = vencimento,
+                Valor = valor,
+                Juros = juros,
+                JurosFixo = jurosFixo,
+                Multa = multa,
+                MultaFixo = multaFixo,
+                Desconto = desconto,
+                Tipo = tipo.DisplayName,
+                DiasDesconto = diasDesconto,
+                StatusBoleto = statusBoleto.DisplayName,
+                Historico = historico,
+                SubContaId = subcontaId,
+                BancoId = bancoId,
+                EhFornecedor = ehFornecedor,
+                PessoaId = pessoaId,
+                CentroCustoUnidadeId = centroCustoUnidadeId,
+                ResponsavelCadastroId = responsavelCadastroId,
+                DataCadastro = DateTime.Now,
+                MeioPagamentoId  = meioPgmId,
+                CentroCustoId = centroCustoId
 
             };
 

@@ -5,15 +5,13 @@ using Invictus.Api.Helpers;
 using Invictus.Api.HuSignalR;
 using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.ReportService.Interfaces;
-using Invictus.Application.Services;
 using Invictus.BackgroundTasks;
-using Invictus.Core.Enums;
+using Invictus.Core.Enumerations;
+using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
-using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.Calendarios;
-using Invictus.Domain.Administrativo.ColaboradorAggregate;
-using Invictus.Domain.Administrativo.PacoteAggregate;
-using Invictus.Domain.Administrativo.TurmaAggregate;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
+using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -22,15 +20,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
@@ -45,6 +40,7 @@ namespace Invictus.Api.Controllers
         private IMapper _mapper;
         private readonly IRelatorioApp _relatorioApp;
         private readonly IPDFDesigns _pdfDesign;
+        private readonly IAspNetUser _aspNetUser;
         //readonly IBus _bus;
         public RoleManager<IdentityRole> RoleManager { get; set; }
         private IConverter _converter;
@@ -70,7 +66,7 @@ namespace Invictus.Api.Controllers
             IMapper mapper,
             RoleManager<IdentityRole> roleMgr,
             IPDFDesigns pdfDesign,
-            //IBus bus,
+            IAspNetUser aspNetUser,
             IMatriculaApplication matriculaApplication)
         {
             //_bus = bus;
@@ -88,6 +84,7 @@ namespace Invictus.Api.Controllers
             _logger = logger;
             _pdfDesign = pdfDesign;
             _matriculaApplication = matriculaApplication;
+            _aspNetUser = aspNetUser;
         }
 
         [HttpGet]
@@ -110,6 +107,136 @@ namespace Invictus.Api.Controllers
 
 
             return Ok(new { calend = calend });
+
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("criar-funcionario")]
+        public IActionResult CriarFuncionario()
+        {
+            var colabs = _db.Colaboradores.ToList();
+
+            var funcionarios = new List<Funcionario>();
+
+            var userId = new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8");
+           
+            foreach (var colab in colabs)
+            {
+                var func = Funcionario.ColaboradorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.CargoId, colab.UnidadeId,
+                    colab.Ativo, DateTime.Now, colab.Endereco.Bairro, colab.Endereco.CEP, colab.Endereco.Complemento, colab.Endereco.Logradouro,
+                    colab.Endereco.Numero, colab.Endereco.Cidade, colab.Endereco.UF, userId);
+
+                funcionarios.Add(func);
+            }
+
+
+            var prof = _db.Professores.ToList();
+
+            
+            foreach (var colab in prof)
+            {
+                var func = Funcionario.ProfessorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.UnidadeId,
+                    colab.Ativo, DateTime.Now, colab.Endereco.Bairro, colab.Endereco.CEP, colab.Endereco.Complemento, colab.Endereco.Logradouro,
+                    colab.Endereco.Numero, colab.Endereco.Cidade, colab.Endereco.UF, userId, colab.CNPJ,colab.DataEntrada,colab.DataSaida,colab.NomeContato,
+                    colab.TelefoneContato);
+
+                funcionarios.Add(func);
+            }
+
+            var fornec = _db.Fornecedors.ToList();            
+            
+
+            foreach (var colab in fornec)
+            {
+                var func = Funcionario.FornecedorFactory(colab.Id,colab.RazaoSocial, colab.Email,colab.CNPJ_CPF,
+                    colab.IE_RG, colab.NomeContato, colab.TelContato,colab.WhatsApp, DateTime.Now, colab.Ativo,
+                    colab.Bairro,colab.CEP, colab.Complemento, colab.Logradouro,
+                    colab.Numero, colab.Cidade, colab.UF, userId,colab.UnidadeId);
+
+                funcionarios.Add(func);
+            }
+
+
+
+            _db.Funcionarios.AddRange(funcionarios);
+
+            _db.SaveChanges();
+
+            return Ok();
+
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("atualizar-boletos-pessoa")]
+        public IActionResult AtualizarBoleto()
+        {
+            var boletos = _db.Boletos.ToList();
+
+            foreach (var boleto in boletos)
+            {
+                var forne =  _db.Fornecedors.Find(boleto.PessoaId);
+
+                if(forne != null)
+                {
+                    boleto.SetTipoPessoa(TipoPessoa.Fornecedor.DisplayName);
+                }
+            }
+
+            foreach (var boleto in boletos)
+            {
+                var prof = _db.Professores.Find(boleto.PessoaId);
+
+                if (prof != null)
+                {
+                    boleto.SetTipoPessoa(TipoPessoa.Professor.DisplayName);
+                }
+            }
+
+            foreach (var boleto in boletos)
+            {
+                var colab = _db.Colaboradores.Find(boleto.PessoaId);
+
+                if (colab != null)
+                {
+                    boleto.SetTipoPessoa(TipoPessoa.Colaborador.DisplayName);
+                }
+            }
+
+            foreach (var boleto in boletos)
+            {
+                var aluno = _db.Alunos.Find(boleto.PessoaId);
+
+                if (aluno != null)
+                {
+                    boleto.SetTipoPessoa(TipoPessoa.Aluno.DisplayName);
+                }
+            }
+
+            foreach (var boleto in boletos)
+            {
+                var matri = _db.Matriculas.Find(boleto.PessoaId);
+
+                if (matri != null)
+                {
+                    //var aluno = await _db.Alunos.FindAsync(boleto.PessoaId);
+
+                    boleto.SetTipoPessoa(TipoPessoa.Matriculado.DisplayName);
+                }
+            }
+
+            _db.Boletos.UpdateRange(boletos);
+
+            _db.SaveChanges();
+            /*
+             ehFornecedor: fornecedor
+
+            aluno/colaborador/matriculado/professor
+             */
+
+
+            return Ok();
 
         }
 
@@ -408,6 +535,32 @@ namespace Invictus.Api.Controllers
         public string ReadExcel()
         {
             _relatorioApp.ReadAndSaveExcel();
+            return "invictus Ok";
+        }
+
+        [HttpGet]
+        [Route("add-fornecedores")]
+        public string ReadEFornecedores()
+        {
+            _relatorioApp.SaveFornecedores();
+            return "invictus Ok";
+        }
+
+        [HttpGet]
+        [Route("atualizar-subcontas")]
+        public string Atualizarsubcontas()
+        {
+            var subcontas = _db.SubContas.ToList();
+
+            foreach (var subs in subcontas)
+            {
+                subs.Atualizar(subs.Tipo);
+            }
+
+            _db.SubContas.UpdateRange(subcontas);
+
+            _db.SaveChanges();
+
             return "invictus Ok";
         }
 

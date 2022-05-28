@@ -25,7 +25,8 @@ namespace Invictus.Domain.Financeiro.Fornecedores
                         string numero,
                         string uf,
                         string bairro,
-                        bool ativo
+                        bool ativo,
+                        DateTime dataCadastro
                         )
         {
             
@@ -43,7 +44,8 @@ namespace Invictus.Domain.Financeiro.Fornecedores
             Numero = numero;    
             UF = uf;
             Bairro = bairro;
-            Ativo = ativo;           
+            Ativo = ativo;
+            DataCadastro = dataCadastro;
 
         }
         
@@ -62,6 +64,7 @@ namespace Invictus.Domain.Financeiro.Fornecedores
         public string UF { get; private set; }
         public string Bairro { get; private set; }
         public bool Ativo { get; private set; }
+        public DateTime DataCadastro { get; private set; }
         public Guid UnidadeId { get; private set; }
         
 

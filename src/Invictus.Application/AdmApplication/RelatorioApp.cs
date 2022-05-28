@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using ExcelDataReader;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.AlunoAggregate;
+using Invictus.Domain.Financeiro.Fornecedores;
+using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.PedagDto;
 using MoreLinq;
 using System;
@@ -36,6 +39,7 @@ namespace Invictus.Application.AdmApplication
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
             var userId = _aspNetUser.ObterUsuarioId();
+            //bool eHMenorIdade = false;
             //var unida de = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577");
             // var turmaId = new Guid("7104d99b-142d-4d1c-9c41-f7c1dde52b0d");
             //using (var stream = new MemoryStream())
@@ -53,9 +57,15 @@ namespace Invictus.Application.AdmApplication
 
                         var naturalidade = reader?.GetValue(14)?.ToString().Split(" - ");
                         var endereco = reader?.GetValue(5)?.ToString().Split(",");
+                        
+                        //var logra = endereco[0];
+                        //var numero = endereco[1];
+                        //var compl = endereco[2];
+
                         var testar = reader?.GetValue(1)?.ToString();
                         var tertarNomePai = reader?.GetValue(15)?.ToString();
-                        alunosDto.Add(new AlunoExcelDto()
+
+                        var alun = new AlunoExcelDto()
                         {
                             Nome = reader?.GetValue(1)?.ToString(),
                             CPF = reader?.GetValue(3)?.ToString(),
@@ -80,15 +90,82 @@ namespace Invictus.Application.AdmApplication
 
                             Bairro = reader?.GetValue(6)?.ToString(),
                             CEP = reader?.GetValue(9)?.ToString(),
-                            Complemento = endereco[1],
+                            Complemento = endereco[2],
 
                             Logradouro = endereco[0],
-                            Numero = "",
+                            Numero = endereco[1],
                             Cidade = reader?.GetValue(7)?.ToString(),
-                            UF = reader?.GetValue(8)?.ToString(),
+                            UF = reader?.GetValue(8)?.ToString()
+                        };
 
+                        
 
-                        });
+                        var resp = reader?.GetValue(0)?.ToString();
+                        if (resp == "SIM"){
+
+                            var nasc = Convert.ToDateTime(reader?.GetValue(4)?.ToString());
+
+                            var maisDezoito = nasc.AddYears(18);
+
+                            if(maisDezoito > DateTime.Now)
+                            {
+                                
+                                // resp menor e fin
+                                var res = new RespExcel();
+                                res.tipo = TipoResponsavel.ResponsavelMenor.DisplayName;
+                                res.nome = reader?.GetValue(17)?.ToString();
+                                res.cpf = reader?.GetValue(19)?.ToString();
+                                res.rg = reader?.GetValue(18)?.ToString();
+                                res.nascimento = Convert.ToDateTime(reader?.GetValue(20)?.ToString());
+                                res.email = reader?.GetValue(24)?.ToString();
+                                res.telCelular = reader?.GetValue(22)?.ToString();
+                                res.telResidencial = reader?.GetValue(21)?.ToString();
+                                res.telWhatsapp = reader?.GetValue(23)?.ToString();
+                                res.temRespFin = false;
+
+                                res.bairro = reader?.GetValue(6)?.ToString();
+                                res.cep = reader?.GetValue(9)?.ToString();
+                                res.complemento = endereco[2];
+                                res.logradouro = endereco[0];
+                                res.numero = endereco[1];
+                                res.cidade = reader?.GetValue(7)?.ToString();
+                                res.uf = reader?.GetValue(8)?.ToString();
+
+                                alun.Responsavel = res;
+
+                            }
+                            else
+                            {
+                                var res = new RespExcel();
+                                res.tipo = TipoResponsavel.ResponsavelFinanceiro.DisplayName;
+                                res.nome = reader?.GetValue(17)?.ToString();
+                                res.cpf = reader?.GetValue(19)?.ToString();
+                                res.rg = reader?.GetValue(18)?.ToString();
+                                res.nascimento = Convert.ToDateTime(reader?.GetValue(20)?.ToString());
+                                res.email = reader?.GetValue(24)?.ToString();
+                                res.telCelular = reader?.GetValue(22)?.ToString();
+                                res.telResidencial = reader?.GetValue(21)?.ToString();
+                                res.telWhatsapp = reader?.GetValue(23)?.ToString();
+                                res.temRespFin = true;
+
+                                res.bairro = reader?.GetValue(6)?.ToString();
+                                res.cep = reader?.GetValue(9)?.ToString();
+                                res.complemento = endereco[2];
+                                res.logradouro = endereco[0];
+                                res.numero = endereco[1];
+                                res.cidade = reader?.GetValue(7)?.ToString();
+                                res.uf = reader?.GetValue(8)?.ToString();
+                                alun.Responsavel = res;
+                            }
+
+                        }
+
+                        alunosDto.Add(alun);
+                        // verificar Se Menor
+
+                        //se sim = cadastrar resp
+                        // se nao
+                        // ver se o o nome do resp é difeirete, se for, cadastrar como resp fin
                     }
                 }
             }
@@ -122,8 +199,32 @@ namespace Invictus.Application.AdmApplication
                 if (item.TelReferencia != null)
                     item.TelReferencia = item.TelReferencia.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");//item.TelResidencial = item.TelResidencial.Trim(new Char[] { ' ', '(', ')', '-' });
 
+                // RESPONSAVEL
+                if (item.Responsavel != null)
+                {
+                    if (item.Responsavel.cpf != null)
+                        item.Responsavel.cpf = item.Responsavel.cpf.Replace(".", "").Replace("-", "").Replace(".", "");//; ; ; .Trim(new Char[] { ' ', '-', '.' });
+                                                                                               // item.CPF = item.CPF.Replace(".", "").Replace("-", "").Replace("", "");
+                                                                                               // item.CPF = item.CPF.Trim(new Char[] { ' ', '-', '.' });
+                    if (item.Responsavel.rg != null)
+                        item.Responsavel.rg = item.Responsavel.rg.Replace(".", "")?.Replace("-", "")?.Replace(".", ""); //.Trim(new Char[] { ' ', '-', '.' });
+                                                                                              // item.RG = item.RG.Trim(new Char[] { ' ', '-', '.' });
+                                                                                              // item.RG = item.RG.Trim(new Char[] { ' ', '-', '.' });
+                    if (item.Responsavel.cep != null)
+                        item.Responsavel.cep = item.Responsavel.cep.Replace("-", "").Replace(" ", "").Replace(".", "");/// Trim(new Char[] { ' ', '-' });
+
+                    if (item.Responsavel.telCelular != null)
+                        item.Responsavel.telCelular = item.Responsavel.telCelular.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");//.Trim(new Char[] { ' ', '(', ')','-' });
 
 
+                    if (item.Responsavel.telWhatsapp != null)
+                        item.Responsavel.telWhatsapp = item.Responsavel.telWhatsapp.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");//item.TelResidencial = item.TelResidencial.Trim(new Char[] { ' ', '(', ')', '-' });
+                                                                                                                                // item.TelWhatsapp = item.TelWhatsapp.Trim(new Char[] { ' ', '(', ')', '-' });
+                    if (item.Responsavel.telResidencial != null)
+                        item.Responsavel.telResidencial = item.Responsavel.telResidencial.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");//item.TelResidencial = item.TelResidencial.Trim(new Char[] { ' ', '(', ')', '-' });
+
+                    
+                }
 
                 var lead = _mapper.Map<Aluno>(item);
                 /// lead.SetDateAndResponsavelInLead(user.Email + "/" + user.UserName);
@@ -153,7 +254,7 @@ namespace Invictus.Application.AdmApplication
                 alunosIds.Add(item.Id);
             }
 
-            _db.SaveChanges();
+            //_db.SaveChanges();
 
 
             ///////// FINANCEIRO
@@ -170,12 +271,18 @@ namespace Invictus.Application.AdmApplication
                     {
                         if (String.IsNullOrEmpty(reader?.GetValue(0)?.ToString())) break;
 
+                        var nomeX = reader?.GetValue(1)?.ToString();
+                        var cpfX = reader?.GetValue(2)?.ToString();
+                        var primeiroDia = new DateTime(2022, 1, 10, 0, 0, 0);
+                        var valorX = Convert.ToDecimal(reader?.GetValue(5)?.ToString());
+
+
                         listaFin.Add(new PlanilhafinDto()
                         {
-                            nome = reader?.GetValue(1)?.ToString(),
-                            cpf = reader?.GetValue(2)?.ToString(),
-                            primeiroDiaPag = new DateTime(2022, 1, 10, 0, 0, 0),
-                            valor = Convert.ToDecimal(reader?.GetValue(5)?.ToString())
+                            nome = nomeX,
+                            cpf = cpfX,
+                            primeiroDiaPag = primeiroDia,
+                            valor = valorX
 
                         });
                     }
@@ -202,8 +309,7 @@ namespace Invictus.Application.AdmApplication
                 var listaCompleta = listaFin.Where(l => l.cpf == listaFinDistinct.ToList()[i].cpf);
 
                 var command = new MatriculaCommand();
-                command.menorIdade = false;
-                command.temRespFin = false;
+                
 
                 command.plano.bolsaId = "";
                 command.plano.bonusPontualidade = plano.BonusPontualidade;
@@ -219,10 +325,83 @@ namespace Invictus.Application.AdmApplication
                 command.plano.valorParcela = 0;
 
 
+                var abcd = listaFinDistinct.ToList()[i].cpf;
                 var alunoId = alunos.Where(a => a.CPF == listaFinDistinct.ToList()[i].cpf).Select(a => a.Id).FirstOrDefault();
 
-                command.alunoId = alunoId;
+                var alunoDto = alunosDto.Where(a => a.CPF == listaFinDistinct.ToList()[i].cpf).FirstOrDefault();
+
+                if(alunoDto.Responsavel != null)
+                {
+                    var resp = alunoDto.Responsavel;
+
+                    if(resp.tipo == "Responsável financeiro")
+                    {
+                        command.menorIdade = false;
+                        command.temRespFin = true;
+
+                        var respon = new MatForm()
+                        {
+                            nome = alunoDto.Responsavel.nome,
+                            tipo = "Responsável financeiro",
+                            cpf = alunoDto.Responsavel.cpf,
+                            rg = alunoDto.Responsavel.rg,
+                            nascimento = alunoDto.Responsavel.nascimento,
+                            parentesco = null,
+                            naturalidade = null,
+                            naturalidadeUF = null,
+                            email = alunoDto.Responsavel.email,
+                            telCelular = alunoDto.Responsavel.telCelular,
+                            telWhatsapp = alunoDto.Responsavel.telWhatsapp,
+                            telResidencial = alunoDto.Responsavel.telResidencial,
+                            cep = alunoDto.Responsavel.cep,
+                            logradouro = alunoDto.Responsavel.logradouro,
+                            numero = alunoDto.Responsavel.numero,
+                            complemento = alunoDto.Responsavel.complemento,
+                            cidade = alunoDto.Responsavel.cidade,
+                            uf = alunoDto.Responsavel.uf,
+                            bairro = alunoDto.Responsavel.bairro
+
+                        };
+
+                        command.respFin = respon; // Responsável menor
+                    }
+                    else
+                    {
+                        command.menorIdade = true;
+                        command.temRespFin = false;
+
+                        var respon = new MatForm()
+                        {
+                            nome = alunoDto.Responsavel.nome,
+                            tipo = "Responsável menor",
+                            cpf = alunoDto.Responsavel.cpf,
+                            rg = alunoDto.Responsavel.rg,
+                            nascimento = alunoDto.Responsavel.nascimento,
+                            parentesco = null,
+                            naturalidade = null,
+                            naturalidadeUF = null,
+                            email = alunoDto.Responsavel.email,
+                            telCelular = alunoDto.Responsavel.telCelular,
+                            telWhatsapp = alunoDto.Responsavel.telWhatsapp,
+                            telResidencial = alunoDto.Responsavel.telResidencial,
+                            cep = alunoDto.Responsavel.cep,
+                            logradouro = alunoDto.Responsavel.logradouro,
+                            numero = alunoDto.Responsavel.numero,
+                            complemento = alunoDto.Responsavel.complemento,
+                            cidade = alunoDto.Responsavel.cidade,
+                            uf = alunoDto.Responsavel.uf,
+                            bairro = alunoDto.Responsavel.bairro
+
+                        };
+
+                        command.respMenor = respon;
+                    }
+                }
+
                 
+
+                command.alunoId = alunoId;
+
 
                 //var turmaId = new Guid("7a76c44a-e294-488f-a57c-6edd5abfb8ec");
                 command.turmaId = matricula.turmaId;
@@ -231,6 +410,8 @@ namespace Invictus.Application.AdmApplication
 
                 commands.Add(command);
             }
+
+            _db.SaveChanges();
 
             return commands;
         }
@@ -435,7 +616,7 @@ namespace Invictus.Application.AdmApplication
 
                 parcelas.Add(parcela);
             }
-            
+
 
             return parcelas;
         }
@@ -444,9 +625,9 @@ namespace Invictus.Application.AdmApplication
         {
             List<string> alunosDto = new List<string>();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-           
+
             using (var stream = File.Open("CADASTRO ITAGUAÍ ENF 03.xlsx", FileMode.Open, FileAccess.Read))
-            {                
+            {
                 stream.Position = 1;
 
                 using (var reader = ExcelReaderFactory.CreateReader(stream))
@@ -473,7 +654,7 @@ namespace Invictus.Application.AdmApplication
             {
                 var aluno = _db.Alunos.Where(a => a.CPF == item).FirstOrDefault();
 
-                if(aluno != null)
+                if (aluno != null)
                 {
                     _db.Alunos.Remove(aluno);
 
@@ -482,18 +663,89 @@ namespace Invictus.Application.AdmApplication
 
             }
 
-           // var aluno = await _db.Alunos.Where(a => a.Id == alunoId).FirstOrDefaultAsync();
+            // var aluno = await _db.Alunos.Where(a => a.Id == alunoId).FirstOrDefaultAsync();
 
-            
+
             // var alunoFoto = await _db.aluno.Where(a => a.a == alunoId).FirstOrDefaultAsync();
 
-            
+
 
             //var alunos = _db.Alunos.
 
             //_db.Alunos.AddRange(alunos);
             //_db.SaveChanges();
 
+        }
+
+        public void SaveFornecedores()
+        {
+            List<FornecedorDto> fornecedoresDto = new List<FornecedorDto>();
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            
+            using (var stream = File.Open("FORNECEDORES ITAGUAÍ.xlsx", FileMode.Open, FileAccess.Read))
+            {
+                stream.Position = 1;
+
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    while (reader.Read())
+                    {
+                        if (String.IsNullOrEmpty(reader?.GetValue(0)?.ToString())) break;
+                        
+                        fornecedoresDto.Add(new FornecedorDto()
+                        {
+                            razaoSocial = reader?.GetValue(1)?.ToString().ToUpper(),
+                            ie_rg = reader?.GetValue(4)?.ToString(),
+                            cnpj_cpf = reader?.GetValue(3)?.ToString(),
+                            email = reader?.GetValue(12)?.ToString(),
+                            telContato = reader?.GetValue(10)?.ToString(),
+                            whatsApp = reader?.GetValue(11)?.ToString(),
+                            nomeContato = "",
+                            cep = reader?.GetValue(9)?.ToString(),
+                            logradouro = reader?.GetValue(5)?.ToString().ToUpper(),
+                            complemento = "",
+                            cidade = reader?.GetValue(8)?.ToString().ToUpper(),
+                            numero = reader?.GetValue(6)?.ToString().ToUpper(),
+                            uf = null,
+                            bairro = reader?.GetValue(7)?.ToString().ToUpper(),
+                            ativo = true,
+                            dataCadastro = Convert.ToDateTime(reader?.GetValue(2)?.ToString()),
+                            unidadeId = new Guid("99301da0-f674-4810-b1cd-08d9d78d8577")
+                        });
+                    }
+                }
+            }
+
+            List<Fornecedor> forncedores = new List<Fornecedor>();
+
+            foreach (var item in fornecedoresDto)
+            {
+                if (item.cnpj_cpf != null)
+                    item.cnpj_cpf = item.cnpj_cpf.Replace(".", "").Replace("-", "").Replace(".", "");
+
+                if (item.ie_rg != null)
+                    item.ie_rg = item.ie_rg.Replace(".", "").Replace("-", "").Replace(".", ""); 
+
+                if (item.cep != null)
+                    item.cep = item.cep.Replace("-", "").Replace(" ", "").Replace(".", "");
+
+                if (item.telContato != null)
+                    item.telContato = item.telContato.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");
+
+
+                if (item.whatsApp != null)
+                    item.whatsApp = item.whatsApp.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");
+                               
+
+                var fornecedor = _mapper.Map<Fornecedor>(item);
+
+
+                forncedores.Add(fornecedor);
+            }
+
+            _db.Fornecedors.AddRange(forncedores);
+            _db.SaveChanges();
         }
     }
 
@@ -537,7 +789,34 @@ namespace Invictus.Application.AdmApplication
         public DateTime DataCadastro { get; set; }
         public bool Ativo { get; set; }
         public Guid UnidadeId { get; set; }
-        // public virtual List<Responsavel> Responsaveis { get; set; }
+        public bool temResp { get; set; }
+        public RespExcel Responsavel { get; set; }
 
+    }
+
+    public class RespExcel
+    {
+         
+        public string nome { get; set; }
+        public string tipo { get; set; }
+        public bool temRespFin { get; set; }
+        public string cpf { get; set; }
+        public string rg { get; set; }
+        public DateTime? nascimento { get; set; }
+        public string parentesco { get; set; }
+        public string naturalidade { get; set; }
+        public string naturalidadeUF { get; set; }
+        public string email { get; set; }
+        public string telCelular { get; set; }
+        public string telWhatsapp { get; set; }
+        public string telResidencial { get; set; }
+        public string cep { get; set; }
+        public string logradouro { get; set; }
+        public string numero { get; set; }
+        public string complemento { get; set; }
+        public string cidade { get; set; }
+        public string uf { get; set; }
+        public string bairro { get; set; }
+        public Guid matriculaId { get; set; }
     }
 }

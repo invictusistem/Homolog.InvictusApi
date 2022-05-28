@@ -21,6 +21,18 @@ namespace Invictus.Domain.Financeiro.Configuracoes
        //public Guid UnidadeId { get; private set; }
         public virtual PlanoConta PlanoConta { get; private set; }
 
+        public void Atualizar(string valor)
+        {
+            if(valor == "debito")
+            {
+                Tipo = "Débito";
+            }
+
+            if(valor == "credito")
+            {
+                Tipo = "Crédito";
+            }
+        }
         protected SubConta()
         {
 

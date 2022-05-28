@@ -1,4 +1,5 @@
-﻿using Invictus.Dtos.AdmDtos.Utils;
+﻿using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.Financeiro;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
     {
         Task<PaginatedItemsViewModel<FornecedorDto>> GetFornecedores(int itemsPerPage, int currentPage, string paramsJson);
         Task<IEnumerable<FornecedorDto>> GetAllFornecedores();
+        Task<IEnumerable<ColaboradorDto>> GetAllColaboradoresAndProfessores();
         Task<FornecedorDto>  GetFornecedor(Guid fornecedorId);
     }
 }

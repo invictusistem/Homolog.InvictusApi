@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Core.Interfaces;
+using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.Financeiro;
 using Invictus.QueryService.FinanceiroQueries.Interfaces;
@@ -24,6 +25,60 @@ namespace Invictus.QueryService.FinanceiroQueries
             _config = config;
            // _unidadeQueries = unidadeQueries;
             _aspNetUser = aspNetUser;
+        }
+
+        public async Task<IEnumerable<ColaboradorDto>> GetAllColaboradoresAndProfessores()
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            var queryColaborador = @"SELECT Colaboradores.id, Colaboradores.nome 
+                                    FROM Colaboradores 
+                                    WHERE Colaboradores.ativo = 'True' 
+                                    AND Colaboradores.unidadeId = @unidadeId";
+
+            var queryProfessor = @"SELECT Professores.id, Professores.nome 
+                                    FROM Professores 
+                                    WHERE Professores.ativo = 'True' 
+                                    AND Professores.unidadeId = @unidadeId";
+
+            var pessoas = new List<ColaboradorDto>();
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var colaboradores = await connection.QueryAsync<ColaboradorDto>(queryColaborador, new { unidadeId  = unidadeId });
+
+                if (colaboradores.Any())
+                {
+                    foreach (var colaborador in colaboradores)
+                    {
+                        colaborador.isColaborador = true;
+                        colaborador.isProfessor = false;
+                    }
+
+                    pessoas.AddRange(colaboradores);
+                }
+
+                var professores = await connection.QueryAsync<ColaboradorDto>(queryProfessor, new { unidadeId = unidadeId });
+
+                if (professores.Any())
+                {
+                    foreach (var professor in professores)
+                    {
+                        professor.isColaborador = false;
+                        professor.isProfessor = true;
+                    }
+
+                    pessoas.AddRange(professores);
+                }
+
+                connection.Close();
+
+                return pessoas;
+
+            }
         }
 
         public async Task<IEnumerable<FornecedorDto>> GetAllFornecedores()

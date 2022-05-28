@@ -192,9 +192,19 @@ namespace Invictus.Api.Controllers.Financeiro
 
             return Ok();
         }*/
+
+        [HttpGet]
+        [Route("contas/receber/{id}")]
+        public async Task<IActionResult> GetContaReceber(Guid id)
+        {
+            var conta = await _finQueries.GetContaReceber(id);
+
+            return Ok(new { conta = conta });
+        }
+
         [HttpGet]
         [Route("contas/receber")]
-        public async Task<IActionResult> Criar([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> GetContasReceber([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end);//.CadastrarContaReceber(command);
 
@@ -207,11 +217,44 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok(new { contas = contas, totalAtraso = totalAtraso, totalreceber = totalreceber });
         }
 
+        [HttpGet]
+        [Route("contas/pagar")]
+        public async Task<IActionResult> GetContasPagar([FromQuery] string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            var contas = await _finQueries.GetContasPagar(meioPagamentoId, start, end);//.CadastrarContaReceber(command);
+
+            if (!contas.Any()) return NotFound();
+
+            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName).Select(c => c.valor).Sum();
+
+            var totalPagar = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName).Select(c => c.valor).Sum();
+
+            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalPagar = totalPagar });
+        }
+
         [HttpPost]
         [Route("contas/receber")]
         public async Task<IActionResult> Criar([FromBody] CadastrarContaReceberCommand command)
         {
             await _financApp.CadastrarContaReceber(command);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("contas/pagar")]
+        public async Task<IActionResult> CadastrarContaPagar([FromBody] CadastrarContaReceberCommand command)
+        {
+            await _financApp.CadastrarContaPagar(command);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("contas/receber")]
+        public async Task<IActionResult> EditarContaReceber([FromBody] BoletoDto boleto)
+        {
+            await _financApp.EditarContaReceber(boleto);
 
             return Ok();
         }

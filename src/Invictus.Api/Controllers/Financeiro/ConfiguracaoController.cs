@@ -4,7 +4,6 @@ using Invictus.QueryService.FinanceiroQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers.Financeiro
@@ -82,6 +81,15 @@ namespace Invictus.Api.Controllers.Financeiro
         public async Task<IActionResult> GetSubContasAtivas()
         {
             var result = await _finConfigQuereis.GetAllSubContasAtivas();
+
+            return Ok(new { result = result });
+        }
+
+        [HttpGet]
+        [Route("subconta/ativas/debito")]
+        public async Task<IActionResult> GetSubContasAtivasDebito()
+        {
+            var result = await _finConfigQuereis.GetAllSubContasAtivasDebitos();
 
             return Ok(new { result = result });
         }

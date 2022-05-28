@@ -28,6 +28,8 @@ namespace Invictus.Application.AdmApplication
         {
             newFornecedor.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
+            newFornecedor.dataCadastro = DateTime.Now;
+
             var fornecedor = _mapper.Map<Fornecedor>(newFornecedor);
 
             await _fornecedorRepo.SaveFornecedor(fornecedor);

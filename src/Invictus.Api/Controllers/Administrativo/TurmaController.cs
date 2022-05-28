@@ -63,7 +63,7 @@ namespace Invictus.Api.Controllers
 
             // if (salas.Count() == 0 || typePacotes.Count() == 0) return NotFound();
 
-            return Ok(new { alunos = alunos, professores = professores, turma = turma.FirstOrDefault() });//Ok(new { salas = salas, typePacotes = typePacotes });
+            return Ok(new { alunos = alunos.OrderBy(a => a.nome), professores = professores, turma = turma.FirstOrDefault() });//Ok(new { salas = salas, typePacotes = typePacotes });
 
         }
 

@@ -81,6 +81,8 @@ namespace Invictus.Api.Controllers
 
             // Ao criar app. Unidade, criar a caixa da escola
 
+            // colocar estagio em andamento se a data inicio for "hoje"
+
             return Ok();
         }
 

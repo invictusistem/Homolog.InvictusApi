@@ -246,6 +246,8 @@ namespace Invictus.QueryService.FinanceiroQueries
             var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
             var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
             var meioPgmId = Guid.NewGuid();
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
             if (meioPagamentoId == "null")
             {
 
@@ -254,13 +256,14 @@ namespace Invictus.QueryService.FinanceiroQueries
             {
                 meioPgmId = new Guid(meioPagamentoId);
             }
-            var query = @"SELECT * FROM Boletos WHERE Vencimento >= @inicio AND Vencimento <= @fim AND Tipo = 'Crédito'";
+            var query = @"SELECT * FROM Boletos WHERE Vencimento >= @inicio AND Vencimento <= @fim AND Tipo = 'Crédito' AND Boletos.CentroCustoUnidadeId = @unidadeId ";
 
             if (meioPagamentoId != "null") query =  query + " AND MeioPagamentoId = '"+ meioPgmId + "'";
 
+
             query = query + " ORDER BY Boletos.Vencimento";
 
-            var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome WHERE Fornecedores.id = @id";
+            var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome FROM Fornecedores WHERE Fornecedores.id = @id";
 
             var alunoQuery = @"SELECT 
                             Alunos.Nome 
@@ -274,7 +277,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Open();
                 // itemsPerPage currentPage  param   unidadeId
 
-                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim });
+                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim, unidadeId = unidadeId });
 
                 foreach (var boleto in boletos)
                 {
@@ -292,6 +295,144 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Close();
 
                 return boletos;
+            }
+        }
+
+        public async Task<IEnumerable<BoletoDto>> GetContasPagar(string meioPagamentoId, DateTime start, DateTime end)
+        {
+            //StringBuilder query = new StringBuilder();
+            var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
+            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+            var meioPgmId = Guid.NewGuid();
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            if (meioPagamentoId == "null")
+            {
+
+            }
+            else
+            {
+                meioPgmId = new Guid(meioPagamentoId);
+            }
+            var query = @"SELECT 
+                        Boletos.Id,
+                        Boletos.Vencimento,
+                        Boletos.Valor,
+                        Boletos.StatusBoleto,
+                        Boletos.PessoaId,
+                        Boletos.EhFornecedor,
+                        Boletos.Historico,
+                        Bancos.Nome as banco
+                        FROM Boletos 
+                        LEFT JOIN Bancos ON Boletos.BancoId = Bancos.Id
+                        WHERE Vencimento >= @inicio 
+                        AND Vencimento <= @fim 
+                        AND Tipo = 'Débito' 
+                        AND Boletos.CentroCustoUnidadeId = @unidadeId  ";
+
+            if (meioPagamentoId != "null") query = query + " AND MeioPagamentoId = '" + meioPgmId + "'";
+
+
+            query = query + " ORDER BY Boletos.Vencimento";
+
+            var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome FROM Fornecedores WHERE Fornecedores.id = @id";
+
+            var colaboradorQuery = @"SELECT Colaboradores.nome FROM Colaboradores WHERE Colaboradores.id = @id";
+
+            var professorQuery = @"SELECT Professores.nome FROM Professores WHERE Professores.id = @id";            
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                // itemsPerPage currentPage  param   unidadeId
+
+                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim, unidadeId = unidadeId });
+
+                foreach (var boleto in boletos)
+                {
+                    if (boleto.ehFornecedor)
+                    {
+                        boleto.nome = await connection.QuerySingleAsync<string>(fornecedorQuery, new { id = boleto.pessoaId });
+                    }
+                    else
+                    {
+                        
+                        var nomes = await connection.QueryAsync<string>(colaboradorQuery, new { id = boleto.pessoaId });
+
+                        if (nomes.Any())
+                        {
+                            boleto.nome = nomes.FirstOrDefault();
+                        }
+                        else
+                        {
+                            boleto.nome = await connection.QuerySingleAsync<string>(professorQuery, new { id = boleto.pessoaId });
+                        }
+                    }
+                }
+
+
+                connection.Close();
+
+                return boletos;
+            }
+        }
+
+        public async Task<BoletoDto> GetContaReceber(Guid id)
+        {
+            //StringBuilder query = new StringBuilder();
+            //var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
+            //var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+           //var meioPgmId = Guid.NewGuid();
+            //var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            //if (meioPagamentoId == "null")
+            //{
+
+            //}
+            //else
+            //{
+            //    meioPgmId = new Guid(meioPagamentoId);
+            //}
+            var query = @"SELECT * FROM Boletos WHERE Boletos.id = @id ";
+
+            //if (meioPagamentoId != "null") query = query + " AND MeioPagamentoId = '" + meioPgmId + "'";
+
+
+            //query = query + " ORDER BY Boletos.Vencimento";
+
+            //var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome FROM Fornecedores WHERE Fornecedores.id = @id";
+
+            //var alunoQuery = @"SELECT 
+            //                Alunos.Nome 
+            //                FROM Alunos
+            //                INNER JOIN Matriculas on Alunos.Id = Matriculas.AlunoId
+            //                WHERE Matriculas.Id = @id ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                // itemsPerPage currentPage  param   unidadeId
+
+                var boleto = await connection.QuerySingleAsync<BoletoDto>(query, new { id = id });
+
+                //foreach (var boleto in boletos)
+                //{
+                //    if (boleto.ehFornecedor)
+                //    {
+                //        boleto.nome = await connection.QuerySingleAsync<string>(fornecedorQuery, new { id = boleto.pessoaId });
+                //    }
+                //    else
+                //    {
+                //        boleto.nome = await connection.QuerySingleAsync<string>(alunoQuery, new { id = boleto.pessoaId });
+                //    }
+                //}
+
+
+                connection.Close();
+
+                return boleto;
             }
         }
     }

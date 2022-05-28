@@ -10,5 +10,7 @@ namespace Invictus.Application.FinancApplication.Interfaces
     public interface IFinanceiroApp
     {
         Task CadastrarContaReceber(CadastrarContaReceberCommand command);
+        Task EditarContaReceber(BoletoDto boleto);
+        Task CadastrarContaPagar(CadastrarContaReceberCommand command);
     }
 }

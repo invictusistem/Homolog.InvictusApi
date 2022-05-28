@@ -27,5 +27,5 @@ namespace Invictus.Api.Controllers
             
             return Ok(new { typePacotes = typePacotes });
         }
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 }
