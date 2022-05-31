@@ -600,6 +600,25 @@ namespace Invictus.QueryService.AdministrativoQueries
             return diaAulaCompleta;
         }
 
+        public async Task<string> GetEmailDoProfessorById(Guid professorId)
+        {
+            var query = @"SELECT Professores.Email FROM Professores WHERE Professores.id = @id";
+            
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<string>(query, new { id = professorId });
+
+                connection.Close();
+
+                return result.FirstOrDefault();
+
+            }
+        }
+
 
         #endregion
 

@@ -20,5 +20,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId);
         Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId);
         Task<IEnumerable<ProfessorCalendarioViewModel>> GetProfessorCalendario(Guid professorId);
+        Task<string> GetEmailDoProfessorById(Guid professorId);
     }
 }

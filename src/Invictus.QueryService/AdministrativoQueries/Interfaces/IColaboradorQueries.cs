@@ -13,5 +13,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson);
         Task<ColaboradorDto> GetColaboradoresByEmail(string email);
         Task<ColaboradorDto> GetColaboradoresById(Guid colaboradorId);
+        Task<string> GetEmailFromColaboradorById(Guid colaboradorId);
     }
 }

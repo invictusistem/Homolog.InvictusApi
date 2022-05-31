@@ -75,6 +75,24 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         }
 
+        public async Task<string> GetEmailFromColaboradorById(Guid colaboradorId)
+        {
+            var query = "SELECT Colaboradores.Email FROM Colaboradores WHERE Colaboradores.id = @id";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<string>(query, new { id = colaboradorId });
+
+                connection.Close();
+
+                return results.FirstOrDefault();
+
+            }
+        }
+
         private async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradores(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
             //var ativos = param.ativo;

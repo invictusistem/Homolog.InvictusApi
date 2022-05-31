@@ -594,6 +594,19 @@ namespace Invictus.Api.Controllers
             return Ok(new { turmas = turmas });
         }
 
+        [HttpGet]
+        [Route("change-email")]
+        public async Task<IActionResult> ChangeEmail()
+        {
+            var user = await UserManager.FindByEmailAsync("alvarocamargorj2018@gmail.com");
+
+            user.Email = "alvaroximenesrj@gmail.com";
+
+            await UserManager.UpdateAsync(user);
+
+            return Ok();
+        }
+
         [HttpPost]
         [Route("matricular-registros")]
         public IActionResult MatriculaExcel([FromBody] MatriculaPlanilha matricula)

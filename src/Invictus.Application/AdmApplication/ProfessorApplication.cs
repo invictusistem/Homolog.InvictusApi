@@ -9,15 +9,18 @@ using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Invictus.Application.AdmApplication
 {
     public class ProfessorApplication : IProfessorApplication
     {
+        public UserManager<IdentityUser> UserManager { get; set; }
         private readonly IProfessorRepository _profRepository;
         private readonly ITurmaRepo _turmaRepo;
         private readonly ICalendarioQueries _calendariosQueries;
@@ -29,7 +32,7 @@ namespace Invictus.Application.AdmApplication
         private readonly IUnidadeQueries _unidadeQueries;
         public ProfessorApplication(IProfessorRepository profRepository, IMapper mapper, IAspNetUser aspNetUser, IUnidadeQueries unidadeQueries,
             ICalendarioQueries calendariosQueries, ICalendarioRepo calendarioRepo, IProfessorQueries profQueries, ITurmaQueries turmaQueries,
-            ITurmaRepo turmaRepo)
+            ITurmaRepo turmaRepo, UserManager<IdentityUser> userMgr)
         {
             _profRepository = profRepository;
             _mapper = mapper;
@@ -40,6 +43,7 @@ namespace Invictus.Application.AdmApplication
             _calendarioRepo = calendarioRepo;
             _turmaQueries = turmaQueries;
             _turmaRepo = turmaRepo;
+            UserManager = userMgr;
         }
 
         public async Task AddDisponibilidade(DisponibilidadeDto disponibilidadeDto)
@@ -64,7 +68,7 @@ namespace Invictus.Application.AdmApplication
 
         public async Task EditDisponibilidade(DisponibilidadeDto dispoDto)
         {
-            if(dispoDto.domingo == false &
+            if (dispoDto.domingo == false &
                 dispoDto.segunda == false &
                 dispoDto.terca == false &
                 dispoDto.quarta == false &
@@ -86,7 +90,7 @@ namespace Invictus.Application.AdmApplication
             _profRepository.Save();
         }
 
-        private async Task RemoverProfessorDoCalendarioDaUnidade(Guid unidadeId,Guid professorId)
+        private async Task RemoverProfessorDoCalendarioDaUnidade(Guid unidadeId, Guid professorId)
         {
             IEnumerable<TurmaCalendarioViwModel> calendarios = await _calendariosQueries.GetFutureCalendarsByProfessorIdAndUnidadeId(unidadeId, professorId);
 
@@ -100,7 +104,7 @@ namespace Invictus.Application.AdmApplication
                 }
 
                 _calendarioRepo.UpdateCalendarios(calend.ToList());
-                
+
             }
         }
 
@@ -115,13 +119,13 @@ namespace Invictus.Application.AdmApplication
                 //var calendFilter = calendarios.Where(c => c.unidadeId == dispoDto.unidadeId);
                 foreach (var calend in calendarios)
                 {
-                    if(calend.DiaDaSemana.ToLower() == "domingo")
+                    if (calend.DiaDaSemana.ToLower() == "domingo")
                     {
-                        if(dispoDto.domingo == false)
+                        if (dispoDto.domingo == false)
                         {
                             calend.RemoveProfessorDaAula();
                         }
-                        
+
                     }
 
                     if (calend.DiaDaSemana.ToLower() == "segunda-feira")
@@ -183,7 +187,11 @@ namespace Invictus.Application.AdmApplication
         }
 
         public async Task EditProfessor(ProfessorDto editedProfessor)
-        {  
+        {
+            var newEmail = editedProfessor.email;
+
+            var oldEmail = await _profQueries.GetEmailDoProfessorById(editedProfessor.id);
+
             var professor = _mapper.Map<Professor>(editedProfessor);
 
             professor.SetDataEntrada(editedProfessor.dataEntrada);
@@ -193,6 +201,38 @@ namespace Invictus.Application.AdmApplication
             await _profRepository.EditProfessor(professor);
 
             _profRepository.Save();
+
+            if (newEmail != oldEmail)
+            {
+                if (!String.IsNullOrEmpty(newEmail))
+                {
+                    // update se existir
+                    var user = await UserManager.FindByEmailAsync(oldEmail);
+                    if(user != null)
+                    {
+                        await UserManager.UpdateAsync(user);
+
+                        var claims = await UserManager.GetClaimsAsync(user);
+
+                        var claim = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
+
+                        await UserManager.RemoveClaimAsync(user, claim);
+
+                        await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", editedProfessor.ativo.ToString()));
+                    }
+
+                }
+                else
+                {
+                    var user = await UserManager.FindByEmailAsync(oldEmail);
+                    if (user != null)
+                    {
+                        await UserManager.DeleteAsync(user);
+                    }
+                }
+            }
+
+            
         }
 
         public async Task RemoveProfessorMateria(Guid profMateriaId)
@@ -204,7 +244,7 @@ namespace Invictus.Application.AdmApplication
 
             // remover o prof da materia da turma (turmasMaterias conforme seu id e a matériaId
             var profTurma = _mapper.Map<IEnumerable<TurmaMaterias>>(await _turmaQueries.GetTurmasMateriasByProfessorAndMateriaId(materiaDoProfessor.PacoteMateriaId, materiaDoProfessor.ProfessorId));
-            
+
             if (profTurma.Any())
             {
                 // set prf guid 00000000 no turmasMaterias
@@ -227,7 +267,7 @@ namespace Invictus.Application.AdmApplication
 
                 _calendarioRepo.UpdateCalendarios(calendarios.ToList());
             }
-            
+
             _profRepository.Save();
         }
 
