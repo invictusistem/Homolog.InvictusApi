@@ -11,7 +11,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<IEnumerable<ContratoDto>> GetContratosViewModel();
         Task<ContratoDto> GetContratoById(Guid contratoId);
-        Task<IEnumerable<ContratoDto>> GetContratoByTypePacote(Guid typePacoteId);
+        Task<IEnumerable<ContratoDto>> GetContratoByTypePacote(Guid typePacoteId, bool ativo);
         Task<int> CountContratos();
         Task<ContratoDto> GetContratoCompletoById(Guid contratoId); 
         Task<ContratoDto> GetContratoCompletoByTypeId(Guid typePacoteId);

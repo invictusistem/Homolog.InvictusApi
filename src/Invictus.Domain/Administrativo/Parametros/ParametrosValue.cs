@@ -16,6 +16,7 @@ namespace Invictus.Domain.Administrativo.Parametros
             Descricao = descricao;
             Comentario = comentario;
             ParametrosKeyId = parametrosKeyId;
+            Ativo = ativo;
         }
        // public int Id { get; private set; }
         public string Value { get; private set; }

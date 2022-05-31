@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.AdministrativoQueries
@@ -62,16 +63,22 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<ContratoDto>> GetContratoByTypePacote(Guid typePacoteId)
+        public async Task<IEnumerable<ContratoDto>> GetContratoByTypePacote(Guid typePacoteId, bool ativo)
         {
-            var query = "SELECT * FROM Contratos where Contratos.typePacoteId = @typePacoteId";
+            //var query = "SELECT * FROM Contratos WHERE Contratos.typePacoteId = @typePacoteId AND Contratos.ativo = 'True'";
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT * FROM Contratos WHERE Contratos.typePacoteId = @typePacoteId ");
+
+            if (ativo == true) query.Append(" AND Contratos.ativo = 'True'");
+
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var resultado = await connection.QueryAsync<ContratoDto>(query, new { typePacoteId = typePacoteId });
+                var resultado = await connection.QueryAsync<ContratoDto>(query.ToString(), new { typePacoteId = typePacoteId });
 
                 connection.Close();
 

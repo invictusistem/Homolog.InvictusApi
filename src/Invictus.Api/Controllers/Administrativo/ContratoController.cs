@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers
@@ -118,10 +119,12 @@ namespace Invictus.Api.Controllers
 
         [HttpGet]
         [Route("type-pacote/{typePacoteId}")]
-        public async Task<ActionResult> GetContratoByTypePacote(Guid typePacoteId)
+        public async Task<ActionResult> GetContratoByTypePacote(Guid typePacoteId, [FromQuery]bool ativo)
         {
 
-            var contratos = await _contratoQuery.GetContratoByTypePacote(typePacoteId);
+            var contratos = await _contratoQuery.GetContratoByTypePacote(typePacoteId, ativo);
+
+            if (!contratos.Any()) return NotFound();
 
             return Ok(new { contratos = contratos });
 

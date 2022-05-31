@@ -56,7 +56,7 @@ namespace Invictus.Api.Controllers
         {
             var plano = await _planoQueries.GetPlanoById(planoId);
 
-            var contratos = await _contratoQueries.GetContratoByTypePacote(plano.typePacoteId);
+            var contratos = await _contratoQueries.GetContratoByTypePacote(plano.typePacoteId, false);
 
             var typePacotes = await _typePacoteQueries.GetTypePacotes();
 
