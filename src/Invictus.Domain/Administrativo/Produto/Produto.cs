@@ -4,6 +4,27 @@ using System;
 
 namespace Invictus.Domain.Administrativo.Models
 {
+    public class ProdutoLog : Entity
+    {
+        public ProdutoLog(string metodo,
+                            Guid userId,
+                            Guid unidadeId,
+                            string observacao,
+                            DateTime horario)
+        {
+            Metodo = metodo;
+            UserId = userId;
+            UnidadeId = unidadeId;
+            Observacao = Observacao;
+            Horario = horario;
+        }
+
+        public string Metodo { get; private set; }
+        public Guid UserId { get; private set; }
+        public Guid UnidadeId { get; private set; }
+        public string Observacao { get; private set; }
+        public DateTime Horario { get; private set; }
+    }
     public class Produto : Entity, IAggregateRoot
     {
 
@@ -16,6 +37,7 @@ namespace Invictus.Domain.Administrativo.Models
                         int nivelMinimo,
                         Guid unidadeId,
                         DateTime dataCadastro,
+                        bool ativo,
                         string observacoes
                         )
         {   
@@ -28,8 +50,8 @@ namespace Invictus.Domain.Administrativo.Models
             NivelMinimo = nivelMinimo;
             UnidadeId = unidadeId;
             DataCadastro = dataCadastro;
+            Ativo = ativo;
             Observacoes = observacoes;
-
         }
         public string CodigoProduto { get; private set; }
         public string Nome { get; private set; }
@@ -40,6 +62,7 @@ namespace Invictus.Domain.Administrativo.Models
         public int NivelMinimo { get; private set; }
         public Guid UnidadeId { get; private set; }
         public DateTime DataCadastro { get; private set; }
+        public bool Ativo { get; private set; }
         public string Observacoes { get; private set; }
 
         public void AddCodigoProduto(int totalProductsInDataBase)

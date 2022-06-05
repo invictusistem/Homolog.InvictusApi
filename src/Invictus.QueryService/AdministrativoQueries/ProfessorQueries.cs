@@ -56,7 +56,8 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Professores.Id,
                         Professores.Nome,
                         Professores.Email,
-                        Professores.Ativo
+                        Professores.Ativo,
+                        Unidades.sigla as unidadeSigla
                         FROM Professores INNER JOIN Unidades on Professores.UnidadeId = Unidades.Id WHERE  ");
             if (param.todasUnidades == false) query.Append(" Professores.UnidadeId = '" + unidade.id + "' AND ");
             if (param.nome != "") query.Append(" LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");

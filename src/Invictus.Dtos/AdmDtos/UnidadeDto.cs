@@ -19,6 +19,7 @@ namespace Invictus.Dtos.AdmDtos
         public string numero { get; set; }
         public string cidade { get; set; }
         public string uf { get; set; }
+        public bool isUnidadeGlobal { get; set; }
         public bool ativo { get; set; }
 
         //public List<Modulo> Modulos { get; private set; }

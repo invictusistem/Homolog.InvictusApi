@@ -58,11 +58,13 @@ namespace Invictus.Api.Controllers
         // [Route("produto")]
         public async Task<IActionResult> Save(ProdutoDto newProduto)
         {
+            var nomes = await _produtoQueries.SearchProductByName(newProduto.nome);
+
+            if (nomes.Any()) return Conflict();
 
             await _produtoApplication.AddProduto(newProduto);
 
-
-            return NoContent();
+            return Ok();
         }
 
         [HttpPost]
@@ -72,7 +74,7 @@ namespace Invictus.Api.Controllers
 
             await _produtoApplication.DoarEntreUnidades(doacaoCommand);
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpPut]

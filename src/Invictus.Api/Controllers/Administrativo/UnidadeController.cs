@@ -87,12 +87,12 @@ namespace Invictus.Api.Controllers
         //[HttpPost]
         //public IActionResult SaveUnidade([FromBody] CreateUnidadeDto command)
         [HttpPost]
-        public async Task<IActionResult> SaveUnidade([FromBody] UnidadeDto command)
+        public async Task<IActionResult> SaveUnidade([FromBody] UnidadeDto newUnidade)
         {
-            var msg = await _utils.ValidaUnidade(command.sigla);
+            var msg = await _utils.ValidaUnidade(newUnidade);
             if (msg.Count() > 0) return Conflict(new { msg = msg });
 
-            await _unidadeApplication.CreateUnidade(command);
+            await _unidadeApplication.CreateUnidade(newUnidade);
 
             return Ok();
         }
@@ -112,9 +112,12 @@ namespace Invictus.Api.Controllers
         #region PUT
 
         [HttpPut]
-        public async Task<IActionResult> EditUnidade([FromBody] UnidadeDto command)
+        public async Task<IActionResult> EditUnidade([FromBody] UnidadeDto editedUnidade)
         {
-            await _unidadeApplication.EditUnidade(command);
+            var msg = await _utils.ValidaUnidade(editedUnidade);
+            if (msg.Count() > 0) return Conflict(new { msg = msg });
+
+            await _unidadeApplication.EditUnidade(editedUnidade);
 
             return Ok();
         }

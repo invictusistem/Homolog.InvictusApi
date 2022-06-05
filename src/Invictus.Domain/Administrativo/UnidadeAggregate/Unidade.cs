@@ -14,12 +14,14 @@ namespace Invictus.Domain.Administrativo.UnidadeAggregate
                        string cnpj,
                        string descricao,
                        bool ativo,
+                       bool isUnidadeGlobal,
                        Endereco endereco)
         {           
             Sigla = sigla;
             CNPJ = cnpj;
             Descricao = descricao;            
             Ativo = ativo;
+            IsUnidadeGlobal = isUnidadeGlobal;
             Endereco = endereco;
             Salas = new List<Sala>();
         }
@@ -28,6 +30,7 @@ namespace Invictus.Domain.Administrativo.UnidadeAggregate
         public string CNPJ { get; private set; }
         public string Descricao { get; private set; }
         public bool Ativo { get; private set; }
+        public bool IsUnidadeGlobal { get; private set; }
         public Endereco Endereco { get; private set; }
         public List<Sala> Salas { get; private set; }
 

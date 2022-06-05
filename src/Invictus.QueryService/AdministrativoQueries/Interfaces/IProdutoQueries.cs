@@ -10,6 +10,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     public interface IProdutoQueries
     {
         Task<ProdutoDto> GetProdutobyId(Guid produtoId);
+        Task<IEnumerable<string>> SearchProductByName(string nome);
         Task<IEnumerable<ProdutoDto>> GetProdutos();
         Task<int> ProdutosCount();
     }

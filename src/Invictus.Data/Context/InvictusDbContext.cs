@@ -67,6 +67,7 @@ namespace Invictus.Data.Context
         public DbSet<ParametrosValue> ParametrosValues { get; set; }
         public DbSet<PlanoPagamentoTemplate> PlanosPgmTemplate { get; set; }
         public DbSet<Produto> Produtos { get; set; }
+        public DbSet<ProdutoLog> ProdutosLogs { get; set; }
         public DbSet<Domain.Administrativo.ProfessorAggregate.Disponibilidade> Disponibilidades { get; set; }
         public DbSet<Domain.Administrativo.ProfessorAggregate.MateriaHabilitada> MateriasHabilitadas { get; set; }
         public DbSet<Professor> Professores { get; set; }

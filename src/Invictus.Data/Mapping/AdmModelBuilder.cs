@@ -11,6 +11,7 @@ using Invictus.Data.Mapping.AdmMappings.MatriculaMapping;
 using Invictus.Data.Mapping.AdmMappings.ModelMapping;
 using Invictus.Data.Mapping.AdmMappings.PacoteMapping;
 using Invictus.Data.Mapping.AdmMappings.ParametrosMapping;
+using Invictus.Data.Mapping.AdmMappings.ProdutoMapping;
 using Invictus.Data.Mapping.AdmMappings.ProfessorMapping;
 using Invictus.Data.Mapping.AdmMappings.RequerimentoMapping;
 using Invictus.Data.Mapping.AdmMappings.ResponsavelMapping;
@@ -52,6 +53,7 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new ParametrosValueDbMapping());
             modelBuilder.ApplyConfiguration(new PlanoPagamentoTemplateDbMapping());
             modelBuilder.ApplyConfiguration(new ProdutoDbMapping());
+            modelBuilder.ApplyConfiguration(new ProdutoLogDbMapping());
             modelBuilder.ApplyConfiguration(new DisponibilidadeDbMapping());
             modelBuilder.ApplyConfiguration(new MateriaHabilitadaDbMapping());
             modelBuilder.ApplyConfiguration(new ProfessorDbMapping());

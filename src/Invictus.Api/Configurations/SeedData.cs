@@ -25,7 +25,7 @@ namespace Invictus.Api.Configurations
             if(unidade.Count() == 0)
             {
                 var endereco = new Endereco("Campo Grande", "23093122", "Sala 205", "Estrada da Posse", "3700", "Rio de Janeiro", "RJ");
-                var newUnidade = new Unidade("DEV","12345678912345","Invictus Dev", true, endereco);
+                var newUnidade = new Unidade("DEV","12345678912345","Invictus Dev", true, false,endereco);
                 context.Unidades.Add(newUnidade);
                 context.SaveChanges();
                 var colab = context.Colaboradores.Where(c => c.Email == "invictus@master.com");

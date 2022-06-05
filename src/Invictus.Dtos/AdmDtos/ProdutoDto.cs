@@ -14,6 +14,7 @@ namespace Invictus.Dtos.AdmDtos
         public int nivelMinimo { get; set; }
         public Guid unidadeId { get; set; }
         public DateTime dataCadastro { get; set; }
+        public bool ativo { get; set; }
         public string observacoes { get; set; }
     }    
 }

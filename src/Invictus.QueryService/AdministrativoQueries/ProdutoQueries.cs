@@ -1,12 +1,11 @@
 ﻿using Dapper;
+using Invictus.Core.Interfaces;
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.AdministrativoQueries
@@ -14,10 +13,11 @@ namespace Invictus.QueryService.AdministrativoQueries
     public class ProdutoQueries : IProdutoQueries
     {
         private readonly IConfiguration _config;
-        
-        public ProdutoQueries(IConfiguration config)
+        private readonly IAspNetUser _aspNetUser;
+        public ProdutoQueries(IConfiguration config, IAspNetUser aspNetUser)
         {
             _config = config;
+            _aspNetUser = aspNetUser;
         }
         public async Task<ProdutoDto> GetProdutobyId(Guid produtoId)
         {
@@ -39,23 +39,26 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<ProdutoDto>> GetProdutos()
         {
-            var query = @"select 
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            var query = @"SELECT 
                         produtos.Id, 
                         produtos.Nome,
                         produtos.preco,
                         produtos.quantidade,
                         produtos.NivelMinimo,
                         unidades.sigla as Observacoes 
-                        from Produtos 
-                        inner join unidades on 
-                        Produtos.UnidadeId = Unidades.Id";
-            /* select * from agendaprovas where turmaId = 1070*/
+                        FROM Produtos 
+                        INNER JOIN unidades ON 
+                        Produtos.UnidadeId = Unidades.Id 
+                        WHERE Produtos.unidadeId = @unidadeId";
+            
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var produtos = await connection.QueryAsync<ProdutoDto>(query);
+                var produtos = await connection.QueryAsync<ProdutoDto>(query, new { unidadeId = unidadeId });
 
                 return produtos;
             }
@@ -75,6 +78,27 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return count;
+            }
+        }
+
+        public async Task<IEnumerable<string>> SearchProductByName(string nome)
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            string query = @"SELECT Produtos.nome FROM Produtos WHERE 
+                            LOWER(Produtos.nome) like LOWER('%" + nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND " +
+                            "Produtos.unidadeId = @unidadeId";            
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var names = await connection.QueryAsync<string>(query, new { unidadeId  = unidadeId });
+
+                connection.Close();
+
+                return names;
             }
         }
     }

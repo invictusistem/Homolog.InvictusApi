@@ -17,6 +17,7 @@ namespace Invictus.Dtos.AdmDtos
         public string telefoneContato { get; set; }
         public string nomeContato { get; set; }        
         public Guid unidadeId { get; set; }
+        public string unidadeSigla { get; set; }
         public string numero { get; set; }
         public bool ativo { get; set; }
         public string cep { get; set; }

@@ -46,7 +46,7 @@ namespace Invictus.Application.AdmApplication
             await _produtolRepository.UpdateProduto(produto);
 
             var newProduto = new Produto("", produto.Nome, produto.Descricao, produto.Preco, produto.PrecoCusto, 
-                command.qntDoada, 0, command.unidadeDonatariaId, DateTime.Now, produto.Observacoes);
+                command.qntDoada, 0, command.unidadeDonatariaId, DateTime.Now, produto.Ativo, produto.Observacoes);
 
             var qntProduto = await _produtoQueries.ProdutosCount();
             newProduto.AddCodigoProduto(qntProduto);
@@ -58,6 +58,13 @@ namespace Invictus.Application.AdmApplication
 
         public async Task EditProduto(ProdutoDto editedProduto)
         {
+            var oldProduct = await _produtoQueries.GetProdutobyId(editedProduto.id);
+
+            if(oldProduct.quantidade != editedProduto.quantidade)
+            {
+
+            }
+
             var produto = _mapper.Map<Produto>(editedProduto);
 
             await _produtolRepository.UpdateProduto(produto);

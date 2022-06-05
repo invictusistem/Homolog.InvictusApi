@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Dapper;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.TurmaAggregate;
@@ -155,16 +156,26 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<List<MateriaView>> GetMateriasLiberadas(Guid turmaId, Guid professorId)
         {
-            //StringBuilder query = new StringBuilder();
-            //query.Append("select TurmasMaterias.id, TurmasMaterias.nome, TurmasMaterias.ProfessorId from TurmasMaterias where ");
-            //query.Append(" TurmasMaterias.MateriaId in ( select ProfessoresMaterias.PacoteMateriaId from ProfessoresMaterias where ");
-            //query.Append(" ProfessoresMaterias.ProfessorId = '" + professorId + "' ) and TurmasMaterias.TurmaId = '" + turmaId + "' ");
-            //query.Append(" and TurmasMaterias.ProfessorId = '00000000-0000-0000-0000-000000000000' OR TurmasMaterias.ProfessorId = '" + professorId + "' ");
+            /*
+             
 
+             */
 
-            string query = @"SELECT * FROM TurmasMaterias 
+            string turmaHorariosQuery = @"SELECT * FROM TurmasHorarios WHERE TurmasHorarios.TurmaId = @turmaId";
+
+            StringBuilder profDispo = new StringBuilder();
+
+            profDispo.Append(@"SELECT* FROM ProfessoresDisponibilidades
+                            WHERE ProfessoresDisponibilidades.PessoaId = @professorId ");
+
+            string materiasDoProfessorQuery = @"SELECT ProfessoresMaterias.PacoteMateriaId 
+                                            FROM ProfessoresMaterias 
+                                            WHERE ProfessoresMaterias.ProfessorId = @professorId";
+
+            string materiasLiberadas = @"SELECT * FROM TurmasMaterias 
                             WHERE TurmasMaterias.turmaId = @turmaId
-                            AND TurmasMaterias.ProfessorId in (@professorId,'00000000-0000-0000-0000-000000000000') ";
+                            AND TurmasMaterias.ProfessorId in (@professorId,'00000000-0000-0000-0000-000000000000') 
+                            AND TurmasMaterias.MateriaId IN @listaMats";// trazer do msm prof e sem prof
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -172,7 +183,37 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Open();
                 IEnumerable<MateriaView> results = new List<MateriaView>();
 
-                results = await connection.QueryAsync<MateriaView>(query, new { professorId = professorId, turmaId = turmaId });
+                var horarios = await connection.QueryAsync<TurmaHorarioDto>(turmaHorariosQuery, new {  turmaId = turmaId });
+
+                var listaHoratio = horarios.Select(t => t.DiaSemanada);
+
+                foreach (var diaSemana in listaHoratio)
+                {
+                    profDispo.Append(" AND ProfessoresDisponibilidades.");
+                    profDispo.Append(DiaDaSemana.TryParsToDisponibilidadeTable(diaSemana));
+                    profDispo.Append(" = 'True'");
+                }
+
+                var disponibilidadeDoProfessor = await connection.QueryAsync<DisponibilidadeDto>(profDispo.ToString(), new { professorId = professorId });
+                
+                if (!disponibilidadeDoProfessor.Any())
+                {
+                    return results.ToList();
+                }
+
+                var profMaterias = await connection.QueryAsync<Guid>(materiasDoProfessorQuery, new { professorId = professorId });
+                try
+                {
+                    results = await connection.QueryAsync<MateriaView>(materiasLiberadas, new
+                    {
+                        professorId = professorId,
+                        turmaId = turmaId,
+                        listaMats = profMaterias.ToArray()
+                    });
+                }catch(Exception ex)
+                {
+
+                }
 
                 connection.Close();
 

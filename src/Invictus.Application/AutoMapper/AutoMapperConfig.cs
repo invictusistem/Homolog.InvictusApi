@@ -57,7 +57,7 @@ namespace Invictus.Application.AutoMapper
         {
 
             CreateMap<UnidadeDto, Unidade>()
-                 .ConstructUsing(u => new Unidade(u.sigla, u.cnpj, u.descricao, u.ativo,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
+                 .ConstructUsing(u => new Unidade(u.sigla, u.cnpj, u.descricao, u.ativo, u.isUnidadeGlobal,// (c.Nome, c.DescricaoCurta, c.DescricaoLonga, c.DataInicio, c.DataFim, c.Gratuito, c.Valor, c.Online, c.NomeEmpresa, c.OrganizadorId, c.CategoriaId,
                      new Endereco(u.bairro, u.cep, u.complemento, u.logradouro, u.numero, u.cidade, u.uf)));// (c.Endereco.Id, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Complemento, c.Endereco.Bairro, c.Endereco.CEP, c.Endereco.Cidade, c.Endereco.Estado, c.Id)));
 
             CreateMap<ColaboradorDto, Colaborador>()

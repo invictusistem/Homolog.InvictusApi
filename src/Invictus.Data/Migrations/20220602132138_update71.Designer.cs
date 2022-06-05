@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220602132138_update71")]
+    partial class update71
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -764,32 +766,6 @@ namespace Invictus.Data.Migrations
                     b.ToTable("Produtos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.Models.ProdutoLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Horario")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Metodo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UnidadeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProdutosLog");
-                });
-
             modelBuilder.Entity("Invictus.Domain.Administrativo.Models.TypePacote", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1395,9 +1371,6 @@ namespace Invictus.Data.Migrations
 
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<bool>("IsUnidadeGlobal")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Sigla")
                         .HasColumnType("nvarchar(3)");
