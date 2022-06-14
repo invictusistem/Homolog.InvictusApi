@@ -1,21 +1,30 @@
 ﻿using Invictus.Core;
 using Invictus.Core.Interfaces;
 using System;
+using System.Globalization;
+using System.Text;
 
 namespace Invictus.Domain.Administrativo.FuncionarioAggregate
 {
-    public class Funcionario : Entity, IAggregateRoot
+    public class Pessoa : Entity, IAggregateRoot
     {
         public string Nome { get; private set; }
+        public string NomeSocial { get; private set; }
+        public string Pai { get; private set; }
+        public string Mae { get; private set; }
+        public DateTime Nascimento { get; private set; }
+        public string Naturalidade { get; private set; }
+        public string NaturalidadeUF { get; private set; }
         public string RazaoSocial { get; private set; }
         public string CPF { get; private set; }
+        public string RG { get; private set; }
         public string CNPJ { get; private set; }
-        public string CNPJ_CPF { get; private set; }
+        //public string CNPJ_CPF { get; private set; }
         public string IE_RG { get; private set; }
         public Guid? CargoId { get; private set; }
         public string Email { get; private set; }
         public string NomeContato { get; private set; }
-        public string Telefonecontato { get; private set; }
+        public string TelefoneContato { get; private set; }
         public string Celular { get; private set; }
         public string TelResidencial { get; private set; }
         public string TelWhatsapp { get; private set; }
@@ -28,41 +37,70 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
         public Guid UnidadeId { get; private set; }
         public Endereco Endereco { get; private set; }
 
-        public static Funcionario ColaboradorFactory(Guid id, string nome, string email, string cpf, string celular, Guid cargoId, Guid unidadeId,
-            bool ativo, DateTime dataCriacao, string bairro, string cep, string complemento, string logradouro, string numero, string cidade, string uf, Guid respId)
+        public void TratarEmail(string email)
         {
-            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf, id);
+            Email = RemoveDiacritics(email);
+        }
 
+        public void SetTipoPessoa(Invictus.Core.Enumerations.TipoPessoa tipoPessoa)
+        {
+            TipoPessoa = tipoPessoa.DisplayName;
+        }
+        public void SetRespCadastroId(Guid userId)
+        {
+            PessoaRespCadastroId = userId;
+        }
+        private static string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
 
-            var colaborador = new Funcionario()
+            foreach (var c in normalizedString)
             {
-                Id = id,
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+        public static Pessoa ColaboradorFactory(/*Guid id, */string nome, string email, string cpf, string celular, Guid cargoId, Guid unidadeId,
+            bool ativo/*, DateTime dataCriacao, */,string bairro, string cep, string complemento, string logradouro, string numero, string cidade, string uf/*, Guid respId*/)
+        {
+            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf/*, id*/);
+
+
+            var colaborador = new Pessoa()
+            {
+                //Id = id,
                 Nome = nome,
                 CPF = cpf,
                 CargoId = cargoId,
                 Email = email,
                 Celular = celular,
-                DataCadastro = dataCriacao,
+                //DataCadastro = dataCriacao,
                 Ativo = ativo,
                 UnidadeId = unidadeId,
                 Endereco = endereco,
                 TipoPessoa = Invictus.Core.Enumerations.TipoPessoa.Colaborador.DisplayName,
-                PessoaRespCadastroId = respId
+                //PessoaRespCadastroId = respId
 
             };
 
             return colaborador;
         }
 
-        public static Funcionario ProfessorFactory(Guid id, string nome, string email, string cpf, string celular, Guid unidadeId,
+        public static Pessoa ProfessorFactory(Guid id, string nome, string email, string cpf, string celular, Guid unidadeId,
             bool ativo, DateTime dataCriacao, string bairro, string cep, string complemento,
             string logradouro, string numero, string cidade, string uf, Guid respId, string cnpj, DateTime? dataEntrada, DateTime? dataSaida, string nomeContato,
             string Telefonecontato)
         {
-            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf, id);
+            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf/*, id*/);
 
 
-            var colaborador = new Funcionario()
+            var colaborador = new Pessoa()
             {
                 Id = id,
                 Nome = nome,
@@ -80,27 +118,27 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
                 DataEntrada = dataEntrada,
                 DataSaida = dataSaida,
                 NomeContato = nomeContato,
-                Telefonecontato = Telefonecontato
+                TelefoneContato = Telefonecontato
             };
 
             return colaborador;
         }
 
-        public static Funcionario FornecedorFactory(Guid id, string nome, string email, string cnpj_cpf, string ie_rg,string nomecontato,
-            string telContato, string whatsapp, DateTime dataCadastro, bool ativo, string bairro, string cep, string complemento, string logradouro, 
+        public static Pessoa FornecedorFactory(Guid id, string nome, string email, string cnpj_cpf, string ie_rg, string nomecontato,
+            string telContato, string whatsapp, DateTime dataCadastro, bool ativo, string bairro, string cep, string complemento, string logradouro,
             string numero, string cidade, string uf, Guid respId, Guid unidadeId)
         {
-            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf, id);
+            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf/*, id*/);
 
 
-            var colaborador = new Funcionario()
+            var colaborador = new Pessoa()
             {
                 Id = id,
                 RazaoSocial = nome,
-                CNPJ_CPF = cnpj_cpf,
+                CNPJ = cnpj_cpf,
                 IE_RG = ie_rg,
                 NomeContato = nomecontato,
-                Telefonecontato = telContato,
+                TelefoneContato = telContato,
                 TelWhatsapp = whatsapp,
                 DataEntrada = dataCadastro,
                 Ativo = ativo,
@@ -115,8 +153,44 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
             return colaborador;
         }
 
+        public static Pessoa AlunoFactory(Guid id, string nome, string nomeSocial, string pai, string mae, DateTime nascimento, string naturalidade,
+                                        string naturalidadeUF, string email, string cpf, string rg, string nomecontato, string telReferencia, 
+                                        string telCelular, string telResidencial, string whatsapp,DateTime dataCadastro, bool ativo, string bairro, 
+                                        string cep, string complemento, string logradouro,string numero, string cidade, string uf, Guid respId, Guid unidadeId)
+        {
+            var endereco = Endereco.EnderecoFactory(bairro, cep, complemento, logradouro, numero, cidade, uf/*, id*/);
+
+            var colaborador = new Pessoa()
+            {
+                Id = id,
+                Nome = nome,
+                NomeSocial = nomeSocial,
+                CPF = cpf,
+                RG = rg,
+                Pai = pai,
+                Mae = mae,
+                Nascimento = nascimento,
+                Naturalidade = naturalidade,
+                NaturalidadeUF = naturalidadeUF,
+                Email = email,
+                TelefoneContato = telReferencia,
+                NomeContato = nomecontato,
+                Celular = telCelular,
+                TelResidencial = telResidencial,
+                TelWhatsapp = whatsapp,
+                DataCadastro = dataCadastro,
+                Ativo = ativo,
+                UnidadeId = unidadeId,
+                Endereco = endereco,
+                TipoPessoa = Invictus.Core.Enumerations.TipoPessoa.Aluno.DisplayName,
+                PessoaRespCadastroId = respId
+            };
+
+            return colaborador;
+        }
+
         #region EF
-        protected Funcionario() { }
+        protected Pessoa() { }
 
         #endregion
     }
@@ -131,11 +205,11 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
         public string Numero { get; private set; }
         public string Cidade { get; private set; }
         public string UF { get; private set; }
-        public Guid FuncionarioId { get; private set; }
-        public virtual Funcionario Funcionario { get; private set; }
+        public Guid PessoaId { get; private set; }
+        public virtual Pessoa Pessoa { get; private set; }
 
         public static Endereco EnderecoFactory(string bairro, string cep, string complemento, string logradouro,
-            string numero, string cidade, string uf, Guid funcionario)
+            string numero, string cidade, string uf/*, Guid funcionario*/)
         {
             var endereco = new Endereco()
             {

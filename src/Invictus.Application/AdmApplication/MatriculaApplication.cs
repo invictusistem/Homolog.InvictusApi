@@ -293,13 +293,13 @@ namespace Invictus.Application.AdmApplication
                     var aluno = await _alunoQueries.GetAlunoById(alunoId);
 
                     pessoa.nome = aluno.nome;
-                    pessoa.telefone = aluno?.telCelular;
+                    pessoa.telefone = aluno?.celular;
                     pessoa.cpf = aluno.cpf;
-                    pessoa.logradouro = aluno.logradouro;
-                    pessoa.bairro = aluno.bairro;
-                    pessoa.cidade = aluno.cidade;
-                    pessoa.estado = aluno.uf;
-                    pessoa.cep = aluno.cep;
+                    pessoa.logradouro = aluno.endereco.logradouro;
+                    pessoa.bairro = aluno.endereco.bairro;
+                    pessoa.cidade = aluno.endereco.cidade;
+                    pessoa.estado = aluno.endereco.uf;
+                    pessoa.cep = aluno.endereco.cep;
                 }
 
             }
@@ -640,18 +640,18 @@ namespace Invictus.Application.AdmApplication
                 naturalidade = aluno.naturalidade,
                 rg = aluno.rg,
                 cpf = aluno.cpf,
-                cep = aluno.cep,
-                bairro = aluno.bairro,
-                complemento = aluno.complemento,
-                logradouro = aluno.logradouro,
-                numero = aluno.numero,
-                cidade = aluno.cidade,
-                uf = aluno.uf,
+                cep = aluno.endereco.cep,
+                bairro = aluno.endereco.bairro,
+                complemento = aluno.endereco.complemento,
+                logradouro = aluno.endereco.logradouro,
+                numero = aluno.endereco.numero,
+                cidade = aluno.endereco.cidade,
+                uf = aluno.endereco.uf,
                 telResiencia = aluno.telWhatsapp,
                 whatsapp = aluno.telWhatsapp,
                 email = aluno.email,
-                pai = aluno.nomePai,
-                mae = aluno.nomeMae,
+                pai = aluno.pai,
+                mae = aluno.mae,
                 nomeResponsavelMatricula = colaborador.nome
             };
 

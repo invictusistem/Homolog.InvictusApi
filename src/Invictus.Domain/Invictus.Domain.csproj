@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Administrativo\FuncionarioAggregate\Extensions\" />
     <Folder Include="Administrativo\TypePacote\Interfaces\" />
   </ItemGroup>
 

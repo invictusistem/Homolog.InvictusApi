@@ -12,5 +12,6 @@ namespace Invictus.Application.FinancApplication.Interfaces
         Task CadastrarContaReceber(CadastrarContaReceberCommand command);
         Task EditarContaReceber(BoletoDto boleto);
         Task CadastrarContaPagar(CadastrarContaReceberCommand command);
+        Task RemoveConta(Guid contaId);
     }
 }

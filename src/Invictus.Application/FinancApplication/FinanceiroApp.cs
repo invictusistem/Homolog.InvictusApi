@@ -2,6 +2,7 @@
 using Invictus.Application.FinancApplication.Interfaces;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Dtos.Financeiro;
@@ -18,11 +19,13 @@ namespace Invictus.Application.FinancApplication
         private readonly IAspNetUser _aspNetUser;
         private readonly IDebitosRepos _debitoRepo;
         private readonly IMapper _mapper;
-        public FinanceiroApp(IAspNetUser aspNetUser, IDebitosRepos debitoRepo, IMapper mapper)
+        private readonly InvictusDbContext _db;
+        public FinanceiroApp(IAspNetUser aspNetUser, IDebitosRepos debitoRepo, IMapper mapper, InvictusDbContext db)
         {
             _aspNetUser = aspNetUser;
             _debitoRepo = debitoRepo;
             _mapper = mapper;
+            _db = db;
         }
 
         public async Task CadastrarContaPagar(CadastrarContaReceberCommand command)
@@ -68,6 +71,15 @@ namespace Invictus.Application.FinancApplication
         public async Task EditarContaReceber(BoletoDto boleto)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task RemoveConta(Guid contaId)
+        {
+            // var 
+            var conta = await _db.Boletos.FindAsync(contaId);
+            conta.InativarConta();
+            await _debitoRepo.EditBoleto(conta);
+            _db.SaveChanges();
         }
     }
 }

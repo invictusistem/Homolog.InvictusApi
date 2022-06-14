@@ -47,6 +47,60 @@ namespace Invictus.QueryService.AdministrativoQueries
             return paginatedItems;
         }
 
+        public async Task<PaginatedItemsViewModel<PessoaDto>> GetProfessoresV2(int itemsPerPage, int currentPage, string paramsJson)
+        {
+            var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+
+            var professores = await GetProfessoresByFilterV2(itemsPerPage, currentPage, param);
+
+            var profCount = await CountProfessoresByFilterV2(itemsPerPage, currentPage, param);
+
+            var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, profCount, professores.ToList());
+
+            return paginatedItems;
+        }
+
+        private async Task<IEnumerable<PessoaDto>> GetProfessoresByFilterV2(int itemsPerPage, int currentPage, ParametrosDTO param)
+        {
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT
+                        Pessoas.Id,
+                        Pessoas.Nome,
+                        Pessoas.Email,
+                        Pessoas.Ativo,
+                        Unidades.sigla as unidadeSigla
+                        FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Professor' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidade.id + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            //query.Append("Professores.UnidadeId = '" + unidade.id + "'");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
+            query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                //var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidade.id });
+
+                var results = await connection.QueryAsync<PessoaDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+
+                /// var paginatedItems = new PaginatedItemsViewModel<ProfessorDto>(currentPage, itemsPerPage, countItems, results.ToList());
+
+                connection.Close();
+
+                return results;
+
+            }
+        }
+
         private async Task<IEnumerable<ProfessorDto>> GetProfessoresByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
             var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
@@ -84,6 +138,33 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return results;
+
+            }
+        }
+
+        private async Task<int> CountProfessoresByFilterV2(int itemsPerPage, int currentPage, ParametrosDTO param)
+        {
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
+
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("SELECT Count(*) FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Professor' AND ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidade.id + "' AND ");
+            if (param.nome != "") queryCount.Append("LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append("LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append("LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            //if (param.ativo == false) queryCount.Append(" AND Professores.Ativo = 'True' ");
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidade.id });
+
+                connection.Close();
+
+                return countItems;
 
             }
         }
@@ -177,21 +258,28 @@ namespace Invictus.QueryService.AdministrativoQueries
         }
 
 
-        public async Task<ProfessorDto> GetProfessorById(Guid professorId)
-        {
-            string query = @"SELECT * From Professores WHERE Professores.Id = @professorId";
+        public async Task<PessoaDto> GetProfessorById(Guid professorId)
+        { 
+            var query = @"SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.id = @professorId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
+              
+                    var results = await connection.QueryAsync<PessoaDto, EnderecoDto, PessoaDto>(query,
+                         map: (pessoa, endereco) =>
+                         {
+                             pessoa.endereco = endereco;
+                             return pessoa;
+                         },
+                         new { professorId = professorId }, splitOn: "Id");
 
-                var result = await connection.QuerySingleAsync<ProfessorDto>(query, new { professorId = professorId });
+                    connection.Close();
 
-                connection.Close();
-
-                return result;
+                    return results.FirstOrDefault();
             }
+           
         }
 
         public async Task<IEnumerable<MateriaHabilitadaViewModel>> GetProfessoresMaterias(Guid professorId)
@@ -603,7 +691,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<string> GetEmailDoProfessorById(Guid professorId)
         {
-            var query = @"SELECT Professores.Email FROM Professores WHERE Professores.id = @id";
+            var query = @"SELECT Pessoas.Email FROM Pessoas WHERE Pessoas.id = @id";
             
 
             await using (var connection = new SqlConnection(

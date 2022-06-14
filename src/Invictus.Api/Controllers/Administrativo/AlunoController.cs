@@ -29,7 +29,7 @@ namespace Invictus.Api.Controllers.Administrativo
         [Route("pesquisar")]
         public async Task<IActionResult> GetAlunoByFilter([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {            
-            var results = await _alunoQueries.GetMatriculadosView(itemsPerPage, currentPage, paramsJson);
+            var results = await _alunoQueries.GetMatriculadosViewV2(itemsPerPage, currentPage, paramsJson);
 
             if (results.Data.Count() == 0) return NotFound();
 
@@ -63,7 +63,7 @@ namespace Invictus.Api.Controllers.Administrativo
         [Route("{cpf}")]
         public async Task<IActionResult> PesquisarAluno(string cpf)
         {
-            var aluno = await _alunoQueries.SearchPerCPF(cpf);
+            var aluno = await _alunoQueries.SearchPerCPFV2(cpf);
 
             if (aluno.Count() > 0) return Conflict();
 
@@ -82,20 +82,20 @@ namespace Invictus.Api.Controllers.Administrativo
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveAluno([FromBody] AlunoDto newAluno)
+        public async Task<IActionResult> SaveAluno([FromBody] PessoaDto newAluno)
         {
             //var aluno = await _alunoQueries.FindAlunoByCPForEmailorRG(newAluno.cpf, newAluno.rg, newAluno.email);
             var msg = await _utils.ValidaDocumentosAluno(newAluno.cpf, newAluno.rg, newAluno.email);
 
             if (msg.Count() > 0) return Conflict(new { msg = msg });
 
-            await _alunoApplication.saveAlunos(newAluno);
+            await _alunoApplication.SaveAluno(newAluno);
 
             return Ok();
         }
 
         [HttpPut]
-        public async Task<IActionResult> EditAluno([FromBody] AlunoDto aluno)
+        public async Task<IActionResult> EditAluno([FromBody] PessoaDto aluno)
         {
             await _alunoApplication.EditAluno(aluno);
 

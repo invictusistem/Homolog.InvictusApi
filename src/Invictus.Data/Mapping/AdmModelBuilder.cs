@@ -38,7 +38,7 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentacaoTemplateDbMapping());
             modelBuilder.ApplyConfiguration(new EnderecoDbMapping());
-            modelBuilder.ApplyConfiguration(new FuncionarioDbMapping());
+            modelBuilder.ApplyConfiguration(new PessoaDbMapping());
             modelBuilder.ApplyConfiguration(new MateriaTemplateDbMapping());
             modelBuilder.ApplyConfiguration(new MatriculaDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentaoExigenciaDbMapping());

@@ -10,7 +10,7 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
 {
     public interface IPedagMatriculaQueries
     {
-        Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId);
+        Task<PessoaDto> GetAlunoByMatriculaId(Guid matriculaId);
         Task<MatriculaDto> GetMatriculaById(Guid matriculaId);
         Task<ResponsavelDto> GetRespFinanceiroByMatriculaId(Guid matriculaId);
         Task<ResponsavelDto> GetRespMenorByMatriculaId(Guid matriculaId);

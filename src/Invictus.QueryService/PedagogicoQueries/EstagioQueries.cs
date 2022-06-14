@@ -18,6 +18,7 @@ namespace Invictus.QueryService.PedagogicoQueries
 {
     public class EstagioQueries : IEstagioQueries
     {
+        //private readonly IEstagioQueries _estagioqueries;
         private readonly IConfiguration _config;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly IAspNetUser _aspNetUser;
@@ -268,6 +269,23 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
-        
+        public async Task<IEnumerable<string>> GetEstagioByName(string nome)
+        {
+            var query = "SELECT TypeEstagio.Nome FROM TypeEstagio WHERE LOWER(TypeEstagio.Nome) like LOWER('" + nome + "') " +
+                        "collate SQL_Latin1_General_CP1_CI_AI ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<string>(query);
+
+                return result;
+
+            }
+
+            
+        }
     }
 }

@@ -49,7 +49,8 @@ namespace Invictus.Api.Controllers
         [Route("{parametro}/{colaboradorId}")]
         public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetColaborador(string parametro, Guid colaboradorId)
         {
-            var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);
+            //var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);
+            var colaborador = await _colaboradorQueries.GetColaboradoresByIdV2(colaboradorId);
 
             var values = await _paramQueries.GetParamValue(parametro);
 
@@ -57,13 +58,14 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveColaborador([FromBody] ColaboradorDto newColaborador)
+        public async Task<IActionResult> SaveColaborador([FromBody] PessoaDto newColaborador)
         {
 
-            var msg = await _utils.ValidaDocumentosColaborador(newColaborador.cpf, null, newColaborador.email);
+            //var msg = await _utils.ValidaDocumentosColaborador(newColaborador.cpf, null, newColaborador.email);
+            var msg = await _utils.ValidaDocumentoPessoa(newColaborador.cpf, null, newColaborador.email);
             if (msg.Count() > 0) return Conflict(new { msg = msg });
 
-            await _colaboradorApplication.SaveColaborador(newColaborador);
+            await _colaboradorApplication.SaveColaboradorV2(newColaborador);
 
             return NoContent();
 
@@ -71,9 +73,9 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> EditColaborador([FromBody] ColaboradorDto colaborador)
+        public async Task<IActionResult> EditColaborador([FromBody] PessoaDto colaborador)
         {
-            await _colaboradorApplication.EditColaborador(colaborador);
+            await _colaboradorApplication.EditColaboradorV2(colaborador);
 
             return NoContent();
         }
@@ -82,9 +84,9 @@ namespace Invictus.Api.Controllers
         [Route("{colaboradorId}")]
         public async Task<IActionResult> DeleteColaborador(Guid colaboradorId)
         {
-            var colab = await _db.Colaboradores.FindAsync(colaboradorId);
+            var colab = await _db.Pessoas.FindAsync(colaboradorId);
 
-            _db.Colaboradores.Remove(colab);
+            _db.Pessoas.Remove(colab);
 
             _db.SaveChanges();
 

@@ -11,6 +11,7 @@ namespace Invictus.Domain.Financeiro.Interfaces
         //Task SaveInfoFinanceira(InformacaoDebito infoDebito);
         Task SaveBoleto(Boleto boleto);
         Task SaveBoletos(IEnumerable<Boleto> boleto);
+        Task EditBoleto(Boleto conta);
         void Commit();
     }
 }

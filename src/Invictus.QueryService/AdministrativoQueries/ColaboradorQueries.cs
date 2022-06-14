@@ -47,7 +47,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<ColaboradorDto> GetColaboradoresById(Guid colaboradorId)
         {
-            var query = "SELECT * from Colaboradores where Colaboradores.id = @colaboradorId";
+            var query = @"SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.id = @colaboradorId ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -61,6 +61,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return results.FirstOrDefault();
 
             }
+
         }
 
         public async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson)
@@ -71,13 +72,14 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
 
-            return await GetColaboradores(itemsPerPage, currentPage, parametros, unidade.id);
+            //return await GetColaboradores(itemsPerPage, currentPage, parametros, unidade.id);
+            return await GetColaboradoresV2(itemsPerPage, currentPage, parametros, unidade.id);
 
         }
 
         public async Task<string> GetEmailFromColaboradorById(Guid colaboradorId)
         {
-            var query = "SELECT Colaboradores.Email FROM Colaboradores WHERE Colaboradores.id = @id";
+            var query = "SELECT Pessoas.Email FROM Pessoas WHERE Pessoas.id = @id";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -89,6 +91,53 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Close();
 
                 return results.FirstOrDefault();
+
+            }
+        }
+
+        private async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresV2(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+            //var ativos = param.ativo;
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT 
+                        Pessoas.id, 
+                        Pessoas.nome, 
+                        Pessoas.email,
+                        Pessoas.ativo,
+                        Unidades.Sigla as unidadeSigla
+                        FROM Pessoas 
+                        INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id 
+                        WHERE Pessoas.TipoPessoa = 'Colaborador' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
+            query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("SELECT Count(*) FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.TipoPessoa = 'Colaborador' AND ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+                var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidadeId });
+
+                var results = await connection.QueryAsync<ColaboradorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+
+                connection.Close();
+
+                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());
+
+                return paginatedItems;
 
             }
         }
@@ -139,6 +188,50 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             }
         }
-        
+
+        public async Task<PessoaDto> GetColaboradoresByIdV2(Guid colaboradorId)
+        {
+            var query = @"SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.id = @colaboradorId ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                try
+                {
+                    var results = await connection.QueryAsync<PessoaDto, EnderecoDto, PessoaDto>(query,
+                         map: (pessoa, endereco) =>
+                         {
+                             pessoa.endereco = endereco;
+                             return pessoa;
+                         },
+                         new { colaboradorId = colaboradorId }, splitOn: "Id");
+
+                    connection.Close();
+
+                    return results.FirstOrDefault();
+
+                }catch(Exception ex)
+                {
+
+                }
+
+                return new PessoaDto();
+            }
+
+
+            //return conexao.Query<Cliente, Passaporte, Cliente>(
+            //  "SELECT * " +
+            //  "FROM Clientes C " +
+            //  "INNER JOIN Passaportes P ON C.ClienteId = P.ClienteId " +
+            //  "ORDER BY C.Nome",
+            //  map: (cliente, passaporte) =>
+            //  {
+            //      cliente.DadosPassaporte = passaporte;
+            //      return cliente;
+            //  },
+            // splitOn: "ClienteId,PassaporteId");
+        }
     }
 }

@@ -36,8 +36,10 @@ namespace Invictus.Api.Controllers
         public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetProfessor([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
 
-            var results = await _profQueries.GetProfessores(itemsPerPage, currentPage, paramsJson);
-            
+            //var results = await _profQueries.GetProfessores(itemsPerPage, currentPage, paramsJson);
+
+            var results = await _profQueries.GetProfessoresV2(itemsPerPage, currentPage, paramsJson);
+
             if (results.Data.Count() == 0) return NotFound();
 
             return Ok(new { results = results });
@@ -110,11 +112,12 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveProfessor([FromBody] ProfessorDto newProfessor)
+        public async Task<IActionResult> SaveProfessor([FromBody] PessoaDto newProfessor)
         {
-            var msg = await _utils.ValidaDocumentosColaborador(newProfessor.cpf, null, newProfessor.email);
+            //var msg = await _utils.ValidaDocumentosColaborador(newProfessor.cpf, null, newProfessor.email);
+            var msg = await _utils.ValidaDocumentoPessoa(newProfessor.cpf, null, newProfessor.email);
             if (msg.Count() > 0) return Conflict(new { msg = msg });
-            await _profApplication.SaveProfessor(newProfessor);
+            await _profApplication.SaveProfessorV2(newProfessor);
 
             return NoContent();
         }
@@ -130,7 +133,7 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> EditProfessor([FromBody] ProfessorDto editedProfessor)
+        public async Task<IActionResult> EditProfessor([FromBody] PessoaDto editedProfessor)
         {
             await _profApplication.EditProfessor(editedProfessor);
 

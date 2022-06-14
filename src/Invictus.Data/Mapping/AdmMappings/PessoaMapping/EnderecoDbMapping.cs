@@ -10,9 +10,9 @@ namespace Invictus.Data.Mapping.AdmMappings.FuncionarioMapping
         {
             builder.HasKey(c => c.Id);
 
-            builder.HasOne(c => c.Funcionario)
+            builder.HasOne(c => c.Pessoa)
                .WithOne(c => c.Endereco)
-               .HasForeignKey<Endereco>(m => m.FuncionarioId);
+               .HasForeignKey<Endereco>(m => m.PessoaId);
 
             builder.ToTable("Enderecos");
         }

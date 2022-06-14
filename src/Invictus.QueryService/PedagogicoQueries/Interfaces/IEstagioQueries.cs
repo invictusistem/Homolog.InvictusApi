@@ -9,6 +9,7 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
     public interface IEstagioQueries
     {
         Task<IEnumerable<EstagioDto>> GetEstagios();
+        Task<IEnumerable<string>> GetEstagioByName(string nome);
         Task<EstagioDto> GetEstagioById(Guid estagioId);
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosView(int itemsPerPage, int currentPage, string paramsJson);
         Task<IEnumerable<TypeEstagioDto>> GetTiposDeEstagios();

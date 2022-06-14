@@ -115,15 +115,17 @@ namespace Invictus.Api.Controllers
         [Route("criar-funcionario")]
         public IActionResult CriarFuncionario()
         {
+
+            /*
             var colabs = _db.Colaboradores.ToList();
 
-            var funcionarios = new List<Funcionario>();
+            var funcionarios = new List<Pessoa>();
 
             var userId = new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8");
            
             foreach (var colab in colabs)
             {
-                var func = Funcionario.ColaboradorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.CargoId, colab.UnidadeId,
+                var func = Pessoa.ColaboradorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.CargoId, colab.UnidadeId,
                     colab.Ativo, DateTime.Now, colab.Endereco.Bairro, colab.Endereco.CEP, colab.Endereco.Complemento, colab.Endereco.Logradouro,
                     colab.Endereco.Numero, colab.Endereco.Cidade, colab.Endereco.UF, userId);
 
@@ -136,7 +138,7 @@ namespace Invictus.Api.Controllers
             
             foreach (var colab in prof)
             {
-                var func = Funcionario.ProfessorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.UnidadeId,
+                var func = Pessoa.ProfessorFactory(colab.Id, colab.Nome, colab.Email, colab.CPF, colab.Celular, colab.UnidadeId,
                     colab.Ativo, DateTime.Now, colab.Endereco.Bairro, colab.Endereco.CEP, colab.Endereco.Complemento, colab.Endereco.Logradouro,
                     colab.Endereco.Numero, colab.Endereco.Cidade, colab.Endereco.UF, userId, colab.CNPJ,colab.DataEntrada,colab.DataSaida,colab.NomeContato,
                     colab.TelefoneContato);
@@ -149,7 +151,7 @@ namespace Invictus.Api.Controllers
 
             foreach (var colab in fornec)
             {
-                var func = Funcionario.FornecedorFactory(colab.Id,colab.RazaoSocial, colab.Email,colab.CNPJ_CPF,
+                var func = Pessoa.FornecedorFactory(colab.Id,colab.RazaoSocial, colab.Email,colab.CNPJ_CPF,
                     colab.IE_RG, colab.NomeContato, colab.TelContato,colab.WhatsApp, DateTime.Now, colab.Ativo,
                     colab.Bairro,colab.CEP, colab.Complemento, colab.Logradouro,
                     colab.Numero, colab.Cidade, colab.UF, userId,colab.UnidadeId);
@@ -157,12 +159,23 @@ namespace Invictus.Api.Controllers
                 funcionarios.Add(func);
             }
 
+            var alunos = _db.Alunos.ToList();
 
 
-            _db.Funcionarios.AddRange(funcionarios);
+            foreach (var colab in alunos)
+            {
+                var func = Pessoa.AlunoFactory(colab.Id, colab.Nome, colab.NomeSocial, colab.NomePai, colab.NomeMae, colab.Nascimento, colab.Naturalidade,
+                    colab.NaturalidadeUF, colab.Email, colab.CPF, colab.RG, colab.NomeContatoReferencia, colab.TelReferencia, colab.TelCelular, colab.TelResidencial,
+                    colab.TelWhatsapp, colab.DataCadastro, colab.Ativo, colab.Endereco.Bairro, colab.Endereco.CEP, colab.Endereco.Complemento, colab.Endereco.Logradouro,
+                    colab.Endereco.Numero, colab.Endereco.Cidade, colab.Endereco.UF, colab.ColaboradorRespCadastroId, colab.UnidadeId);
+
+                funcionarios.Add(func);
+            }
+
+            _db.Pessoas.AddRange(funcionarios);
 
             _db.SaveChanges();
-
+            */
             return Ok();
 
         }

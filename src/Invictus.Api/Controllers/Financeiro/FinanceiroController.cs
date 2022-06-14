@@ -314,5 +314,14 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok();
 
         }
+
+        [HttpDelete]
+        [Route("contas/{contaId}")]
+        public async Task<IActionResult> DeletarConta(Guid contaId)
+        {
+            await _financApp.RemoveConta(contaId);
+
+            return Ok();
+        }
     }
 }

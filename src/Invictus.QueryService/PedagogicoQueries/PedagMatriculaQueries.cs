@@ -25,49 +25,58 @@ namespace Invictus.QueryService.PedagogicoQueries
             _aspNetUser = aspNetUser;
             _unidadeQueries = unidadeQueries;
         }
-        public async Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId)
+        public async Task<PessoaDto> GetAlunoByMatriculaId(Guid matriculaId)
         {
-            var query = @"select 
-        alunos.id, 
-        alunos.nome ,
-        alunos.nomeSocial ,
-        alunos.cpf ,
-        alunos.rg ,
-        alunos.nomePai ,
-        alunos.nomeMae ,
-        alunos.nascimento ,
-        alunos.naturalidade ,
-        alunos.naturalidadeUF ,
-        alunos.email ,
-        alunos.telReferencia ,
-        alunos.nomeContatoReferencia ,
-        alunos.telCelular ,
-        alunos.telResidencial ,
-        alunos.telWhatsapp ,
-        alunos.bairro,
-        alunos.cep ,
-        alunos.complemento ,
-        alunos.logradouro,
-        alunos.numero,
-        alunos.cidade ,
-        alunos.uf ,
-        alunos.dataCadastro ,
-        alunos.ativo ,
-        alunos.unidadeId
-        FROM Alunos 
-        left join matriculas on alunos.id = matriculas.alunoid
-        where matriculas.id = @matriculaId";
+            var query = @"SELECT 
+        Pessoas.id, 
+        Pessoas.nome ,
+        Pessoas.nomeSocial ,
+        Pessoas.cpf ,
+        Pessoas.rg ,
+        Pessoas.pai ,
+        Pessoas.mae ,
+        Pessoas.nascimento ,
+        Pessoas.naturalidade ,
+        Pessoas.naturalidadeUF ,
+        Pessoas.email ,
+        Pessoas.telefoneContato ,
+        Pessoas.nomeContato ,
+        Pessoas.celular,
+        Pessoas.telResidencial ,
+        Pessoas.telWhatsapp ,
+        Pessoas.dataCadastro,
+        Pessoas.ativo ,
+        Pessoas.unidadeId,
+        Enderecos.Id,
+        Enderecos.bairro,
+        Enderecos.cep ,
+        Enderecos.complemento ,
+        Enderecos.logradouro,
+        Enderecos.numero,
+        Enderecos.cidade ,
+        Enderecos.uf        
+        FROM Pessoas 
+        LEFT JOIN Enderecos ON Pessoas.Id = enderecos.PessoaId 
+        LEFT JOIN matriculas ON Pessoas.id = matriculas.alunoid
+        WHERE matriculas.id = @matriculaId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var result = await connection.QuerySingleAsync<AlunoDto>(query, new { matriculaId = matriculaId });
+                var result = await connection.QueryAsync<PessoaDto, EnderecoDto, PessoaDto>(query,
+                    map: (pessoa, endereco) =>
+                    {
+                        pessoa.endereco = endereco;
+                        return pessoa;
+                    },
+                    new { matriculaId = matriculaId },
+                    splitOn: "Id");
 
                 //connection.Close();
 
-                return result;
+                return result.FirstOrDefault();
 
             }
         }

@@ -221,20 +221,28 @@ WHERE Alunos.nome = 'Mario Gomes'
             }
         }
 
-        public async Task<AlunoDto> GetAlunoById(Guid alunoId)
+        public async Task<PessoaDto> GetAlunoById(Guid alunoId)
         {
-            var query = "SELECT * from Alunos where Alunos.Id = @alunoId";
+            // var query = "SELECT * from Alunos where Alunos.Id = @alunoId";
+            var query = "SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.Id = @alunoId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var results = await connection.QuerySingleAsync<AlunoDto>(query, new { alunoId = alunoId });
+                var results = await connection.QueryAsync<PessoaDto, EnderecoDto, PessoaDto>(query,
+                    map: (pessoa, endereco) =>
+                    {
+                        pessoa.endereco = endereco;
+                        return pessoa;
+                    },
+                    new { alunoId = alunoId },
+                    splitOn: "Id");
 
                 connection.Close();
 
-                return results;
+                return results.FirstOrDefault();
 
             }
         }
@@ -404,6 +412,97 @@ WHERE Alunos.nome = 'Mario Gomes'
           //  if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); 
             query.Append(" ORDER BY Alunos.Nome ");
+            query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<ViewMatriculadosDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+
+                if (results.Count() > 0)
+                    results = BindCPF(results.ToList());
+
+                connection.Close();
+
+                return results;
+            }
+        }
+
+        public async Task<IEnumerable<PessoaDto>> SearchPerCPFV2(string cpf)
+        {
+            var query = "SELECT * FROM Pessoas WHERE LOWER(Pessoas.cpf) like LOWER('" + cpf + "') " +
+                        "collate SQL_Latin1_General_CP1_CI_AI ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<PessoaDto>(query);
+
+                connection.Close();
+
+                return results;
+
+            }
+        }
+
+        public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosViewV2(int itemsPerPage, int currentPage, string paramsJson)
+        {
+            var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
+
+            var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
+
+            var alunos = await GetAlunosByFilterV2(itemsPerPage, currentPage, param, unidade.id);
+
+            var alunosCount = await CountAlunosByFilterV2(itemsPerPage, currentPage, param, unidade.id);
+
+            var paginatedItems = new PaginatedItemsViewModel<ViewMatriculadosDto>(currentPage, itemsPerPage, alunosCount, alunos.ToList());
+
+            return paginatedItems;
+        }
+
+        private async Task<int> CountAlunosByFilterV2(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder queryCount = new StringBuilder();
+            queryCount.Append("select Count(*) ");
+            queryCount.Append("from Pessoas full join matriculas on Pessoas.id = matriculas.alunoid inner join Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString());
+
+                connection.Close();
+
+                return countItems;
+
+            }
+        }
+
+        public async Task<IEnumerable<ViewMatriculadosDto>> GetAlunosByFilterV2(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        {
+
+            StringBuilder query = new StringBuilder();
+            query.Append("select Pessoas.id, matriculas.numeromatricula, Pessoas.cpf, Pessoas.rg, Pessoas.nascimento, Pessoas.dataCadastro, Pessoas.nome, Pessoas.ativo, matriculas.id as matriculaId, unidades.sigla ");
+            query.Append("from Pessoas full join matriculas on Pessoas.id = matriculas.alunoid inner join Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             await using (var connection = new SqlConnection(

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.Calendarios.Interfaces;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
+using Invictus.Domain.Administrativo.FuncionarioAggregate.Interfaces;
 using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces;
 using Invictus.Domain.Administrativo.TurmaAggregate;
@@ -15,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Disponibilidade = Invictus.Domain.Administrativo.ProfessorAggregate.Disponibilidade;
+using MateriaHabilitada = Invictus.Domain.Administrativo.ProfessorAggregate.MateriaHabilitada;
 
 namespace Invictus.Application.AdmApplication
 {
@@ -25,6 +30,7 @@ namespace Invictus.Application.AdmApplication
         private readonly ITurmaRepo _turmaRepo;
         private readonly ICalendarioQueries _calendariosQueries;
         private readonly ICalendarioRepo _calendarioRepo;
+        private readonly IPessoaRepo _pessoaRepo;
         private readonly IProfessorQueries _profQueries;
         private readonly ITurmaQueries _turmaQueries;
         private readonly IMapper _mapper;
@@ -32,7 +38,7 @@ namespace Invictus.Application.AdmApplication
         private readonly IUnidadeQueries _unidadeQueries;
         public ProfessorApplication(IProfessorRepository profRepository, IMapper mapper, IAspNetUser aspNetUser, IUnidadeQueries unidadeQueries,
             ICalendarioQueries calendariosQueries, ICalendarioRepo calendarioRepo, IProfessorQueries profQueries, ITurmaQueries turmaQueries,
-            ITurmaRepo turmaRepo, UserManager<IdentityUser> userMgr)
+            ITurmaRepo turmaRepo, UserManager<IdentityUser> userMgr, IPessoaRepo pessoaRepo)
         {
             _profRepository = profRepository;
             _mapper = mapper;
@@ -44,6 +50,7 @@ namespace Invictus.Application.AdmApplication
             _turmaQueries = turmaQueries;
             _turmaRepo = turmaRepo;
             UserManager = userMgr;
+            _pessoaRepo = pessoaRepo;
         }
 
         public async Task AddDisponibilidade(DisponibilidadeDto disponibilidadeDto)
@@ -186,21 +193,21 @@ namespace Invictus.Application.AdmApplication
 
         }
 
-        public async Task EditProfessor(ProfessorDto editedProfessor)
+        public async Task EditProfessor(PessoaDto editedProfessor)
         {
             var newEmail = editedProfessor.email;
 
             var oldEmail = await _profQueries.GetEmailDoProfessorById(editedProfessor.id);
 
-            var professor = _mapper.Map<Professor>(editedProfessor);
+            var professor = _mapper.Map<Pessoa>(editedProfessor);
 
-            professor.SetDataEntrada(editedProfessor.dataEntrada);
+            // professor.SetDataEntrada(editedProfessor.dataEntrada);
 
-            professor.SetDataSaida(editedProfessor.dataSaida);
+            // professor.SetDataSaida(editedProfessor.dataSaida);
 
-            await _profRepository.EditProfessor(professor);
+            await _pessoaRepo.EditPessoa(professor);
 
-            _profRepository.Save();
+            _pessoaRepo.Commit();
 
             if (newEmail != oldEmail)
             {
@@ -269,6 +276,25 @@ namespace Invictus.Application.AdmApplication
             }
 
             _profRepository.Save();
+        }
+
+        public async Task SaveProfessorV2(PessoaDto newProfessor)
+        {
+            var unidade = await _unidadeQueries.GetUnidadeBySigla(_aspNetUser.ObterUnidadeDoUsuario());
+
+            newProfessor.dataCadastro = DateTime.Now;
+
+            newProfessor.unidadeId = unidade.id;
+
+            var professor = _mapper.Map<Pessoa>(newProfessor);
+
+            professor.SetTipoPessoa(TipoPessoa.Professor);
+
+            professor.SetRespCadastroId(_aspNetUser.ObterUsuarioId());
+
+            await _pessoaRepo.AddPessoa(professor);
+
+            _pessoaRepo.Commit();
         }
 
         public async Task SaveProfessor(ProfessorDto newProfessor)

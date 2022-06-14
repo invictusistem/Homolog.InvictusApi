@@ -11,6 +11,7 @@ using Invictus.Domain.Administrativo.Calendarios.Interfaces;
 using Invictus.Domain.Administrativo.ColaboradorAggregate.Interfaces;
 using Invictus.Domain.Administrativo.ContratoAggregate.Interfaces;
 using Invictus.Domain.Administrativo.DocumentacaoTemplateAggregate.Interface;
+using Invictus.Domain.Administrativo.FuncionarioAggregate.Interfaces;
 using Invictus.Domain.Administrativo.MatriculaRegistro;
 using Invictus.Domain.Administrativo.MatTemplate.Interfaces;
 using Invictus.Domain.Administrativo.PacoteAggregate.Interfaces;
@@ -51,6 +52,7 @@ namespace Invictus.IoC
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IDocTemplateRepository, DocTemplateRepository>();
             services.AddScoped<IMateriaRepo, MateriaRepository>();
+            services.AddScoped<IPessoaRepo, PessoaRepository>();
             //services.AddScoped<IModelRepository, ModelRepository>();
             services.AddScoped<IPlanoPgmRepository, PlanoPgmRepository>();
             services.AddScoped<IContratoRepository, ContratoRepository>();

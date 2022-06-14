@@ -9,6 +9,7 @@ using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -70,6 +71,8 @@ namespace Invictus.Application.PedagApplication
 
         public async Task CreateTypeEstagio(TypeEstagioDto typeEstagio)
         {
+            //var exceptions = new List<string>();
+
             var type = _mapper.Map<TypeEstagio>(typeEstagio);
 
             await _estagioRepo.CreateEstagioType(type);

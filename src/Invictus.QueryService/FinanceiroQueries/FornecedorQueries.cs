@@ -18,12 +18,12 @@ namespace Invictus.QueryService.FinanceiroQueries
     public class FornecedorQueries : IFornecedorQueries
     {
         private readonly IConfiguration _config;
-        //private readonly IUnidadeQueries _unidadeQueries;
+        
         private readonly IAspNetUser _aspNetUser;
         public FornecedorQueries(IConfiguration config, IAspNetUser aspNetUser)
         {
             _config = config;
-           // _unidadeQueries = unidadeQueries;
+           
             _aspNetUser = aspNetUser;
         }
 
@@ -54,8 +54,8 @@ namespace Invictus.QueryService.FinanceiroQueries
                 {
                     foreach (var colaborador in colaboradores)
                     {
-                        colaborador.isColaborador = true;
-                        colaborador.isProfessor = false;
+                        //colaborador.isColaborador = true;
+                        //colaborador.isProfessor = false;
                     }
 
                     pessoas.AddRange(colaboradores);
@@ -67,8 +67,8 @@ namespace Invictus.QueryService.FinanceiroQueries
                 {
                     foreach (var professor in professores)
                     {
-                        professor.isColaborador = false;
-                        professor.isProfessor = true;
+                        //professor.isColaborador = false;
+                        //professor.isProfessor = true;
                     }
 
                     pessoas.AddRange(professores);

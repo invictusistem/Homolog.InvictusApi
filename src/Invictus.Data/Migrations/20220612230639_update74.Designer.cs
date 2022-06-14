@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220612230639_update74")]
+    partial class update74
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,21 +409,21 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Complemento")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("FuncionarioId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Logradouro")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Numero")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PessoaId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UF")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PessoaId")
+                    b.HasIndex("FuncionarioId")
                         .IsUnique();
 
                     b.ToTable("Enderecos");
@@ -518,7 +520,7 @@ namespace Invictus.Data.Migrations
 
                     b.HasIndex("TipoPessoa");
 
-                    b.ToTable("Pessoas");
+                    b.ToTable("Pessoa");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Logs.LogBoletos", b =>
@@ -2251,13 +2253,13 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.FuncionarioAggregate.Pessoa", "Pessoa")
+                    b.HasOne("Invictus.Domain.Administrativo.FuncionarioAggregate.Pessoa", "Funcionario")
                         .WithOne("Endereco")
-                        .HasForeignKey("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", "PessoaId")
+                        .HasForeignKey("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", "FuncionarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Pessoa");
+                    b.Navigation("Funcionario");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.DocumentacaoExigencia", b =>

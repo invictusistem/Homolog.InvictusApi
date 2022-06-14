@@ -52,6 +52,7 @@ namespace Invictus.Domain.Financeiro
         public string StatusBoleto { get; private set; }
         public string Historico { get; private set; }
         public string SubConta { get; private set; }
+        public bool Ativo { get; private set; }
         public Guid? SubContaId { get; private set; }
         public Guid? BancoId { get; private set; }
         public Guid? CentroCustoId { get; private set; }
@@ -68,6 +69,10 @@ namespace Invictus.Domain.Financeiro
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
+        public void InativarConta()
+        {
+            Ativo = false;
+        }
         public void SetMeioPgm(Guid meioPgmId)
         {
             MeioPagamentoId = meioPgmId;
@@ -120,7 +125,8 @@ namespace Invictus.Domain.Financeiro
                 PessoaId = pessoaId,
                 CentroCustoUnidadeId = centroCustoUnidadeId,
                 ResponsavelCadastroId = responsavelCadastroId,
-                DataCadastro = DateTime.Now
+                DataCadastro = DateTime.Now,
+                Ativo = true
 
             };
 
@@ -168,7 +174,8 @@ namespace Invictus.Domain.Financeiro
                 ResponsavelCadastroId = responsavelCadastroId,
                 DataCadastro = DateTime.Now,
                 MeioPagamentoId  = meioPgmId,
-                CentroCustoId = centroCustoId
+                CentroCustoId = centroCustoId,
+                Ativo = true
 
             };
 
@@ -212,7 +219,8 @@ namespace Invictus.Domain.Financeiro
                 PessoaId = pessoaId,
                 CentroCustoUnidadeId = centroCustoUnidadeId,
                 ResponsavelCadastroId = responsavelCadastroId,
-                DataCadastro = DateTime.Now
+                DataCadastro = DateTime.Now,
+                Ativo = true
 
             };
 

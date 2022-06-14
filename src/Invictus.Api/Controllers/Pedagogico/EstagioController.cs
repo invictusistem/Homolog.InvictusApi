@@ -135,6 +135,10 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("tipos")]
         public async Task<IActionResult> EstagioTypeCreate([FromBody] TypeEstagioDto typeEstagio)
         {
+            var result = await _estagioQueries.GetEstagioByName(typeEstagio.nome);
+
+            if (result.Any()) return Conflict();
+
             await _estagioApp.CreateTypeEstagio(typeEstagio);
 
             return Ok();

@@ -4,24 +4,25 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Invictus.Data.Mapping.AdmMappings.FuncionarioMapping
 {
-    public class FuncionarioDbMapping : IEntityTypeConfiguration<Funcionario>
+    public class PessoaDbMapping : IEntityTypeConfiguration<Pessoa>
     {
-        public void Configure(EntityTypeBuilder<Funcionario> builder)
+        public void Configure(EntityTypeBuilder<Pessoa> builder)
         {
-            builder.HasIndex(f => f.Id)
-                .HasDatabaseName("Id")
-                .IsUnique();
+            builder.HasKey(c => c.Id);
+            //builder.HasIndex(f => f.Id)
+            //    .HasDatabaseName("Id")
+            //    .IsUnique();
 
             builder.HasIndex(c => c.TipoPessoa);
 
-            builder.Property(c => c.Id)
-                .ValueGeneratedNever();
+            //builder.Property(c => c.Id)
+            //    .ValueGeneratedNever();
 
             //builder.HasOne(c => c.Endereco)
             //   .WithOne(c => c.Funcionario);
                
 
-            builder.ToTable("Funcionarios");
+            builder.ToTable("Pessoas");
         }
     }
 }

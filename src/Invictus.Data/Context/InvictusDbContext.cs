@@ -52,7 +52,7 @@ namespace Invictus.Data.Context
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<DocumentacaoTemplate> DocumentacoesTemplate { get; set; }
         public DbSet<Domain.Administrativo.FuncionarioAggregate.Endereco> Enderecos { get; set; }
-        public DbSet<Funcionario> Funcionarios { get; set; }
+        public DbSet<Pessoa> Pessoas { get; set; }
         public DbSet<LogBoletos> LogBoletos { get; set; }
         public DbSet<LogCalendario> LogCalendarios { get; set; }
         public DbSet<LogLogin> LogLogins { get; set; }

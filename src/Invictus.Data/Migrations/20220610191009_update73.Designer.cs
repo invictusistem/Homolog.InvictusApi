@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220610191009_update73")]
+    partial class update73
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,27 +409,27 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Complemento")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("FuncionarioId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Logradouro")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Numero")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PessoaId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UF")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PessoaId")
+                    b.HasIndex("FuncionarioId")
                         .IsUnique();
 
                     b.ToTable("Enderecos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Pessoa", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Funcionario", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -436,6 +438,9 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CNPJ")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CNPJ_CPF")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CPF")
@@ -462,35 +467,14 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("IE_RG")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Mae")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Nascimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Naturalidade")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NaturalidadeUF")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NomeContato")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NomeSocial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pai")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("PessoaRespCadastroId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RG")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RazaoSocial")
                         .HasColumnType("nvarchar(max)");
@@ -501,7 +485,7 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("TelWhatsapp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TelefoneContato")
+                    b.Property<string>("Telefonecontato")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TipoPessoa")
@@ -518,7 +502,7 @@ namespace Invictus.Data.Migrations
 
                     b.HasIndex("TipoPessoa");
 
-                    b.ToTable("Pessoas");
+                    b.ToTable("Pessoa");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.Logs.LogBoletos", b =>
@@ -1455,9 +1439,6 @@ namespace Invictus.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
                     b.Property<Guid?>("BancoId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1542,8 +1523,6 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Ativo");
 
                     b.HasIndex("CentroCustoUnidadeId");
 
@@ -2251,13 +2230,13 @@ namespace Invictus.Data.Migrations
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", b =>
                 {
-                    b.HasOne("Invictus.Domain.Administrativo.FuncionarioAggregate.Pessoa", "Pessoa")
+                    b.HasOne("Invictus.Domain.Administrativo.FuncionarioAggregate.Funcionario", "Funcionario")
                         .WithOne("Endereco")
-                        .HasForeignKey("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", "PessoaId")
+                        .HasForeignKey("Invictus.Domain.Administrativo.FuncionarioAggregate.Endereco", "FuncionarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Pessoa");
+                    b.Navigation("Funcionario");
                 });
 
             modelBuilder.Entity("Invictus.Domain.Administrativo.PacoteAggregate.DocumentacaoExigencia", b =>
@@ -2637,7 +2616,7 @@ namespace Invictus.Data.Migrations
                     b.Navigation("Conteudos");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Pessoa", b =>
+            modelBuilder.Entity("Invictus.Domain.Administrativo.FuncionarioAggregate.Funcionario", b =>
                 {
                     b.Navigation("Endereco");
                 });

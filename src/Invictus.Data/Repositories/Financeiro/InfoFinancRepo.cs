@@ -25,6 +25,11 @@ namespace Invictus.Data.Repositories.Financeiro
              _db.DisposeAsync();
         }
 
+        public async Task EditBoleto(Boleto conta)
+        {
+            await _db.Boletos.SingleUpdateAsync(conta);
+        }
+
         public async Task SaveBoleto(Boleto boleto)
         {
             await _db.Boletos.AddAsync(boleto);

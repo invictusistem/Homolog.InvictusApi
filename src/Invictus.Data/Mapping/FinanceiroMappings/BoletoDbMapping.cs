@@ -21,6 +21,8 @@ namespace Invictus.Data.Mapping.FinanceiroMappings
             builder.HasIndex(d => d.StatusBoleto);
 
             builder.HasIndex(d => d.CentroCustoUnidadeId);
+
+            builder.HasIndex(d => d.Ativo);
             // index no status
             // Index no centroCusto
             ///

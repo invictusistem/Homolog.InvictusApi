@@ -85,6 +85,45 @@ namespace Invictus.QueryService.Utilitarios
             return _inconsistencies;
         }
 
+        public async Task<IEnumerable<string>> ValidaDocumentoPessoa(string cpf, string rg, string email)
+        {
+            if (!String.IsNullOrEmpty(cpf))
+            {
+                var query = @"SELECT Pessoas.cpf FROM Pessoas WHERE Pessoas.cpf = @cpf";
+                var query2 = @"SELECT Pessoas.Email FROM Pessoas WHERE Pessoas.Email = @email";
+                var query3 = @"SELECT Pessoas.RG FROM Pessoas WHERE Pessoas.RG = @rg";
+
+                await using (var connection = new SqlConnection(
+                        _config.GetConnectionString("InvictusConnection")))
+                {
+                    connection.Open();
+                    var result = await connection.QueryAsync<string>(query, new { cpf = cpf });
+                    if (result.Count() > 0)
+                    {
+                        _validations.cpf = true;
+                        _inconsistencies.Add("Favor, escolha outro CPF.");
+                    }
+
+                    var result2 = await connection.QueryAsync<string>(query2, new { email = email });
+                    if (result2.Count() > 0)
+                    {
+                        _validations.email = true;
+                        _inconsistencies.Add("Favor, escolha outro e-mail.");
+                    }
+
+                    var result3 = await connection.QueryAsync<string>(query3, new { rg = rg });
+
+                    if (result3.Count() > 0)
+                    {
+                        _validations.rg = true;
+                        _inconsistencies.Add("Favor, escolha outro RG.");
+                    }
+                }
+            }          
+           
+            return _inconsistencies;
+        }
+
         public async Task<IEnumerable<string>> ValidaDocumentosColaborador(string cpf, string rg, string email)
         {
             if (!String.IsNullOrEmpty(cpf))

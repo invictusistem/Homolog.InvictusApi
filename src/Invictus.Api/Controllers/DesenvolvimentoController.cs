@@ -145,9 +145,9 @@ namespace Invictus.Api.Controllers
         [Route("deletar-aluno/{alunoId}")]
         public async Task<IActionResult> DeleteAluno(Guid alunoId)
         {
-            var aluno = await _db.Alunos.Where(a => a.Id == alunoId).FirstOrDefaultAsync();
+            var aluno = await _db.Pessoas.Where(a => a.Id == alunoId).FirstOrDefaultAsync();
 
-            _db.Alunos.Remove(aluno);
+            _db.Pessoas.Remove(aluno);
 
             await _db.SaveChangesAsync();
             // var alunoFoto = await _db.aluno.Where(a => a.a == alunoId).FirstOrDefaultAsync();

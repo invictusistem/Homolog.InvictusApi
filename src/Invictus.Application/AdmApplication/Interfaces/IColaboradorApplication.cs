@@ -10,6 +10,8 @@ namespace Invictus.Application.AdmApplication.Interfaces
     public interface IColaboradorApplication
     {
         Task SaveColaborador(ColaboradorDto newColaborador);
+        Task SaveColaboradorV2(PessoaDto newColaborador);
         Task EditColaborador(ColaboradorDto colaborador);
+        Task EditColaboradorV2(PessoaDto editedColaborador);
     }
 }
