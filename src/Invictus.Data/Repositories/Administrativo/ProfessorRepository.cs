@@ -14,15 +14,15 @@ namespace Invictus.Data.Repositories.Administrativo
             _db = db;
         }
 
-        public async Task AddProfessor(Professor newProfessor)
-        {
-            await _db.Professores.AddAsync(newProfessor);
-        }
+        //public async Task AddProfessor(Professor newProfessor)
+        //{
+        //    await _db.Professores.AddAsync(newProfessor);
+        //}
 
-        public async Task EditProfessor(Professor professor)
-        {
-            await _db.Professores.SingleUpdateAsync(professor);
-        }
+        //public async Task EditProfessor(Professor professor)
+        //{
+        //    await _db.Professores.SingleUpdateAsync(professor);
+        //}
 
         public void Dispose()
         {

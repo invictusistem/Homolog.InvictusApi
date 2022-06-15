@@ -83,7 +83,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             // se nao tiver, criar 
             if (!lista.Any())
             {
-                var alunos = new List<AlunoDto>();
+                var alunos = new List<PessoaDto>();
                 var listaPresenca = new List<ListaPresencaDto>();
 
                 foreach (var aluno in alunos)
@@ -239,14 +239,15 @@ namespace Invictus.QueryService.AdministrativoQueries
         {
             string query = @"select
                             TurmasProfessores.ProfessorId as id,
-                            professores.nome,
-                            professores.email,
+                            Pessoas.nome,
+                            Pessoas.email,
                             TurmasMaterias.id as materiaId,
                             TurmasMaterias.nome
                             from turmasprofessores
-                            inner join Professores on TurmasProfessores.ProfessorId = Professores.Id
-                            left join TurmasMaterias on Professores.Id = TurmasMaterias.ProfessorId
-                            where TurmasProfessores.TurmaId = @turmaId";
+                            inner join Pessoas on TurmasProfessores.ProfessorId = Pessoas.Id
+                            left join TurmasMaterias on Pessoas.Id = TurmasMaterias.ProfessorId
+                            where TurmasProfessores.TurmaId = @turmaId 
+                            AND Pessoas.tipoPessoa = 'Professor' ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

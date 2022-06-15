@@ -16,7 +16,6 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<MateriaTemplateDto>> GetMateriasByTypePacoteLiberadoParaOProfessor(Guid typePacoteId, Guid professorId);
         Task<MateriaTemplateDto> GetMateriaTemplate(Guid materiaId);
         Task<IEnumerable<MateriaTemplateDto>> GetMateriasByListIds(List<Guid> listGuidMaterias);
-        // Task<PaginatedItemsViewModel<MateriaTemplateDto>> GetMateriaTemplate(Guid materiaId, int itemsPerPage, int currentPage, string paramsJson);
 
     }
 }

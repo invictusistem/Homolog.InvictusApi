@@ -26,20 +26,20 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.Dispose();
         }
 
-        public async Task Edit(Aluno newAluno)
-        {
-            await _db.Alunos.SingleUpdateAsync(newAluno);
-        }
+        //public async Task Edit(Aluno newAluno)
+        //{
+        //    await _db.Alunos.SingleUpdateAsync(newAluno);
+        //}
 
         public async Task EditAlunoDoc(AlunoDocumento doc)
         {
             await _db.AlunosDocs.SingleUpdateAsync(doc);
         }
 
-        public async Task SaveAluno(Aluno newAluno)
-        {
-            await _db.Alunos.AddAsync(newAluno);
-        }
+        //public async Task SaveAluno(Aluno newAluno)
+        //{
+        //    await _db.Alunos.AddAsync(newAluno);
+        //}
 
         public async Task SaveAlunoDoc(AlunoDocumento doc)
         {

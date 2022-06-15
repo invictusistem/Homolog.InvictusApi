@@ -1,4 +1,5 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.Financeiro;
 using Invictus.QueryService.FinanceiroQueries.Interfaces;
@@ -25,7 +26,7 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedItemsViewModel<FornecedorDto>>> GetFornecedores([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        public async Task<ActionResult<PaginatedItemsViewModel<PessoaDto>>> GetFornecedores([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
             var fornecedores = await _fornecedorqueries.GetFornecedores(itemsPerPage, currentPage, paramsJson);
 
@@ -66,7 +67,7 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveFornecedor([FromBody] FornecedorDto fornecedor)
+        public async Task<IActionResult> SaveFornecedor([FromBody] PessoaDto fornecedor)
         {
             await _fornecedorApp.CreateFornecedor(fornecedor);
 
@@ -74,7 +75,7 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateFornecedor([FromBody] FornecedorDto fornecedor)
+        public async Task<IActionResult> UpdateFornecedor([FromBody] PessoaDto fornecedor)
         {
             await _fornecedorApp.UpdateFornecedor(fornecedor);
 

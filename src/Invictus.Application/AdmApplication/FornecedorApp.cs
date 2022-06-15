@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
-using Invictus.Domain.Financeiro.Fornecedores;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
+using Invictus.Domain.Administrativo.FuncionarioAggregate.Interfaces;
 using Invictus.Domain.Financeiro.Fornecedores.Interfaces;
-using Invictus.Dtos.Financeiro;
+using Invictus.Dtos.AdmDtos;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.Application.AdmApplication
@@ -17,33 +16,39 @@ namespace Invictus.Application.AdmApplication
         private readonly IFornecedorRepo _fornecedorRepo;
         private readonly IMapper _mapper;
         private readonly IAspNetUser _aspNetUser;
-        public FornecedorApp(IFornecedorRepo fornecedorRepo, IMapper mapper, IAspNetUser aspNetUser)
+        private readonly IPessoaRepo _pessoaRepo;
+        public FornecedorApp(IFornecedorRepo fornecedorRepo, IMapper mapper, IAspNetUser aspNetUser, IPessoaRepo pessoaRepo)
         {
             _fornecedorRepo = fornecedorRepo;
             _mapper = mapper;
             _aspNetUser = aspNetUser;
+            _pessoaRepo = pessoaRepo;
         }
 
-        public async Task CreateFornecedor(FornecedorDto newFornecedor)
+        public async Task CreateFornecedor(PessoaDto newFornecedor)
         {
             newFornecedor.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
             newFornecedor.dataCadastro = DateTime.Now;
 
-            var fornecedor = _mapper.Map<Fornecedor>(newFornecedor);
+            newFornecedor.pessoaRespCadastroId = _aspNetUser.ObterUsuarioId();
 
-            await _fornecedorRepo.SaveFornecedor(fornecedor);
+            var fornecedor = _mapper.Map<Pessoa>(newFornecedor);
 
-            _fornecedorRepo.Commit();
+            fornecedor.SetTipoPessoa(TipoPessoa.Fornecedor);
+
+            await _pessoaRepo.AddPessoa(fornecedor);
+
+            _pessoaRepo.Commit();
         }
 
-        public async Task UpdateFornecedor(FornecedorDto editedFornecedor)
+        public async Task UpdateFornecedor(PessoaDto editedFornecedor)
         {
-            var fornecedor = _mapper.Map<Fornecedor>(editedFornecedor);
-            
-            await _fornecedorRepo.Edit(fornecedor);
+            var fornecedor = _mapper.Map<Pessoa>(editedFornecedor);
 
-            _fornecedorRepo.Commit();
+            await _pessoaRepo.EditPessoa(fornecedor);
+
+            _pessoaRepo.Commit();
         }
     }
 }

@@ -61,22 +61,22 @@ namespace Invictus.Application.AdmApplication
             _pessoaRepo.Commit();
         }
 
-        public async Task saveAlunos(AlunoDto newAluno)
+        public async Task saveAlunos(PessoaDto newAluno)
         {
-            var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
-            newAluno.unidadeId = unidade.id;
+            //var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
+            //newAluno.unidadeId = unidade.id;
 
-            var aluno = _mapper.Map<Aluno>(newAluno);
+            //var aluno = _mapper.Map<Aluno>(newAluno);
 
-            var colaboradorId =  _aspNetUser.ObterUsuarioId();
-            aluno.SetColaboradorResponsavelPeloCadastro(colaboradorId);
+            //var colaboradorId =  _aspNetUser.ObterUsuarioId();
+            //aluno.SetColaboradorResponsavelPeloCadastro(colaboradorId);
 
-            aluno.SetDataCadastro();
+            //aluno.SetDataCadastro();
             
 
-            await _alunoRepo.SaveAluno(aluno);
+            //await _alunoRepo.SaveAluno(aluno);
 
-            _alunoRepo.Commit();
+            //_alunoRepo.Commit();
 
         }
     }

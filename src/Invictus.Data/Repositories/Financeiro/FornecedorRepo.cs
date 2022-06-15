@@ -27,14 +27,14 @@ namespace Invictus.Data.Repositories.Financeiro
             _db.DisposeAsync();
         }
 
-        public async Task Edit(Fornecedor fornecedor)
-        {
-            await _db.Fornecedors.SingleUpdateAsync(fornecedor);
-        }
+        //public async Task Edit(Fornecedor fornecedor)
+        //{
+        //    await _db.Fornecedors.SingleUpdateAsync(fornecedor);
+        //}
 
-        public async Task SaveFornecedor(Fornecedor fornecedor)
-        {
-            await _db.Fornecedors.AddAsync(fornecedor);
-        }
+        //public async Task SaveFornecedor(Fornecedor fornecedor)
+        //{
+        //    await _db.Fornecedors.AddAsync(fornecedor);
+        //}
     }
 }

@@ -12,6 +12,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
 {
     public interface IFinanceiroQueries
     {
+        Task<IEnumerable<BoletoDto>> GetAllBoletosVencidos();
         Task<IEnumerable<BoletoDto>> GetDebitoAlunos(Guid matriculaId);
         Task<IEnumerable<BoletoDto>> GetContasReceber(string meioPagamentoId,DateTime start, DateTime end);
         Task<BoletoDto> GetContaReceber(Guid id);

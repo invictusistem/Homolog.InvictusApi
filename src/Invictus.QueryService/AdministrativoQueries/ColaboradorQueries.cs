@@ -5,7 +5,6 @@ using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -26,9 +25,9 @@ namespace Invictus.QueryService.AdministrativoQueries
             _aspNetUser = aspNetUser;
         }
 
-        public async Task<ColaboradorDto> GetColaboradoresByEmail(string email)
+        public async Task<PessoaDto> GetColaboradoresByEmail(string email)
         {
-            var query = "SELECT * from Colaboradores where LOWER(colaboradores.email) like LOWER('"+ email + "') "+
+            var query = "SELECT * FROM Pessoas WHERE LOWER(Pessoas.email) like LOWER('"+ email + "') "+
                         "collate SQL_Latin1_General_CP1_CI_AI "; 
 
             await using (var connection = new SqlConnection(
@@ -36,7 +35,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<ColaboradorDto>(query);
+                var results = await connection.QueryAsync<PessoaDto>(query);
 
                 connection.Close();
 
@@ -45,7 +44,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<ColaboradorDto> GetColaboradoresById(Guid colaboradorId)
+        public async Task<PessoaDto> GetColaboradoresById(Guid colaboradorId)
         {
             var query = @"SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.id = @colaboradorId ";
 
@@ -54,7 +53,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<ColaboradorDto>(query, new { colaboradorId  = colaboradorId } );
+                var results = await connection.QueryAsync<PessoaDto>(query, new { colaboradorId  = colaboradorId } );
 
                 connection.Close();
 
@@ -64,7 +63,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         }
 
-        public async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson)
+        public async Task<PaginatedItemsViewModel<PessoaDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson)
         {
             var parametros = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
 
@@ -95,7 +94,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        private async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresV2(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        private async Task<PaginatedItemsViewModel<PessoaDto>> GetColaboradoresV2(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
             //var ativos = param.ativo;
             StringBuilder query = new StringBuilder();
@@ -131,18 +130,18 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Open();
                 var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidadeId });
 
-                var results = await connection.QueryAsync<ColaboradorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+                var results = await connection.QueryAsync<PessoaDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
                 connection.Close();
 
-                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());
+                var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, countItems, results.ToList());
 
                 return paginatedItems;
 
             }
         }
 
-        private async Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradores(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        private async Task<PaginatedItemsViewModel<PessoaDto>> GetColaboradores(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
             //var ativos = param.ativo;
             StringBuilder query = new StringBuilder(); 
@@ -178,11 +177,11 @@ namespace Invictus.QueryService.AdministrativoQueries
                 connection.Open();
                 var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidadeId });
 
-                var results = await connection.QueryAsync<ColaboradorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+                var results = await connection.QueryAsync<PessoaDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
                 connection.Close();
 
-                var paginatedItems = new PaginatedItemsViewModel<ColaboradorDto>(currentPage, itemsPerPage, countItems, results.ToList());               
+                var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, countItems, results.ToList());               
 
                 return paginatedItems;
 

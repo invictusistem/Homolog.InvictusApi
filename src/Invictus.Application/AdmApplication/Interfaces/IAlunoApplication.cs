@@ -9,7 +9,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IAlunoApplication
     {
-        Task saveAlunos(AlunoDto newAluno);
+        //Task saveAlunos(AlunoDto newAluno);
         Task SaveAluno(PessoaDto newAluno);
         Task EditAluno(PessoaDto newAluno);
     }

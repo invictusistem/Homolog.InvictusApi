@@ -13,7 +13,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
     {
         Task<IEnumerable<TurmaCalendarioViewModel>> GetCalendarioByTurmaId(Guid turmaId);
         Task<PaginatedItemsViewModel<TurmaCalendarioViewModel>> GetCalendarioPaginatedByTurmaId(Guid turmaId, int itemsPerPage, int currentPage, string paramsJson);
-        //Task<PaginatedItemsViewModel<ColaboradorDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson);
+        //Task<PaginatedItemsViewModel<PessoaDto>> GetColaboradoresByUnidadeId(int itemsPerPage, int currentPage, string paramsJson);
         Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByProfessorIdAndUnidadeId(Guid unidadeId, Guid professorId);
         Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByProfessorIdAndMateriaId(Guid materiaId, Guid professorId);
         Task<IEnumerable<TurmaCalendarioViwModel>> GetFutureCalendarsByTurmaIdAndMateriaId(Guid materiaId, Guid turmaId);

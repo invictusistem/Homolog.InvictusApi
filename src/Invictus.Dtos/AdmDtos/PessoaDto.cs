@@ -36,6 +36,7 @@ namespace Invictus.Dtos.AdmDtos
         public DateTime? dataEntrada { get; set; }
         public DateTime? dataSaida { get; set; }
         public Guid unidadeId { get; set; }
+        public string unidadeSigla { get; set; }
         public EnderecoDto endereco { get;  set; } 
         //public Guid bairroId { get; set; }
         //public string bairro { get; set; }

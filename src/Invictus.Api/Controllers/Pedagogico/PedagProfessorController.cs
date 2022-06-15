@@ -29,22 +29,22 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("{turmaId}")]
         public async Task<IActionResult> AdicionarProfessores(Guid turmaId)
         {
-            var query = "SELECT * from Professores";
-            IEnumerable<ProfessorDto> result = new List<ProfessorDto>();
-            await using (var connection = new SqlConnection(
-                    _config.GetConnectionString("InvictusConnection")))
-            {
-                connection.Open();
+            //var query = "SELECT * from Professores";
+            //IEnumerable<ProfessorDto> result = new List<ProfessorDto>();
+            //await using (var connection = new SqlConnection(
+            //        _config.GetConnectionString("InvictusConnection")))
+            //{
+            //    connection.Open();
 
-                result = await connection.QueryAsync<ProfessorDto>(query, new { turmaId = turmaId });
+            //    result = await connection.QueryAsync<ProfessorDto>(query, new { turmaId = turmaId });
 
-                connection.Close();
+            //    connection.Close();
 
-               // return Oresult;
+              
 
-            }
+            //}
 
-            if (result.Count() == 0) return NotFound();
+            //if (result.Count() == 0) return NotFound();
 
             return Ok();
         }

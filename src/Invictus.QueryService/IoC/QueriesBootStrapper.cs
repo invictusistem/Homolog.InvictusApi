@@ -33,6 +33,7 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IMatriculaQueries, MatriculaQueries>();
             services.AddScoped<IPacoteQueries, PacoteQueries>();
             services.AddScoped<IParametrosQueries, ParametrosQueries>();
+            services.AddScoped<IPessoaQueries, PessoaQueries>();
             services.AddScoped<IPlanoPagamentoQueries, PlanoPagamentoQueries>();
             services.AddScoped<IProdutoQueries, ProdutoQueries>();
             services.AddScoped<IProfessorQueries, ProfessorQueries>();

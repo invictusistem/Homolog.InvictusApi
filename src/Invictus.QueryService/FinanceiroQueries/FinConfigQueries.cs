@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Invictus.Core.Interfaces;
+using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.Financeiro.Configuracoes;
 using Invictus.QueryService.FinanceiroQueries.Interfaces;
@@ -254,18 +255,21 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<FornecedorDto>> GetFornecedoresForCreateFormaRecebimento()
+        public async Task<IEnumerable<PessoaDto>> GetFornecedoresForCreateFormaRecebimento()
         {
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
-            var query = @"SELECT Fornecedores.id, Fornecedores.RazaoSocial FROM Fornecedores WHERE Fornecedores.unidadeId = @unidadeId AND Fornecedores.Ativo = 'True'";
+            var query = @"SELECT Pessoas.id, Pessoas.RazaoSocial FROM Pessoas 
+                        WHERE Pessoas.unidadeId = @unidadeId 
+                        AND Pessoas.Ativo = 'True' 
+                        AND Pessoas.tipoPessoa = 'Fornecedor' ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var fornecedores = await connection.QueryAsync<FornecedorDto>(query, new { unidadeId = unidadeId });
+                var fornecedores = await connection.QueryAsync<PessoaDto>(query, new { unidadeId = unidadeId });
 
                 return fornecedores;
 

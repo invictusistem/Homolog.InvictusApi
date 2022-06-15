@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
+using Invictus.Core.Enumerations;
 
 namespace Invictus.QueryService.FinanceiroQueries
 {
@@ -256,19 +257,33 @@ namespace Invictus.QueryService.FinanceiroQueries
             {
                 meioPgmId = new Guid(meioPagamentoId);
             }
-            var query = @"SELECT * FROM Boletos WHERE Vencimento >= @inicio AND Vencimento <= @fim AND Tipo = 'Crédito' AND Boletos.CentroCustoUnidadeId = @unidadeId ";
+            var query = @"SELECT
+                        Boletos.id, 
+                        Pessoas.nome,
+                        Pessoas.TipoPessoa,
+                        Boletos.vencimento,
+                        Boletos.historico,
+                        Boletos.valor,
+                        Boletos.statusBoleto,
+                        Boletos.PessoaId
+                        FROM Boletos 
+                        LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id  
+                        WHERE Vencimento >= @inicio AND Vencimento <= @fim 
+                        AND Boletos.ativo = 'True' 
+                        AND Tipo = 'Crédito' 
+                        AND Boletos.CentroCustoUnidadeId = @unidadeId ";
 
             if (meioPagamentoId != "null") query =  query + " AND MeioPagamentoId = '"+ meioPgmId + "'";
 
 
             query = query + " ORDER BY Boletos.Vencimento";
 
-            var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome FROM Fornecedores WHERE Fornecedores.id = @id";
+            //var fornecedorQuery = @"SELECT Pessoas.nome FROM Pessoas WHERE Pessoas.id = @id";
 
-            var alunoQuery = @"SELECT 
-                            Alunos.Nome 
-                            FROM Alunos
-                            INNER JOIN Matriculas on Alunos.Id = Matriculas.AlunoId
+            var matriculadoQuery = @"SELECT 
+                            Pessoas.Nome 
+                            FROM Pessoas
+                            INNER JOIN Matriculas on Pessoas.Id = Matriculas.AlunoId
                             WHERE Matriculas.Id = @id ";
 
             await using (var connection = new SqlConnection(
@@ -281,13 +296,10 @@ namespace Invictus.QueryService.FinanceiroQueries
 
                 foreach (var boleto in boletos)
                 {
-                    if (boleto.ehFornecedor)
+                    if (boleto.nome == null)
                     {
-                        boleto.nome = await connection.QuerySingleAsync<string>(fornecedorQuery, new { id = boleto.pessoaId });
-                    }
-                    else
-                    {
-                        boleto.nome = await connection.QuerySingleAsync<string>(alunoQuery, new { id = boleto.pessoaId });
+                        boleto.nome = await connection.QuerySingleAsync<string>(matriculadoQuery, new { id = boleto.pessoaId });
+                        boleto.tipoPessoa = TipoPessoa.Matriculado.DisplayName;
                     }
                 }
 
@@ -429,6 +441,28 @@ namespace Invictus.QueryService.FinanceiroQueries
                 //    }
                 //}
 
+
+                connection.Close();
+
+                return boleto;
+            }
+        }
+
+        public async Task<IEnumerable<BoletoDto>> GetAllBoletosVencidos()
+        {
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            //var boletos = await _db.Boletos.Where(b => b.Vencimento < hoje &
+            //                                b.StatusBoleto == "Em aberto").ToListAsync();
+
+            var query = @"SELECT * FROM Boletos WHERE Boletos.ativo = 'True' ";           
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var boleto = await connection.QueryAsync<BoletoDto>(query);
 
                 connection.Close();
 

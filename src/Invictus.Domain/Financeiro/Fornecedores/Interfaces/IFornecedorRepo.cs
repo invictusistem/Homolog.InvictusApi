@@ -8,8 +8,8 @@ namespace Invictus.Domain.Financeiro.Fornecedores.Interfaces
 {
     public interface IFornecedorRepo : IDisposable
     {
-        Task SaveFornecedor(Fornecedor fornecedor);
-        Task Edit(Fornecedor fornecedor);
+        //Task SaveFornecedor(Fornecedor fornecedor);
+        //Task Edit(Fornecedor fornecedor);
         void Commit();
     }
 }

@@ -8,8 +8,8 @@ namespace Invictus.Domain.Administrativo.ColaboradorAggregate.Interfaces
 {
     public interface IColaboradorRepository : IDisposable
     {
-        Task AddColaborador(Colaborador newColaborador);
-        Task EditColaborador(Colaborador newColaborador);
+        //Task AddColaborador(Colaborador newColaborador);
+        //Task EditColaborador(Colaborador newColaborador);
 
         void Commit();
     }

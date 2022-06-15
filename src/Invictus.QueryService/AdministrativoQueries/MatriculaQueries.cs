@@ -163,5 +163,24 @@ select Pacotes.TypePAcoteId from Pacotes WHERE Pacotes.id not in ('f2bb154b-c45d
         {
             throw new NotImplementedException();
         }
+
+        public async Task<MatriculaDto> GetMatriculaById(Guid id)
+        {
+            string query = @"SELECT * FROM Matriculas WHERE Matriculas.id = @id";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var matricula = await connection.QueryAsync<MatriculaDto>(query, new { id = id});
+
+                connection.Close();
+
+                return matricula.FirstOrDefault();
+
+            }
+
+        }
     }
 }

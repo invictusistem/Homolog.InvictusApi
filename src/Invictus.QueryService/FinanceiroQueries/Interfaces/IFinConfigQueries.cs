@@ -1,4 +1,5 @@
-﻿using Invictus.Dtos.Financeiro;
+﻿using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.Financeiro.Configuracoes;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
         Task<IEnumerable<SubContaDto>> GetAllSubContas();
         Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas();
         Task<IEnumerable<SubContaDto>> GetAllSubContasAtivasDebitos();
-        Task<IEnumerable<FornecedorDto>> GetFornecedoresForCreateFormaRecebimento();
+        Task<IEnumerable<PessoaDto>> GetFornecedoresForCreateFormaRecebimento();
 
 
 

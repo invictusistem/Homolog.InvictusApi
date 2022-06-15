@@ -28,15 +28,16 @@ namespace Invictus.QueryService.PedagogicoQueries
             _unidade = unidade;
         }
 
-        public async Task<IEnumerable<AlunoDto>> GetAlunosDaTurma(Guid turmaId)
+        public async Task<IEnumerable<PessoaDto>> GetAlunosDaTurma(Guid turmaId)
         {
-            var query = @"select 
-                            alunos.nome, 
-                            alunos.email, 
-                            alunos.cpf
-                            from alunos 
-                            inner join Matriculas on Alunos.id = Matriculas.alunoId
-                            Where Matriculas.TurmaId = @turmaId";
+            var query = @"SELECT 
+                            Pessoas.nome, 
+                            Pessoas.email, 
+                            Pessoas.cpf
+                            FROM Pessoas 
+                            INNER JOIN Matriculas ON Alunos.id = Matriculas.alunoId
+                            WHERE Matriculas.TurmaId = @turmaId 
+                            AND Pessoas.tipoPessoa = 'Fornecedor' ";
 
 
             await using (var connection = new SqlConnection(
@@ -44,7 +45,7 @@ namespace Invictus.QueryService.PedagogicoQueries
             {
                 connection.Open();
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount);
-                var alunos = await connection.QueryAsync<AlunoDto>(query, new { turmaId = turmaId });
+                var alunos = await connection.QueryAsync<PessoaDto>(query, new { turmaId = turmaId });
 
                 foreach (var item in alunos)
                 {
@@ -225,7 +226,7 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
-        public Task<IEnumerable<ProfessorDto>> GetProfessoresDaTurma(Guid turmaId)
+        public Task<IEnumerable<PessoaDto>> GetProfessoresDaTurma(Guid turmaId)
         {
             throw new NotImplementedException();
         }

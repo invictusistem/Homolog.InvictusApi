@@ -5,38 +5,37 @@ using System;
 namespace Invictus.Domain.Financeiro
 {    
     public class Boleto : Entity
-    {
-
-        public Boleto(DateTime vencimento,
-                    decimal valor,
-                    int juros,
-                    int jurosFixo,
-                    string multa,
-                    string multaFixo,
-                    string desconto,
-                    TipoLancamento tipo,
-                    string diasDesconto,
-                    StatusPagamento statusBoleto,
-                    Guid centroCustoUnidadeId,
-                    Guid responsavelCadastroId,
-                    BoletoResponseInfo infoBoletos,
-                    DateTime dataCadastro)
-        {
-            Vencimento = vencimento;
-            Valor = valor;
-            Juros = juros;
-            JurosFixo = jurosFixo;
-            Multa = multa;
-            MultaFixo = multaFixo;
-            Desconto = desconto;
-            Tipo = tipo.DisplayName;
-            DiasDesconto = diasDesconto;
-            StatusBoleto = statusBoleto.DisplayName;
-            CentroCustoUnidadeId = centroCustoUnidadeId;
-            ResponsavelCadastroId = responsavelCadastroId;
-            InfoBoletos = infoBoletos;
-            DataCadastro = dataCadastro;
-        }
+    {     
+        //public Boleto(DateTime vencimento,
+        //            decimal valor,
+        //            int juros,
+        //            int jurosFixo,
+        //            string multa,
+        //            string multaFixo,
+        //            string desconto,
+        //            TipoLancamento tipo,
+        //            string diasDesconto,
+        //            StatusPagamento statusBoleto,
+        //            Guid centroCustoUnidadeId,
+        //            Guid responsavelCadastroId,
+        //            BoletoResponseInfo infoBoletos,
+        //            DateTime dataCadastro)
+        //{
+        //    Vencimento = vencimento;
+        //    Valor = valor;
+        //    Juros = juros;
+        //    JurosFixo = jurosFixo;
+        //    Multa = multa;
+        //    MultaFixo = multaFixo;
+        //    Desconto = desconto;
+        //    Tipo = tipo.DisplayName;
+        //    DiasDesconto = diasDesconto;
+        //    StatusBoleto = statusBoleto.DisplayName;
+        //    CentroCustoUnidadeId = centroCustoUnidadeId;
+        //    ResponsavelCadastroId = responsavelCadastroId;
+        //    InfoBoletos = infoBoletos;
+        //    DataCadastro = dataCadastro;
+        //}
 
         public DateTime Vencimento { get; private set; }
         public DateTime DataPagamento { get; private set; }
@@ -286,7 +285,7 @@ namespace Invictus.Domain.Financeiro
 
         #region EF
 
-        protected Boleto() { }
+        public Boleto() { }
         //public virtual InformacaoDebito InformacaoDebito { get; private set; }
 
         #endregion

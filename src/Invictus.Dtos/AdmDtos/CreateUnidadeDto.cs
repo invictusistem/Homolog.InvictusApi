@@ -9,6 +9,6 @@ namespace Invictus.Dtos.AdmDtos
     public class CreateUnidadeDto
     {
         public UnidadeDto unidade { get; set; }
-        public ColaboradorDto colaborador { get; set; }
+        public PessoaDto colaborador { get; set; }
     }    
 }

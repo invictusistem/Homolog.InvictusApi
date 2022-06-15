@@ -33,7 +33,7 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetProfessor([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        public async Task<ActionResult<PaginatedItemsViewModel<PessoaDto>>> GetProfessor([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
 
             //var results = await _profQueries.GetProfessores(itemsPerPage, currentPage, paramsJson);

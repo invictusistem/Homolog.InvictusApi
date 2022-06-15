@@ -22,6 +22,7 @@ namespace Invictus.Api.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IColaboradorQueries _colaboradorQueries;
+        
         private readonly IProfessorQueries _profQueries;
         private readonly IUsuariosQueries _userQueries;
         private readonly IUsuarioApplication _userApplication;

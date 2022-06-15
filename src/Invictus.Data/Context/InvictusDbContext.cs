@@ -41,13 +41,13 @@ namespace Invictus.Data.Context
 
         #region Administrativo
         public DbSet<AgendaTrimestre> AgendasTrimestres { get; set; }
-        public DbSet<Aluno> Alunos { get; set; }
+        //public DbSet<Aluno> Alunos { get; set; }
         public DbSet<AlunoDocumento> AlunosDocs { get; set; }
         public DbSet<AlunoPlanoPagamento> AlunoPlanos { get; set; }
         public DbSet<Autorizacao> Autorizacoes { get; set; }
         public DbSet<Calendario> Calendarios { get; set; }
         public DbSet<AnotacaoColaborador> ColaboradoresAnotacoes { get; set; }
-        public DbSet<Colaborador> Colaboradores { get; set; }
+        //public DbSet<Colaborador> Colaboradores { get; set; }
         public DbSet<Conteudo> Conteudos { get; set; }
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<DocumentacaoTemplate> DocumentacoesTemplate { get; set; }
@@ -70,7 +70,7 @@ namespace Invictus.Data.Context
         public DbSet<ProdutoLog> ProdutosLogs { get; set; }
         public DbSet<Domain.Administrativo.ProfessorAggregate.Disponibilidade> Disponibilidades { get; set; }
         public DbSet<Domain.Administrativo.ProfessorAggregate.MateriaHabilitada> MateriasHabilitadas { get; set; }
-        public DbSet<Professor> Professores { get; set; }
+        //public DbSet<Professor> Professores { get; set; }
         public DbSet<Requerimento> Requerimentos { get; set; }
         public DbSet<TipoRequerimento> TypeRequerimentos { get; set; }
         public DbSet<Responsavel> Responsaveis { get; set; }
@@ -96,7 +96,7 @@ namespace Invictus.Data.Context
         public DbSet<Boleto> Boletos { get; set; }
         public DbSet<Bolsa> Bolsas { get; set; }
         public DbSet<Caixa> Caixas { get; set; }
-        public DbSet<Fornecedor> Fornecedors { get; set; }
+        //public DbSet<Fornecedor> Fornecedors { get; set; }
         //public DbSet<InformacaoDebito> InformacoesDebito { get; set; }
         public DbSet<Reparcelado> Reparcelamentos { get; set; }
 

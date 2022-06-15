@@ -8,8 +8,8 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate.Interface
 {
     public interface IAlunoRepo : IDisposable
     {
-        Task SaveAluno(Aluno newAluno);
-        Task Edit(Aluno newAluno);
+        //Task SaveAluno(Aluno newAluno);
+        //Task Edit(Aluno newAluno);
         Task SaveAlunoPlano(AlunoPlanoPagamento newPlano);
         Task SaveAlunoDocs(IEnumerable<AlunoDocumento> docs);
         Task SaveAlunoDoc(AlunoDocumento docs);

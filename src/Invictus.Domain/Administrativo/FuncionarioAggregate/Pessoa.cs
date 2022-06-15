@@ -37,6 +37,10 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
         public Guid UnidadeId { get; private set; }
         public Endereco Endereco { get; private set; }
 
+        public void AtualizarNome()
+        {
+            Nome = RazaoSocial;
+        }
         public void TratarEmail(string email)
         {
             Email = RemoveDiacritics(email);

@@ -3,8 +3,6 @@ using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.Dtos.PedagDto;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.AdministrativoQueries.Interfaces
@@ -15,12 +13,11 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosViewV2(int itemsPerPage, int currentPage, string paramsJson);
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetAllMatriculadosView(int itemsPerPage, int currentPage,string paramsJson);
         Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetSomenteMatriculadosView(int itemsPerPage, int currentPage, string paramsJson);
-        Task<IEnumerable<AlunoDto>> FindAlunoByCPForEmailorRG(string cpf, string rg, string email);
-        Task<IEnumerable<AlunoDto>> SearchPerCPF(string cpf);
+        Task<IEnumerable<PessoaDto>> FindAlunoByCPForEmailorRG(string cpf, string rg, string email);
+        Task<IEnumerable<PessoaDto>> SearchPerCPF(string cpf);
         Task<IEnumerable<PessoaDto>> SearchPerCPFV2(string cpf);
         Task<DateTime> GetIdadeAluno(Guid alunoId);
         Task<PessoaDto> GetAlunoById(Guid alunoId);
-
-        Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId);
+        Task<PessoaDto> GetAlunoByMatriculaId(Guid matriculaId);
     }
 }

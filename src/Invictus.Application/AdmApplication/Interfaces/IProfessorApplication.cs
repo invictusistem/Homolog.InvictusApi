@@ -10,7 +10,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IProfessorApplication
     {
-        Task SaveProfessor(ProfessorDto newProfessor);
+        //Task SaveProfessor(ProfessorDto newProfessor);
         Task SaveProfessorV2(PessoaDto newProfessor);
         Task EditProfessor(PessoaDto editedProfessor);
         Task AddProfessorMateria(Guid profId, Guid materiaId);

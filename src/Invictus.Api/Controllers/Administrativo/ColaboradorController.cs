@@ -36,7 +36,7 @@ namespace Invictus.Api.Controllers
 
         [HttpGet]
         [Route("pesquisar")]
-        public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetColaboradorV2([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
+        public async Task<ActionResult<PaginatedItemsViewModel<PessoaDto>>> GetColaboradorV2([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
             var results = await _colaboradorQueries.GetColaboradoresByUnidadeId(itemsPerPage, currentPage, paramsJson);
             
@@ -47,7 +47,7 @@ namespace Invictus.Api.Controllers
 
         [HttpGet]
         [Route("{parametro}/{colaboradorId}")]
-        public async Task<ActionResult<PaginatedItemsViewModel<ColaboradorDto>>> GetColaborador(string parametro, Guid colaboradorId)
+        public async Task<IActionResult> GetColaborador(string parametro, Guid colaboradorId)
         {
             //var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);
             var colaborador = await _colaboradorQueries.GetColaboradoresByIdV2(colaboradorId);

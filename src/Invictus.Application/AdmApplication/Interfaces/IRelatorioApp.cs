@@ -9,10 +9,10 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IRelatorioApp
     {
-        void ReadAndSaveExcel();
-        void SaveFornecedores();
-        List<MatriculaCommand> MatriculaExcel(MatriculaPlanilha matricula);
-        void DeleteExcel();
+        //void ReadAndSaveExcel();
+        //void SaveFornecedores();
+        //List<MatriculaCommand> MatriculaExcel(MatriculaPlanilha matricula);
+        //void DeleteExcel();
     }
 
     public class MatriculaPlanilha

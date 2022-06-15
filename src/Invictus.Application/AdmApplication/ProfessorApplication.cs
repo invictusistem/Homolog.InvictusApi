@@ -297,23 +297,23 @@ namespace Invictus.Application.AdmApplication
             _pessoaRepo.Commit();
         }
 
-        public async Task SaveProfessor(ProfessorDto newProfessor)
-        {
-            var unidade = await _unidadeQueries.GetUnidadeBySigla(_aspNetUser.ObterUnidadeDoUsuario());
+        //public async Task SaveProfessor(ProfessorDto newProfessor)
+        //{
+        //    var unidade = await _unidadeQueries.GetUnidadeBySigla(_aspNetUser.ObterUnidadeDoUsuario());
 
-            newProfessor.unidadeId = unidade.id;
+        //    newProfessor.unidadeId = unidade.id;
 
-            var professor = _mapper.Map<Professor>(newProfessor);
+        //    var professor = _mapper.Map<Professor>(newProfessor);
 
-            //var sdfd = newProfessor.dataEntrada;
-            //var wewfwf = newProfessor.dataEntrada.Value;
-            professor.SetDataCadastro();
+        //    //var sdfd = newProfessor.dataEntrada;
+        //    //var wewfwf = newProfessor.dataEntrada.Value;
+        //    professor.SetDataCadastro();
 
-            professor.SetDataEntrada(newProfessor.dataEntrada);
+        //    professor.SetDataEntrada(newProfessor.dataEntrada);
 
-            await _profRepository.AddProfessor(professor);
+        //    await _profRepository.AddProfessor(professor);
 
-            _profRepository.Save();
-        }
+        //    _profRepository.Save();
+        //}
     }
 }

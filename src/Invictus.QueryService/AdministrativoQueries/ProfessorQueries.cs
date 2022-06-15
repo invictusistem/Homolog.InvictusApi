@@ -23,7 +23,7 @@ namespace Invictus.QueryService.AdministrativoQueries
         private readonly IAspNetUser _user;
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly ITurmaQueries _turmaQueries;
-        private readonly List<ProfessorDto> _professores;
+        private readonly List<PessoaDto> _professores;
         public ProfessorQueries(IAspNetUser user, IUnidadeQueries unidadeQueries, IConfiguration config,
             ITurmaQueries turmaQueries)
         {
@@ -31,10 +31,10 @@ namespace Invictus.QueryService.AdministrativoQueries
             _unidadeQueries = unidadeQueries;
             _config = config;
             _turmaQueries = turmaQueries;
-            _professores = new List<ProfessorDto>();
+            _professores = new List<PessoaDto>();
         }
 
-        public async Task<PaginatedItemsViewModel<ProfessorDto>> GetProfessores(int itemsPerPage, int currentPage, string paramsJson)
+        public async Task<PaginatedItemsViewModel<PessoaDto>> GetProfessores(int itemsPerPage, int currentPage, string paramsJson)
         {
             var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
 
@@ -42,7 +42,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             var profCount = await CountProfessoresByFilter(itemsPerPage, currentPage, param);
 
-            var paginatedItems = new PaginatedItemsViewModel<ProfessorDto>(currentPage, itemsPerPage, profCount, professores.ToList());
+            var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, profCount, professores.ToList());
 
             return paginatedItems;
         }
@@ -101,25 +101,25 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        private async Task<IEnumerable<ProfessorDto>> GetProfessoresByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
+        private async Task<IEnumerable<PessoaDto>> GetProfessoresByFilter(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
             var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
 
             StringBuilder query = new StringBuilder();
             query.Append(@"SELECT
-                        Professores.Id,
-                        Professores.Nome,
-                        Professores.Email,
-                        Professores.Ativo,
+                        Pessoas.Id,
+                        Pessoas.Nome,
+                        Pessoas.Email,
+                        Pessoas.Ativo,
                         Unidades.sigla as unidadeSigla
-                        FROM Professores INNER JOIN Unidades on Professores.UnidadeId = Unidades.Id WHERE  ");
-            if (param.todasUnidades == false) query.Append(" Professores.UnidadeId = '" + unidade.id + "' AND ");
-            if (param.nome != "") query.Append(" LOWER(Professores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append(" LOWER(Professores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append(" LOWER(Professores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+                        FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidade.id + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             //query.Append("Professores.UnidadeId = '" + unidade.id + "'");
-            if (param.ativo == false) { query.Append(" Professores.Ativo = 'True' "); } else { query.Append(" Professores.Ativo = 'True' OR Professores.Ativo = 'False' "); }
-            query.Append(" ORDER BY Professores.Nome ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
 
@@ -131,7 +131,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 //var countItems = await connection.QuerySingleAsync<int>(queryCount.ToString(), new { unidadeId = unidade.id });
 
-                var results = await connection.QueryAsync<ProfessorDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
+                var results = await connection.QueryAsync<PessoaDto>(query.ToString(), new { currentPage = currentPage, itemsPerPage = itemsPerPage });
 
                 /// var paginatedItems = new PaginatedItemsViewModel<ProfessorDto>(currentPage, itemsPerPage, countItems, results.ToList());
 
@@ -361,17 +361,17 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId)
+        public async Task<IEnumerable<PessoaDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId)
         {
             var diaSemana = DiaDaSemana.TryParsToDisponibilidadeTable(diaDaSemana);
             string query = @"select 
-                            Professores.Id,
-                            professores.Nome
-                            from professores 
-                            inner join professoresDisponibilidades on Professores.Id = professoresDisponibilidades.PessoaId
-                            inner join ProfessoresMaterias on Professores.Id = ProfessoresMaterias.ProfessorId
+                            Pessoas.Id,
+                            Pessoas.Nome
+                            from Pessoas 
+                            inner join professoresDisponibilidades on Pessoas.Id = professoresDisponibilidades.PessoaId
+                            inner join ProfessoresMaterias on Pessoas.Id = ProfessoresMaterias.ProfessorId
                             WHERE professoresDisponibilidades." + diaSemana + @" = 'True' 
-                            and Professores.Ativo = 'True'
+                            and Pessoas.Ativo = 'True'
                             AND professoresDisponibilidades.UnidadeId = @unidadeId
                             and ProfessoresMaterias.PacoteMateriaId = @materiaId ";
 
@@ -380,7 +380,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<ProfessorDto>(query, new { diaDaSemana = diaDaSemana, unidadeId = unidadeId, materiaId = materiaId });
+                var result = await connection.QueryAsync<PessoaDto>(query, new { diaDaSemana = diaDaSemana, unidadeId = unidadeId, materiaId = materiaId });
 
                 connection.Close();
 
@@ -390,7 +390,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
 
         #region GetProfDisponiveis
-        public async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId)
+        public async Task<IEnumerable<PessoaDto>> GetProfessoresDisponiveis(Guid turmaId)
         {
             // var turmaId = "";
             var turma = await _turmaQueries.GetTurma(turmaId);
@@ -436,7 +436,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
-        private async Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
+        private async Task<IEnumerable<PessoaDto>> GetProfessoresDisponiveisNoDia(Guid unidadeId, List<string> diasSemana, Guid turmaId)
         {/*
             StringBuilder profsDisponiveis = new StringBuilder();
             profsDisponiveis.Append("select professores.id, professores.Nome, professores.Email from ProfessoresDisponibilidades ");
@@ -492,12 +492,12 @@ namespace Invictus.QueryService.AdministrativoQueries
             */
 
             var query = @"SELECT 
-                        Professores.Id,                        
-                        Professores.Nome
-                        FROM Professores
-                        INNER JOIN ProfessoresDisponibilidades ON Professores.Id = ProfessoresDisponibilidades.PessoaId
+                        Pessoas.Id,                        
+                        Pessoas.Nome
+                        FROM Pessoas
+                        INNER JOIN ProfessoresDisponibilidades ON Pessoas.Id = ProfessoresDisponibilidades.PessoaId
                         WHERE ProfessoresDisponibilidades.UnidadeId = @unidadeId
-                        AND Professores.id NOT IN (
+                        AND Pessoas.id NOT IN (
                         SELECT TurmasProfessores.ProfessorId FROM TurmasProfessores WHERE TurmasProfessores.TurmaId = @turmaId
                         ) ";
 
@@ -506,7 +506,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<ProfessorDto>(query, new { unidadeId = unidadeId, turmaId = turmaId });                
+                var result = await connection.QueryAsync<PessoaDto>(query, new { unidadeId = unidadeId, turmaId = turmaId });                
 
                 connection.Close();
 

@@ -17,7 +17,7 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
         Task<IEnumerable<AnotacaoDto>> GetAnotacoesMatricula(Guid matriculaId);
         Task<ResponsavelDto> GetResponsavel(Guid matriculaId);
         Task<ResponsavelDto> GetResponsavelById(Guid id);
-        Task<IEnumerable<AlunoDto>> GetAlunosIndicacao();
+        Task<IEnumerable<PessoaDto>> GetAlunosIndicacao();
         Task<IEnumerable<MatriculaViewModel>> GetRelatorioMatriculas(string param);
         Task<IEnumerable<MatriculaViewModel>> GetMatriculadosFromUnidade();
 

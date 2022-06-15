@@ -8,8 +8,8 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces
 {
     public interface IProfessorRepository : IDisposable
     {
-        Task AddProfessor(Professor professor);
-        Task EditProfessor(Professor professor);
+        //Task AddProfessor(Professor professor);
+        //Task EditProfessor(Professor professor);
         Task AddProfessorMateria(MateriaHabilitada profMateria);
         Task RemoveProfessorMateria(Guid profMateriaId);
         Task AddDisponibilidade(Disponibilidade disponibilidade);

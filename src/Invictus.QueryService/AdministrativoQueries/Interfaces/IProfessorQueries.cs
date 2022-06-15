@@ -10,7 +10,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
 {
     public interface IProfessorQueries 
     {
-        Task<PaginatedItemsViewModel<ProfessorDto>> GetProfessores(int itemsPerPage,int currentPage, string paramsJson);
+        Task<PaginatedItemsViewModel<PessoaDto>> GetProfessores(int itemsPerPage,int currentPage, string paramsJson);
         Task<PaginatedItemsViewModel<PessoaDto>> GetProfessoresV2(int itemsPerPage, int currentPage, string paramsJson);
         Task<PessoaDto> GetProfessorById(Guid professorId);
         Task<MateriaHabilitadaViewModel> GetProfessorMateria(Guid professorMateriaId);
@@ -18,8 +18,8 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<IEnumerable<MateriaHabilitadaViewModel>> GetProfessoresMaterias(Guid professorId);
         Task<IEnumerable<UnidadeDto>> GetProfessoresUnidadesDisponiveis(Guid professorId);
         Task<IEnumerable<DisponibilidadeView>> GetProfessorDisponibilidade(Guid professorId);
-        Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveis(Guid turmaId);
-        Task<IEnumerable<ProfessorDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId);
+        Task<IEnumerable<PessoaDto>> GetProfessoresDisponiveis(Guid turmaId);
+        Task<IEnumerable<PessoaDto>> GetProfessoresDisponiveisByFilter(string diaDaSemana, Guid unidadeId, Guid materiaId);
         Task<IEnumerable<ProfessorCalendarioViewModel>> GetProfessorCalendario(Guid professorId);
         Task<string> GetEmailDoProfessorById(Guid professorId);
     }

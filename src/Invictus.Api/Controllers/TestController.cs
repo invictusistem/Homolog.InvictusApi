@@ -185,68 +185,64 @@ namespace Invictus.Api.Controllers
         [Route("atualizar-boletos-pessoa")]
         public IActionResult AtualizarBoleto()
         {
-            var boletos = _db.Boletos.ToList();
+            //var boletos = _db.Boletos.ToList();
 
-            foreach (var boleto in boletos)
-            {
-                var forne =  _db.Fornecedors.Find(boleto.PessoaId);
+            //foreach (var boleto in boletos)
+            //{
+            //    var forne =  _db.Fornecedors.Find(boleto.PessoaId);
 
-                if(forne != null)
-                {
-                    boleto.SetTipoPessoa(TipoPessoa.Fornecedor.DisplayName);
-                }
-            }
+            //    if(forne != null)
+            //    {
+            //        boleto.SetTipoPessoa(TipoPessoa.Fornecedor.DisplayName);
+            //    }
+            //}
 
-            foreach (var boleto in boletos)
-            {
-                var prof = _db.Professores.Find(boleto.PessoaId);
+            //foreach (var boleto in boletos)
+            //{
+            //    var prof = _db.Professores.Find(boleto.PessoaId);
 
-                if (prof != null)
-                {
-                    boleto.SetTipoPessoa(TipoPessoa.Professor.DisplayName);
-                }
-            }
+            //    if (prof != null)
+            //    {
+            //        boleto.SetTipoPessoa(TipoPessoa.Professor.DisplayName);
+            //    }
+            //}
 
-            foreach (var boleto in boletos)
-            {
-                var colab = _db.Colaboradores.Find(boleto.PessoaId);
+            //foreach (var boleto in boletos)
+            //{
+            //    var colab = _db.Colaboradores.Find(boleto.PessoaId);
 
-                if (colab != null)
-                {
-                    boleto.SetTipoPessoa(TipoPessoa.Colaborador.DisplayName);
-                }
-            }
+            //    if (colab != null)
+            //    {
+            //        boleto.SetTipoPessoa(TipoPessoa.Colaborador.DisplayName);
+            //    }
+            //}
 
-            foreach (var boleto in boletos)
-            {
-                var aluno = _db.Alunos.Find(boleto.PessoaId);
+            //foreach (var boleto in boletos)
+            //{
+            //    var aluno = _db.Alunos.Find(boleto.PessoaId);
 
-                if (aluno != null)
-                {
-                    boleto.SetTipoPessoa(TipoPessoa.Aluno.DisplayName);
-                }
-            }
+            //    if (aluno != null)
+            //    {
+            //        boleto.SetTipoPessoa(TipoPessoa.Aluno.DisplayName);
+            //    }
+            //}
 
-            foreach (var boleto in boletos)
-            {
-                var matri = _db.Matriculas.Find(boleto.PessoaId);
+            //foreach (var boleto in boletos)
+            //{
+            //    var matri = _db.Matriculas.Find(boleto.PessoaId);
 
-                if (matri != null)
-                {
-                    //var aluno = await _db.Alunos.FindAsync(boleto.PessoaId);
+            //    if (matri != null)
+            //    {
+                   
 
-                    boleto.SetTipoPessoa(TipoPessoa.Matriculado.DisplayName);
-                }
-            }
+            //        boleto.SetTipoPessoa(TipoPessoa.Matriculado.DisplayName);
+            //    }
+            //}
 
-            _db.Boletos.UpdateRange(boletos);
+            //_db.Boletos.UpdateRange(boletos);
 
-            _db.SaveChanges();
-            /*
-             ehFornecedor: fornecedor
-
-            aluno/colaborador/matriculado/professor
-             */
+            //_db.SaveChanges();
+           
 
 
             return Ok();
@@ -547,7 +543,7 @@ namespace Invictus.Api.Controllers
         [Route("readexcelalunos")]
         public string ReadExcel()
         {
-            _relatorioApp.ReadAndSaveExcel();
+            //_relatorioApp.ReadAndSaveExcel();
             return "invictus Ok";
         }
 
@@ -555,7 +551,7 @@ namespace Invictus.Api.Controllers
         [Route("add-fornecedores")]
         public string ReadEFornecedores()
         {
-            _relatorioApp.SaveFornecedores();
+            //_relatorioApp.SaveFornecedores();
             return "invictus Ok";
         }
 
@@ -594,7 +590,7 @@ namespace Invictus.Api.Controllers
         [Route("delete-registros")]
         public string DeleteExcel()
         {
-            _relatorioApp.DeleteExcel();
+           // _relatorioApp.DeleteExcel();
             return "invictus Ok";
         }
 
@@ -624,8 +620,9 @@ namespace Invictus.Api.Controllers
         [Route("matricular-registros")]
         public IActionResult MatriculaExcel([FromBody] MatriculaPlanilha matricula)
         {
-            var commands = _relatorioApp.MatriculaExcel(matricula);
-            return Ok(new { commands = commands });
+            //var commands = _relatorioApp.MatriculaExcel(matricula);
+            //return Ok(new { commands = commands });
+            return Ok();
         }
 
         [HttpPost]

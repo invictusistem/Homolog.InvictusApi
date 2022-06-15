@@ -35,49 +35,49 @@ namespace Invictus.Application.AdmApplication
             _pessoaRepo = pessoaRepo;
         }
 
-        public async Task EditColaborador(ColaboradorDto editedColaborador)
+        public async Task EditColaborador(PessoaDto editedColaborador)
         {
-            var newEmail = editedColaborador.email;
+            //var newEmail = editedColaborador.email;
 
-            var oldEmail = await _colabQueries.GetEmailFromColaboradorById(editedColaborador.id);
+            //var oldEmail = await _colabQueries.GetEmailFromColaboradorById(editedColaborador.id);
 
-            var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(editedColaborador);            
+            //var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(editedColaborador);            
 
-            await _colaboradorRepo.EditColaborador(colaborador);
+            //await _colaboradorRepo.EditColaborador(colaborador);
 
-            _colaboradorRepo.Commit();
+            //_colaboradorRepo.Commit();
 
-            if (newEmail != oldEmail)
-            {
-                if (!String.IsNullOrEmpty(newEmail))
-                {
-                    // update se existir
-                    var user = await UserManager.FindByEmailAsync(oldEmail);
-                    if (user != null)
-                    {
-                        await UserManager.UpdateAsync(user);
+            //if (newEmail != oldEmail)
+            //{
+            //    if (!String.IsNullOrEmpty(newEmail))
+            //    {
+            //        // update se existir
+            //        var user = await UserManager.FindByEmailAsync(oldEmail);
+            //        if (user != null)
+            //        {
+            //            await UserManager.UpdateAsync(user);
 
-                        var claims = await UserManager.GetClaimsAsync(user);
+            //            var claims = await UserManager.GetClaimsAsync(user);
 
-                        var claim = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
+            //            var claim = claims.Where(c => c.Type == "IsActive").FirstOrDefault();
 
-                        await UserManager.RemoveClaimAsync(user, claim);
+            //            await UserManager.RemoveClaimAsync(user, claim);
 
-                        await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", editedColaborador.ativo.ToString()));
-                    }
+            //            await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", editedColaborador.ativo.ToString()));
+            //        }
 
-                }
-                else
-                {
-                    var user = await UserManager.FindByEmailAsync(oldEmail);
-                    if (user != null)
-                    {
-                        await UserManager.DeleteAsync(user);
-                    }
-                }
-            }
+            //    }
+            //    else
+            //    {
+            //        var user = await UserManager.FindByEmailAsync(oldEmail);
+            //        if (user != null)
+            //        {
+            //            await UserManager.DeleteAsync(user);
+            //        }
+            //    }
+            //}
 
-            _colaboradorRepo.Commit();
+            //_colaboradorRepo.Commit();
         }
 
         public async Task EditColaboradorV2(PessoaDto editedColaborador)
@@ -125,27 +125,27 @@ namespace Invictus.Application.AdmApplication
             _colaboradorRepo.Commit();
         }
 
-        public async Task SaveColaborador(ColaboradorDto newColaborador)
+        public async Task SaveColaborador(PessoaDto newColaborador)
         {
-            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+            //var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
 
-            var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
+            //var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
 
-            newColaborador.unidadeId = unidade.id;
+            //newColaborador.unidadeId = unidade.id;
 
-            //var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(newColaborador);
-            var colaborador = _mapper.Map<Pessoa>(newColaborador);
+            ////var colaborador = _mapper.Map<ColaboradorDto, Colaborador>(newColaborador);
+            //var colaborador = _mapper.Map<Pessoa>(newColaborador);
 
-            colaborador.SetRespCadastroId(_aspNetUser.GetUnidadeIdDoUsuario());
-            //colaborador.SetColaborador();
+            //colaborador.SetRespCadastroId(_aspNetUser.GetUnidadeIdDoUsuario());
+            ////colaborador.SetColaborador();
 
-            colaborador.TratarEmail(colaborador.Email);
+            //colaborador.TratarEmail(colaborador.Email);
 
-            //await _colaboradorRepo.AddColaborador(colaborador);
+            ////await _colaboradorRepo.AddColaborador(colaborador);
 
-            await _pessoaRepo.AddPessoa(colaborador);
+            //await _pessoaRepo.AddPessoa(colaborador);
 
-            _pessoaRepo.Commit();
+            //_pessoaRepo.Commit();
 
         }
 

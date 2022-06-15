@@ -26,18 +26,18 @@ namespace Invictus.QueryService.AdministrativoQueries
             _unidadeQueries = unidadeQueries;
             _utils = utils;
         }
-        public async Task<IEnumerable<AlunoDto>> FindAlunoByCPForEmailorRG(string cpf, string rg, string email)
+        public async Task<IEnumerable<PessoaDto>> FindAlunoByCPForEmailorRG(string cpf, string rg, string email)
         {
-            var query = "SELECT * from Alunos where LOWER(Alunos.cpf) like LOWER('" + cpf + "') collate SQL_Latin1_General_CP1_CI_AI " +
-                "OR LOWER(Alunos.rg) like LOWER('" + rg + "') collate SQL_Latin1_General_CP1_CI_AI " +
-                "OR LOWER(Alunos.email) like LOWER('" + email + "') collate SQL_Latin1_General_CP1_CI_AI ";
+            var query = "SELECT * FROM Pessoas WHERE LOWER(Pessoas.cpf) like LOWER('" + cpf + "') collate SQL_Latin1_General_CP1_CI_AI " +
+                "OR LOWER(Pessoas.rg) like LOWER('" + rg + "') collate SQL_Latin1_General_CP1_CI_AI " +
+                "OR LOWER(Pessoas.email) like LOWER('" + email + "') collate SQL_Latin1_General_CP1_CI_AI ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<AlunoDto>(query);
+                var results = await connection.QueryAsync<PessoaDto>(query);
 
                 connection.Close();
 
@@ -56,7 +56,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.ativo == false) query.Append(" Alunos.Ativo = 'True' ");
             query.Append(" ORDER BY Alunos.Nome ");
-            //query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
+         
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -73,35 +73,8 @@ namespace Invictus.QueryService.AdministrativoQueries
         }
 
         public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetMatriculadosView(int itemsPerPage, int currentPage, string paramsJson)
-        {
-            //var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
-            //var uindade = await _unidadeQueries.GetUnidadeDoUsuario();
+        {           
 
-
-            // var alunosNaBase = await GetIdsAlunosDaBase(param, uindade.id);
-
-            // get alunos na Table Alunos
-            /*
-             lista Alunos
-             aluno.temMatricula ? sim =
-
-            aluno.temMatricula ?
-              
-             */
-            /*
-             select alunos.id,
-matriculas.numeromatricula, 
-matriculas.cpf, 
-alunos.nome,
-matriculas.id as matriculaId,
-unidades.sigla
-from alunos
-full join matriculas on alunos.id = matriculas.alunoid
-inner join Unidades on Alunos.UnidadeId = Unidades.Id
-WHERE Alunos.nome = 'Mario Gomes'
-             */
-
-            // old
             var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
             var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
 
@@ -184,9 +157,9 @@ WHERE Alunos.nome = 'Mario Gomes'
 
         }
 
-        public async Task<IEnumerable<AlunoDto>> SearchPerCPF(string cpf)
+        public async Task<IEnumerable<PessoaDto>> SearchPerCPF(string cpf)
         {
-            var query = "SELECT * from Alunos where LOWER(Alunos.cpf) like LOWER('" + cpf + "') " +
+            var query = "SELECT * FROM Pessoas WHERE LOWER(Alunos.cpf) like LOWER('" + cpf + "') " +
                         "collate SQL_Latin1_General_CP1_CI_AI ";
 
             await using (var connection = new SqlConnection(
@@ -194,7 +167,7 @@ WHERE Alunos.nome = 'Mario Gomes'
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<AlunoDto>(query);
+                var results = await connection.QueryAsync<PessoaDto>(query);
 
                 connection.Close();
 
@@ -223,7 +196,7 @@ WHERE Alunos.nome = 'Mario Gomes'
 
         public async Task<PessoaDto> GetAlunoById(Guid alunoId)
         {
-            // var query = "SELECT * from Alunos where Alunos.Id = @alunoId";
+           
             var query = "SELECT * FROM Pessoas INNER JOIN Enderecos ON Pessoas.id = Enderecos.PessoaId WHERE Pessoas.Id = @alunoId";
 
             await using (var connection = new SqlConnection(
@@ -247,7 +220,7 @@ WHERE Alunos.nome = 'Mario Gomes'
             }
         }
 
-        public async Task<AlunoDto> GetAlunoByMatriculaId(Guid matriculaId)
+        public async Task<PessoaDto> GetAlunoByMatriculaId(Guid matriculaId)
         {
             var query = @"select* from alunos Where alunos.id = (
                         select matriculas.alunoId from matriculas where matriculas.id = @matriculaId 
@@ -258,7 +231,7 @@ WHERE Alunos.nome = 'Mario Gomes'
             {
                 connection.Open();
 
-                var results = await connection.QuerySingleAsync<AlunoDto>(query, new { matriculaId = matriculaId });
+                var results = await connection.QuerySingleAsync<PessoaDto>(query, new { matriculaId = matriculaId });
 
                 connection.Close();
 
@@ -358,9 +331,7 @@ WHERE Alunos.nome = 'Mario Gomes'
         }
 
         public async Task<PaginatedItemsViewModel<ViewMatriculadosDto>> GetAllMatriculadosView(int itemsPerPage, int currentPage, string paramsJson)
-        {            
-
-            // old
+        {  
             var param = JsonSerializer.Deserialize<ParametrosDTO>(paramsJson);
             var unidade = await _unidadeQueries.GetUnidadeDoUsuario();
 
@@ -378,12 +349,11 @@ WHERE Alunos.nome = 'Mario Gomes'
 
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append("select Count(*) ");
-            queryCount.Append("from alunos full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
-            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-           // if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-           // if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-           // if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            queryCount.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); 
+            queryCount.Append(@"from Pessoas full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id 
+                              WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+          
+            queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); 
 
 
             await using (var connection = new SqlConnection(
@@ -404,14 +374,14 @@ WHERE Alunos.nome = 'Mario Gomes'
         {
 
             StringBuilder query = new StringBuilder();
-            query.Append("select alunos.id, matriculas.numeromatricula, alunos.cpf, alunos.rg, alunos.nascimento, alunos.dataCadastro, alunos.nome, alunos.ativo, matriculas.id as matriculaId, unidades.sigla ");
-            query.Append("from alunos full join matriculas on alunos.id = matriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
-            if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            //if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-           // if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-          //  if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); 
-            query.Append(" ORDER BY Alunos.Nome ");
+            query.Append(@"select Pessoas.id, matriculas.numeromatricula, Pessoas.cpf, Pessoas.rg, Pessoas.nascimento, Pessoas.dataCadastro, Pessoas.nome, 
+                        Pessoas.ativo, matriculas.id as matriculaId, unidades.sigla ");
+            query.Append(@"from Pessoas full join matriculas on Pessoas.id = matriculas.alunoid inner join Unidades on Pessoas.UnidadeId = Unidades.Id WHERE 
+                         Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+          
+            query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); 
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             await using (var connection = new SqlConnection(

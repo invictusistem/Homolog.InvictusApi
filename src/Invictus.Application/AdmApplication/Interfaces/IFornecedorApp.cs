@@ -1,4 +1,5 @@
-﻿using Invictus.Dtos.Financeiro;
+﻿using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.Financeiro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
 {
     public interface IFornecedorApp
     {
-        Task UpdateFornecedor(FornecedorDto fornecedor);
-        Task CreateFornecedor(FornecedorDto fornecedor);
+       Task UpdateFornecedor(PessoaDto fornecedor);
+       Task CreateFornecedor(PessoaDto fornecedor);
     }
 }

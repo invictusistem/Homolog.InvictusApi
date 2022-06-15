@@ -81,20 +81,21 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
-        public async Task<IEnumerable<AlunoDto>> GetAlunosIndicacao()
+        public async Task<IEnumerable<PessoaDto>> GetAlunosIndicacao()
         {
-            var query = @"select 
-                        alunos.id,
-                        alunos.nome
-                        from Alunos 
-                        inner join Matriculas on Alunos.id = Matriculas.AlunoId";
+            var query = @"SELECT 
+                        Pessoas.id,
+                        Pessoas.nome
+                        FROM Pessoas 
+                        INNER JOIN Matriculas ON Alunos.id = Matriculas.AlunoId 
+                        WHERE Pessoas.tipoPessoa = 'Aluno' ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var result = await connection.QueryAsync<AlunoDto>(query);
+                var result = await connection.QueryAsync<PessoaDto>(query);
 
                 // connection.Close();
 
@@ -151,11 +152,11 @@ namespace Invictus.QueryService.PedagogicoQueries
 
             var query = @"SELECT 
                         Matriculas.Id as matriculaId,
-                        Alunos.Nome as alunoNome
+                        Pessoas.Nome as alunoNome
                         FROM Matriculas
-                        INNER JOIN Alunos on Matriculas.alunoId = Alunos.Id
-                        WHERE Alunos.UnidadeId = @unidadeId
-                        ORDER BY Alunos.Nome ";
+                        INNER JOIN Pessoas on Matriculas.alunoId = Pessoas.Id
+                        WHERE Pessoas.UnidadeId = @unidadeId
+                        ORDER BY Pessoas.Nome ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))

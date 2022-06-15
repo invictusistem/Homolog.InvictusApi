@@ -206,7 +206,7 @@ namespace Invictus.Api.Controllers.Financeiro
         [Route("contas/receber")]
         public async Task<IActionResult> GetContasReceber([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end);//.CadastrarContaReceber(command);
+            var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end);
 
             if (!contas.Any()) return NotFound();
 
@@ -221,7 +221,7 @@ namespace Invictus.Api.Controllers.Financeiro
         [Route("contas/pagar")]
         public async Task<IActionResult> GetContasPagar([FromQuery] string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            var contas = await _finQueries.GetContasPagar(meioPagamentoId, start, end);//.CadastrarContaReceber(command);
+            var contas = await _finQueries.GetContasPagar(meioPagamentoId, start, end);
 
             if (!contas.Any()) return NotFound();
 
@@ -323,5 +323,6 @@ namespace Invictus.Api.Controllers.Financeiro
 
             return Ok();
         }
+
     }
 }

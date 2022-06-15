@@ -17,10 +17,10 @@ namespace Invictus.Data.Repositories.Administrativo
             _db = db;
         }
 
-        public async Task AddColaborador(Colaborador newColaborador)
-        {
-            await _db.Colaboradores.AddAsync(newColaborador);
-        }
+        //public async Task AddColaborador(Colaborador newColaborador)
+        //{
+        //    await _db.Colaboradores.AddAsync(newColaborador);
+        //}
         
 
         public void Dispose()
@@ -28,10 +28,10 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.Dispose();
         }
 
-        public async Task EditColaborador(Colaborador newColaborador)
-        {
-            await _db.Colaboradores.SingleUpdateAsync(newColaborador);
-        }
+        //public async Task EditColaborador(Colaborador newColaborador)
+        //{
+        //    await _db.Colaboradores.SingleUpdateAsync(newColaborador);
+        //}
 
         public void Commit()
         {
