@@ -384,6 +384,7 @@ namespace Invictus.Api.Controllers
 
 
 
+
             _db.Boletos.UpdateRange(boletos);
 
             _db.SaveChanges();
