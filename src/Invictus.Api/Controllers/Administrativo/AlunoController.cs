@@ -31,7 +31,7 @@ namespace Invictus.Api.Controllers.Administrativo
         {            
             var results = await _alunoQueries.GetMatriculadosViewV2(itemsPerPage, currentPage, paramsJson);
 
-            if (results.Data.Count() == 0) return NotFound();
+            if (results.Data.Count == 0) return NotFound();
 
             return Ok(results);
         }
@@ -42,7 +42,7 @@ namespace Invictus.Api.Controllers.Administrativo
         {
             var results = await _alunoQueries.GetAllMatriculadosView(itemsPerPage, currentPage, paramsJson);
 
-            if (results.Data.Count() == 0) return NotFound();
+            if (results.Data.Count == 0) return NotFound();
 
             return Ok(results);
         }
@@ -54,7 +54,7 @@ namespace Invictus.Api.Controllers.Administrativo
             // TODO? trazer unidade tb
             var results = await _alunoQueries.GetSomenteMatriculadosView(itemsPerPage, currentPage, paramsJson);
 
-            if (results.Data.Count() == 0) return NotFound();
+            if (results.Data.Count == 0) return NotFound();
 
             return Ok(results);
         }

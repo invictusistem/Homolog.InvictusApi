@@ -31,15 +31,17 @@ namespace Invictus.QueryService.FinanceiroQueries
         {
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
-            var queryColaborador = @"SELECT Colaboradores.id, Colaboradores.nome 
-                                    FROM Colaboradores 
-                                    WHERE Colaboradores.ativo = 'True' 
-                                    AND Colaboradores.unidadeId = @unidadeId";
+            var queryColaborador = @"SELECT Pessoas.id, Pessoas.nome 
+                                    FROM Pessoas 
+                                    WHERE Pessoas.ativo = 'True' 
+                                    AND Pessoas.tipoPessoa = 'Colaborador' 
+                                    AND Pessoas.unidadeId = @unidadeId";
 
-            var queryProfessor = @"SELECT Professores.id, Professores.nome 
-                                    FROM Professores 
-                                    WHERE Professores.ativo = 'True' 
-                                    AND Professores.unidadeId = @unidadeId";
+            var queryProfessor = @"SELECT Pessoas.id, Pessoas.nome 
+                                    FROM Pessoas 
+                                    WHERE Pessoas.ativo = 'True' 
+                                    AND Pessoas.tipoPessoa = 'Professor' 
+                                    AND Pessoas.unidadeId = @unidadeId";
 
             var pessoas = new List<PessoaDto>();
 
@@ -81,8 +83,10 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<PessoaDto>> GetAllFornecedores()
+        public async Task<List<PessoaDto>> GetAllFornecedores(Guid? pessoaId)
         {
+            //var pessoaId = Guid.NewGuid();
+
             var query = "SELECT * FROM Pessoas WHERE Pessoas.tipoPessoa = 'Fornecedor' AND Pessoas.ativo = 'True' ";
 
             await using (var connection = new SqlConnection(
@@ -92,9 +96,30 @@ namespace Invictus.QueryService.FinanceiroQueries
 
                 var fornecedores = await connection.QueryAsync<PessoaDto>(query);
 
+                var todosFornecedores = fornecedores.ToList();
+
+                var pessoaEstaNaLista = fornecedores.Where(f => f.id == pessoaId);
+
+                if (pessoaId != new Guid("00000000-0000-0000-0000-000000000000"))
+                {
+                    if (!pessoaEstaNaLista.Any())
+                    {
+                        var busca = @"SELECT * FROM Pessoas WHERE Pessoas.Id = @pessoaId AND Pessoas.tipoPessoa = 'Fornecedor' ";
+                        var pessoa = await connection.QueryAsync<PessoaDto>(busca, new { pessoaId = pessoaId });
+                        if (pessoa.Any())
+                        {
+                            if (pessoa.FirstOrDefault().tipoPessoa == "Fornecedor")
+                            {
+                                var pessoaAdd = pessoa.FirstOrDefault();
+                                todosFornecedores.Add(pessoaAdd);
+                            }
+                        }
+                    }
+                }
+
                 connection.Close();
 
-                return fornecedores;
+                return todosFornecedores;
 
             }
         }

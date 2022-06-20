@@ -46,6 +46,7 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         public string Descricao { get; private set; }
         public bool Ativo { get; private set; }
         public bool EhCartao { get; private set; }
+        public bool Dinheiro { get; private set; }
         public int? DiasParaCompensacao { get; private set; }
         public decimal? Taxa { get; private set; }
         public bool? PermiteParcelamento { get; private set; }

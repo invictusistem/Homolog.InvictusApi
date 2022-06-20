@@ -3,6 +3,7 @@ using Invictus.Application.FinancApplication.Interfaces;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Dtos.AdmDtos;
@@ -42,7 +43,7 @@ namespace Invictus.Application.FinancApplication
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
             var userId = _aspNetUser.ObterUsuarioId();
 
-            var boleto = Boleto.CadastrarContaPagarFactory(command.vencimento, command.valor, 0, 0, "", "", "", TipoLancamento.Debito, "",
+            var boleto = Boleto.CadastrarContaPagarFactory(command.vencimento, command.valor, 0, 0, "", "", 0, TipoLancamento.Debito, "",
                 StatusPagamento.EmAberto, command.ehFornecedor, command.pessoaId, unidadeId, userId, command.historico, command.subcontaId, command.bancoId,
                 command.meioPgmId, command.centrocustoId);
 
@@ -56,6 +57,8 @@ namespace Invictus.Application.FinancApplication
             {
 
             }
+
+            
         }
 
         public async Task CadastrarContaReceber(CadastrarContaReceberCommand command)
@@ -63,7 +66,7 @@ namespace Invictus.Application.FinancApplication
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
             var userId = _aspNetUser.ObterUsuarioId();
 
-            var boleto = Boleto.CadastrarContaReceberFactory(command.vencimento, command.valor, 0, 0, "", "", "", TipoLancamento.Credito, "",
+            var boleto = Boleto.CadastrarContaReceberFactory(command.vencimento, command.valor, 0, 0, "", "", 0, TipoLancamento.Credito, "",
                 StatusPagamento.EmAberto, command.ehFornecedor, command.pessoaId, unidadeId, userId, command.historico, command.subcontaId, command.bancoId);
 
             await _debitoRepo.SaveBoleto(boleto);
@@ -116,7 +119,7 @@ namespace Invictus.Application.FinancApplication
                 banco_numero = boletoDto.banco_numero,
                 token_facilitador = boletoDto.token_facilitador,
                 credencial = boletoDto.credencial//,
-               // boletoId = boletoDto.boletoId,
+                                                 // boletoId = boletoDto.boletoId,
             };
 
             var boleto = new BoletoViewModel()
@@ -157,23 +160,17 @@ namespace Invictus.Application.FinancApplication
         }
 
         public async Task RemoveConta(Guid contaId)
-        {
-            // var 
-            try
-            {
-                //var conta = await _db.Boletos.Include(b => b.InfoBoletos).Where(b => b.Id == contaId).FirstOrDefaultAsync();
-                var conta = await _finQueries.GetContaReceber(contaId);
-                conta.ativo = false;
+        {   
+            var conta = await _finQueries.GetContaReceber(contaId);
+            //conta.ativo = false;
+            var toBoleto = ToBoletoView(conta);
 
-                var toBoleto = ToBoletoView(conta);
-                var boleto = _mapper.Map<Boleto>(toBoleto);
+            var boleto = _mapper.Map<Boleto>(toBoleto);
 
-                await _debitoRepo.EditBoleto(boleto);
-            }
-            catch(Exception ex)
-            {
+            boleto.CancelarBoleto();
 
-            }
+            await _debitoRepo.EditBoleto(boleto);
+
             _db.SaveChanges();
 
         }

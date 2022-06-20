@@ -94,6 +94,23 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
+        public async Task<IEnumerable<FormaRecebimentoDto>> GetAllFormasRecebimentosAtivas()
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var query = @"SELECT * FROM FormasRecebimento WHERE FormasRecebimento.UnidadeId = @unidadeId AND FormasRecebimento.ativo = 'True' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var bancos = await connection.QueryAsync<FormaRecebimentoDto>(query, new { unidadeId = unidadeId });
+
+                return bancos;
+
+            }
+        }
+
         public async Task<IEnumerable<MeioPagamentoDto>> GetAllMeiosPagamento()
         {
             var unidadeIdDoUsuario = _aspNetUser.GetUnidadeIdDoUsuario();

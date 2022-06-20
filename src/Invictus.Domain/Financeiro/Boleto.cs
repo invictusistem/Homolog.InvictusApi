@@ -45,7 +45,7 @@ namespace Invictus.Domain.Financeiro
         public int JurosFixo { get; private set; }
         public string Multa { get; private set; }
         public string MultaFixo { get; private set; }
-        public string Desconto { get; private set; }
+        public decimal Desconto { get; private set; }
         public string Tipo { get; private set; }
         public string DiasDesconto { get; private set; }
         public string StatusBoleto { get; private set; }
@@ -56,6 +56,7 @@ namespace Invictus.Domain.Financeiro
         public Guid? BancoId { get; private set; }
         public Guid? CentroCustoId { get; private set; }
         public Guid? MeioPagamentoId { get; private set; }
+        public Guid? FormaRecebimentoId { get; private set; }
         public string FormaPagamento { get; private set; }
         public string DigitosCartao { get; private set; }
         public bool EhFornecedor { get; private set; }
@@ -93,7 +94,7 @@ namespace Invictus.Domain.Financeiro
                   // int jurosFixo,
                   // string multa,
                    //string multaFixo,
-                   string desconto,
+                   decimal desconto,
                    TipoLancamento tipo,
                    string diasDesconto,
                    //StatusPagamento statusBoleto,
@@ -138,7 +139,7 @@ namespace Invictus.Domain.Financeiro
                     int jurosFixo,
                     string multa,
                     string multaFixo,
-                    string desconto,
+                    decimal desconto,
                     TipoLancamento tipo,
                     string diasDesconto,
                     StatusPagamento statusBoleto,
@@ -187,7 +188,7 @@ namespace Invictus.Domain.Financeiro
                     int jurosFixo,
                     string multa,
                     string multaFixo,
-                    string desconto,
+                    decimal desconto,
                     TipoLancamento tipo,
                     string diasDesconto,
                     StatusPagamento statusBoleto,
@@ -236,8 +237,8 @@ namespace Invictus.Domain.Financeiro
         public void CancelarBoleto()
         {
             StatusBoleto = StatusPagamento.Cancelado.DisplayName;
-
-            SubConta = "Caixa da escola";
+            Ativo = false;
+            //SubConta = "Caixa da escola";
         }
 
         public void SetBoletoDateCadastro(DateTime date)
@@ -251,14 +252,16 @@ namespace Invictus.Domain.Financeiro
             ResponsavelCadastroId = new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8");
         }
 
-        public void ReceberBoleto(decimal valorPago, string formaPagamento, string digitosCartao)
+        public void ReceberBoleto(decimal valorPago, Guid formaRecebimentoId, Guid bancoId, string digitosCartao = null)
         {
             DataPagamento = DateTime.Now;
             ValorPago = valorPago;
             StatusBoleto = StatusPagamento.Pago.DisplayName;
-            FormaPagamento = formaPagamento;
+            //FormaPagamento = formaPagamento;
             SubConta = "Caixa da escola";
-            if (formaPagamento != "dinheiro")
+            FormaRecebimentoId = formaRecebimentoId;
+            BancoId = bancoId;
+            if (digitosCartao != null)
             {
                 DigitosCartao = digitosCartao;
             }

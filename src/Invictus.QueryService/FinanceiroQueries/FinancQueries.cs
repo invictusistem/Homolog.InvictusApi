@@ -46,18 +46,18 @@ namespace Invictus.QueryService.FinanceiroQueries
             return paginatedItems;
         }
 
-        public async Task<IEnumerable<ViewMatriculadosDto>> GetAlunosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
+        private async Task<IEnumerable<ViewMatriculadosDto>> GetAlunosByFilter(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
 
             StringBuilder query = new StringBuilder();
-            query.Append("SELECT alunos.nome, alunos.email, alunos.cpf, alunos.ativo, Matriculas.id as matriculaId, Matriculas.NumeroMatricula, unidades.descricao ");
-            query.Append("FROM Matriculas inner join alunos on Matriculas.AlunoId = Alunos.Id inner join unidades on alunos.UnidadeId = unidades.Id WHERE ");
-            if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { query.Append(" Alunos.Ativo = 'True' "); } else { query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
-            query.Append(" ORDER BY Alunos.Nome ");
+            query.Append("SELECT Pessoas.nome, Pessoas.email, Pessoas.cpf, Pessoas.ativo, Matriculas.id as matriculaId, Matriculas.NumeroMatricula, unidades.descricao ");
+            query.Append("FROM Matriculas INNER JOIN Pessoas on Matriculas.AlunoId = Pessoas.Id INNER JOIN unidades on Pessoas.UnidadeId = unidades.Id WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             await using (var connection = new SqlConnection(
@@ -85,13 +85,13 @@ namespace Invictus.QueryService.FinanceiroQueries
         {
 
             StringBuilder queryCount = new StringBuilder();
-            queryCount.Append("select Count(*) ");
-            queryCount.Append("FROM Matriculas inner join alunos on Matriculas.AlunoId = Alunos.Id inner join unidades on alunos.UnidadeId = unidades.Id WHERE  ");
-            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { queryCount.Append(" Alunos.Ativo = 'True' "); } else { queryCount.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
+            queryCount.Append("SELECT COUNT(*) ");
+            queryCount.Append("FROM Matriculas INNER JOIN Pessoas ON Matriculas.AlunoId = Pessoas.Id INNER JOIN unidades ON Pessoas.UnidadeId = unidades.Id WHERE Pessoas.tipoPessoa = 'Aluno' AND ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
 
 
             await using (var connection = new SqlConnection(
@@ -241,23 +241,14 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<BoletoDto>> GetContasReceber(string meioPagamentoId, DateTime start, DateTime end)
-        {
-            //StringBuilder query = new StringBuilder();
+        public async Task<IEnumerable<BoletoDto>> GetContasReceber(string meioPagamentoId, DateTime start, DateTime end, bool ativo)
+        {   
             var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
-            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
-            var meioPgmId = Guid.NewGuid();
-            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);           
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();           
 
-            if (meioPagamentoId == "null")
-            {
-
-            }
-            else
-            {
-                meioPgmId = new Guid(meioPagamentoId);
-            }
-            var query = @"SELECT
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT
                         Boletos.id, 
                         Pessoas.nome,
                         Pessoas.TipoPessoa,
@@ -265,21 +256,20 @@ namespace Invictus.QueryService.FinanceiroQueries
                         Boletos.historico,
                         Boletos.valor,
                         Boletos.statusBoleto,
-                        Boletos.PessoaId
+                        Boletos.PessoaId,
+                        Boletos.ativo
                         FROM Boletos 
                         LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id  
-                        WHERE Vencimento >= @inicio AND Vencimento <= @fim 
-                        AND Boletos.ativo = 'True' 
-                        AND Tipo = 'Crédito' 
-                        AND Boletos.CentroCustoUnidadeId = @unidadeId ";
+                        WHERE Vencimento >= @inicio AND Vencimento <= @fim  ");
+            if (ativo == false) query.Append(" AND Boletos.ativo = 'True' ");
+            query.Append(@" AND Tipo = 'Crédito' 
+                            AND Boletos.CentroCustoUnidadeId = @unidadeId  ");
 
-            if (meioPagamentoId != "null") query =  query + " AND MeioPagamentoId = '"+ meioPgmId + "'";
+            if (meioPagamentoId != "null") query.Append(@"AND MeioPagamentoId = '" + meioPagamentoId + "'");
 
-
-            query = query + " ORDER BY Boletos.Vencimento";
-
-            //var fornecedorQuery = @"SELECT Pessoas.nome FROM Pessoas WHERE Pessoas.id = @id";
-
+            query.Append(@" ORDER BY Boletos.Vencimento");
+              
+            //
             var matriculadoQuery = @"SELECT 
                             Pessoas.Nome 
                             FROM Pessoas
@@ -292,7 +282,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Open();
                 // itemsPerPage currentPage  param   unidadeId
 
-                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim, unidadeId = unidadeId });
+                var boletos = await connection.QueryAsync<BoletoDto>(query.ToString(), new { inicio = inicio, fim = fim, unidadeId = unidadeId});
 
                 foreach (var boleto in boletos)
                 {
@@ -310,42 +300,61 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<BoletoDto>> GetContasPagar(string meioPagamentoId, DateTime start, DateTime end)
+        public async Task<IEnumerable<BoletoDto>> GetContasPagar(string meioPagamentoId, DateTime start, DateTime end, bool ativo)
         {
-            //StringBuilder query = new StringBuilder();
             var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
             var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
-            var meioPgmId = Guid.NewGuid();
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
-            if (meioPagamentoId == "null")
-            {
 
-            }
-            else
-            {
-                meioPgmId = new Guid(meioPagamentoId);
-            }
-            var query = @"SELECT 
-                        Boletos.Id,
-                        Boletos.Vencimento,
-                        Boletos.Valor,
-                        Boletos.StatusBoleto,
+            //var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
+            //var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+            //var meioPgmId = Guid.NewGuid();
+            //var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT
+                        Boletos.id, 
+                        Boletos.vencimento,    
+                        Boletos.valor,
+                        Boletos.statusBoleto,
                         Boletos.PessoaId,
                         Boletos.EhFornecedor,
                         Boletos.Historico,
-                        Bancos.Nome as banco
+                        Pessoas.nome,
+                        Pessoas.TipoPessoa,
+                        Boletos.historico,
+                        Boletos.ativo
                         FROM Boletos 
-                        LEFT JOIN Bancos ON Boletos.BancoId = Bancos.Id
-                        WHERE Vencimento >= @inicio 
-                        AND Vencimento <= @fim 
-                        AND Tipo = 'Débito' 
-                        AND Boletos.CentroCustoUnidadeId = @unidadeId  ";
+                        LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id  
+                        WHERE Vencimento >= @inicio AND Vencimento <= @fim  ");
+            if (ativo == false) query.Append(" AND Boletos.ativo = 'True' ");
+            query.Append(@" AND Tipo = 'Débito' 
+                            AND Boletos.CentroCustoUnidadeId = @unidadeId  ");
 
-            if (meioPagamentoId != "null") query = query + " AND MeioPagamentoId = '" + meioPgmId + "'";
+            if (meioPagamentoId != "null") query.Append(@" AND MeioPagamentoId = '" + meioPagamentoId + "' ");
+
+            query.Append(@" ORDER BY Boletos.Vencimento");
+
+            //var query = @"SELECT 
+            //            Boletos.Id,
+            //            Boletos.Vencimento,
+            //            Boletos.Valor,
+            //            Boletos.StatusBoleto,
+            //            Boletos.PessoaId,
+                        
+            //            Bancos.Nome as banco
+            //            FROM Boletos 
+            //            LEFT JOIN Bancos ON Boletos.BancoId = Bancos.Id
+            //            WHERE Vencimento >= @inicio 
+            //            AND Vencimento <= @fim 
+            //            AND Tipo = 'Débito' 
+            //            AND Boletos.CentroCustoUnidadeId = @unidadeId  ";
+
+            //if (meioPagamentoId != "null") query = query + " AND MeioPagamentoId = '" + meioPgmId + "'";
 
 
-            query = query + " ORDER BY Boletos.Vencimento";
+            //query = query + " ORDER BY Boletos.Vencimento";
 
             var fornecedorQuery = @"SELECT Fornecedores.RazaoSocial as nome FROM Fornecedores WHERE Fornecedores.id = @id";
 
@@ -359,7 +368,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Open();
                 // itemsPerPage currentPage  param   unidadeId
 
-                var boletos = await connection.QueryAsync<BoletoDto>(query, new { inicio = inicio, fim = fim, unidadeId = unidadeId });
+                var boletos = await connection.QueryAsync<BoletoDto>(query.ToString(), new { inicio = inicio, fim = fim, unidadeId = unidadeId });
 
                 foreach (var boleto in boletos)
                 {
@@ -455,19 +464,26 @@ namespace Invictus.QueryService.FinanceiroQueries
             //var boletos = await _db.Boletos.Where(b => b.Vencimento < hoje &
             //                                b.StatusBoleto == "Em aberto").ToListAsync();
 
-            var query = @"SELECT * FROM Boletos WHERE Boletos.ativo = 'True' ";           
+            var query = @"SELECT * FROM Boletos WHERE Boletos.ativo = 'True' 
+                        AND Boletos.statusBoleto = 'Em aberto' 
+                        AND Boletos.Vencimento < @hoje";           
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var boleto = await connection.QueryAsync<BoletoDto>(query);
+                var boleto = await connection.QueryAsync<BoletoDto>(query, new { hoje = hoje });
 
                 connection.Close();
 
                 return boleto;
             }
+        }
+
+        public async Task<IEnumerable<BoletoDto>> GetCaixa(DateTime start, DateTime end)
+        {
+            throw new NotImplementedException();
         }
     }
 }

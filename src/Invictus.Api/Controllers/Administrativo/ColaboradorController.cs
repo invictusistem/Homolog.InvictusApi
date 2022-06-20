@@ -57,6 +57,16 @@ namespace Invictus.Api.Controllers
             return Ok(new { colaborador = colaborador, values = values });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetColaboradoresAtivosContasPagar([FromQuery]Guid pessoaId)
+        {
+            var result =  await _colaboradorQueries.GetColaboradoresProfessoresAtivos(pessoaId);
+
+            return Ok(new { result = result });
+
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveColaborador([FromBody] PessoaDto newColaborador)
         {

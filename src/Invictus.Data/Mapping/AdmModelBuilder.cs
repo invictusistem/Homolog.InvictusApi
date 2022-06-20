@@ -27,13 +27,13 @@ namespace Invictus.Data.Mapping
         public static void RegisterBuilders(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new AgendaTrimestreDbMapping());
-            //modelBuilder.ApplyConfiguration(new AlunoDbMapping());
+            modelBuilder.ApplyConfiguration(new AlunoDbMapping());
             modelBuilder.ApplyConfiguration(new AlunoDocumentoDbMapping());
             modelBuilder.ApplyConfiguration(new AlunoPlanoPagamentoDbMapping());
             modelBuilder.ApplyConfiguration(new AutorizacaoDbMapping());
             modelBuilder.ApplyConfiguration(new CalendarioDbMapping());
             modelBuilder.ApplyConfiguration(new AnotacaoColaboradorDbMapping());
-            //modelBuilder.ApplyConfiguration(new ColaboradorDbMapping());
+            modelBuilder.ApplyConfiguration(new ColaboradorDbMapping());
             modelBuilder.ApplyConfiguration(new ConteudoDbMapping());
             modelBuilder.ApplyConfiguration(new ContratoDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentacaoTemplateDbMapping());
@@ -55,8 +55,8 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new ProdutoDbMapping());
             modelBuilder.ApplyConfiguration(new ProdutoLogDbMapping());
             modelBuilder.ApplyConfiguration(new DisponibilidadeDbMapping());
-            //modelBuilder.ApplyConfiguration(new MateriaHabilitadaDbMapping());
-            //modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
+            modelBuilder.ApplyConfiguration(new MateriaHabilitadaDbMapping());
+            modelBuilder.ApplyConfiguration(new ProfessorDbMapping());
             modelBuilder.ApplyConfiguration(new RequerimentoDbMapping());
             modelBuilder.ApplyConfiguration(new TipoRequerimentoDbMapping());
             modelBuilder.ApplyConfiguration(new ResponsavelDbMapping());

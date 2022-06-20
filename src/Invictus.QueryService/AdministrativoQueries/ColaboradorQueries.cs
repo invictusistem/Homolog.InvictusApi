@@ -5,6 +5,7 @@ using Invictus.Dtos.AdmDtos.Utils;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -27,8 +28,8 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<PessoaDto> GetColaboradoresByEmail(string email)
         {
-            var query = "SELECT * FROM Pessoas WHERE LOWER(Pessoas.email) like LOWER('"+ email + "') "+
-                        "collate SQL_Latin1_General_CP1_CI_AI "; 
+            var query = "SELECT * FROM Pessoas WHERE LOWER(Pessoas.email) like LOWER('" + email + "') " +
+                        "collate SQL_Latin1_General_CP1_CI_AI ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -53,7 +54,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             {
                 connection.Open();
 
-                var results = await connection.QueryAsync<PessoaDto>(query, new { colaboradorId  = colaboradorId } );
+                var results = await connection.QueryAsync<PessoaDto>(query, new { colaboradorId = colaboradorId });
 
                 connection.Close();
 
@@ -144,7 +145,7 @@ namespace Invictus.QueryService.AdministrativoQueries
         private async Task<PaginatedItemsViewModel<PessoaDto>> GetColaboradores(int itemsPerPage, int currentPage, ParametrosDTO param, Guid unidadeId)
         {
             //var ativos = param.ativo;
-            StringBuilder query = new StringBuilder(); 
+            StringBuilder query = new StringBuilder();
             query.Append(@"SELECT 
                         Colaboradores.id, 
                         Colaboradores.nome, 
@@ -181,7 +182,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                 connection.Close();
 
-                var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, countItems, results.ToList());               
+                var paginatedItems = new PaginatedItemsViewModel<PessoaDto>(currentPage, itemsPerPage, countItems, results.ToList());
 
                 return paginatedItems;
 
@@ -211,7 +212,8 @@ namespace Invictus.QueryService.AdministrativoQueries
 
                     return results.FirstOrDefault();
 
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
 
                 }
@@ -231,6 +233,47 @@ namespace Invictus.QueryService.AdministrativoQueries
             //      return cliente;
             //  },
             // splitOn: "ClienteId,PassaporteId");
+        }
+
+        public async Task<IEnumerable<PessoaDto>> GetColaboradoresProfessoresAtivos(Guid pessoaId)
+        {
+            var query = @"SELECT * FROM Pessoas WHERE Pessoas.ativo = 'True' AND
+                        Pessoas.tipoPessoa = 'Colaborador' OR
+                        Pessoas.tipoPessoa = 'Professor' ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var results = await connection.QueryAsync<PessoaDto>(query);
+
+                var todosColaboradores = results.ToList();
+
+                var pessoaEstaNaLista = results.Where(f => f.id == pessoaId);
+                
+
+                if (!pessoaEstaNaLista.Any())
+                {
+                    var busca = @"SELECT * FROM Pessoas WHERE Pessoas.Id = @pessoaId AND 
+                                Pessoas.tipoPessoa = 'Colaborador' OR
+                                Pessoas.tipoPessoa = 'Professor'";
+
+                    var pessoa = await connection.QueryAsync<PessoaDto>(busca, new { pessoaId = pessoaId });
+
+                    if (pessoa.Any())
+                    {   
+                            var pessoaAdd = pessoa.FirstOrDefault();
+                        todosColaboradores.Add(pessoaAdd);
+                    }
+                }
+
+
+                connection.Close();
+
+                return todosColaboradores.OrderBy(c => c.nome);
+
+            }            
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Invictus.Dtos.Financeiro
         public string nome { get; set; }
         public string tipoPessoa { get; set; }
         public string multaFixo { get; set; }
-        public string desconto { get; set; }
+        public decimal desconto { get; set; }
         public string diasDesconto { get; set; }
         public string statusBoleto { get; set; }
         public Guid reparcelamentoId { get; set; }

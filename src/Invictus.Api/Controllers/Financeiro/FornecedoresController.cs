@@ -37,13 +37,13 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("todos")]
-        public async Task<IActionResult> GetAllFornecedores()
+        public async Task<IActionResult> GetAllFornecedores([FromQuery] Guid? pessoaId)
         {
-            var fornecedores = await _fornecedorqueries.GetAllFornecedores();
+            var fornecedores = await _fornecedorqueries.GetAllFornecedores(pessoaId);
 
             //if (!fornecedores.Count() == 0) return NotFound();
 
-            return Ok(new { fornecedores = fornecedores });
+            return Ok(new { fornecedores = fornecedores.OrderBy(c => c.nome) });
         }
 
         [HttpGet]

@@ -1,10 +1,12 @@
-﻿using Invictus.Application.AdmApplication;
+﻿using AutoMapper;
+using Invictus.Application.AdmApplication;
 using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.FinancApplication.Interfaces;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Financeiro;
 using Invictus.Dtos.Financeiro;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -32,9 +34,10 @@ namespace Invictus.Api.Controllers.Financeiro
         private readonly IAspNetUser _aspNetUser;
         private readonly ITurmaPedagQueries _turmaQueries;
         private readonly IUnidadeQueries _unidadeQueries;
+        private readonly IMapper _mapper;
         private readonly InvictusDbContext _db;
         public FinanceiroController(IFinanceiroQueries finQueries, ITurmaPedagQueries turmaQueries, InvictusDbContext db, IAspNetUser aspNetUser,
-            IUnidadeQueries unidadeQueries, IBoletoService boletoService, IFinanceiroApp financApp)
+            IUnidadeQueries unidadeQueries, IBoletoService boletoService, IFinanceiroApp financApp, IMapper mapper)
         {
             _finQueries = finQueries;
             _boletoService = boletoService;
@@ -43,6 +46,7 @@ namespace Invictus.Api.Controllers.Financeiro
             _aspNetUser = aspNetUser;
             _unidadeQueries = unidadeQueries;
             _financApp = financApp;
+            _mapper = mapper;
         }
 
 
@@ -204,32 +208,35 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("contas/receber")]
-        public async Task<IActionResult> GetContasReceber([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> GetContasReceber([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] bool ativo)
         {
-            var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end);
+            var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end, ativo);
 
             if (!contas.Any()) return NotFound();
 
-            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName).Select(c => c.valor).Sum();
+            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName & c.ativo == true).Select(c => c.valor).Sum();
 
-            var totalreceber = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName).Select(c => c.valor).Sum();
+            var totalreceber = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName & c.ativo == true).Select(c => c.valor).Sum();
             
             return Ok(new { contas = contas, totalAtraso = totalAtraso, totalreceber = totalreceber });
         }
 
         [HttpGet]
         [Route("contas/pagar")]
-        public async Task<IActionResult> GetContasPagar([FromQuery] string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> GetContasPagar([FromQuery] string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] bool ativo)
         {
-            var contas = await _finQueries.GetContasPagar(meioPagamentoId, start, end);
+            var contas = await _finQueries.GetContasPagar(meioPagamentoId, start, end, ativo);
 
             if (!contas.Any()) return NotFound();
+            var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            
+            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName & c.ativo == true & c.vencimento < hoje).Select(c => c.valor).Sum();
 
-            var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName).Select(c => c.valor).Sum();
+            var totalPagar = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName & c.ativo == true & c.vencimento > hoje).Select(c => c.valor).Sum();
 
-            var totalPagar = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName).Select(c => c.valor).Sum();
+            var valorPago = contas.Where(c => c.statusBoleto == StatusPagamento.Pago.DisplayName & c.ativo == true).Select(c => c.valor).Sum();
 
-            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalPagar = totalPagar });
+            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalPagar = totalPagar, valorPago = valorPago });
         }
 
         [HttpPost]
@@ -250,6 +257,15 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok();
         }
 
+        [HttpGet]
+        [Route("caixa")]
+        public async Task<IActionResult> GetCaixa([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            await _finQueries.GetCaixa(start, end);
+
+            return Ok ();
+        }
+
         [HttpPut]
         [Route("contas/receber")]
         public async Task<IActionResult> EditarContaReceber([FromBody] BoletoDto boleto)
@@ -259,12 +275,78 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok();
         }
 
+        private BoletoViewModel ToBoletoView(BoletoDto boletoDto)
+        {
+            var respInfo = new BoletoResponseViewModel()
+            {
+                id_unico = boletoDto.id_unico,
+                id_unico_original = boletoDto.id_unico_original,
+                status = boletoDto.status,
+                msg = boletoDto.msg,
+                nossonumero = boletoDto.nossonumero,
+                linkBoleto = boletoDto.linkBoleto,
+                linkGrupo = boletoDto.linkGrupo,
+                linhaDigitavel = boletoDto.linhaDigitavel,
+                pedido_numero = boletoDto.pedido_numero,
+                banco_numero = boletoDto.banco_numero,
+                token_facilitador = boletoDto.token_facilitador,
+                credencial = boletoDto.credencial//,
+                                                 // boletoId = boletoDto.boletoId,
+            };
+
+            var boleto = new BoletoViewModel()
+            {
+                id = boletoDto.id,
+                vencimento = boletoDto.vencimento,
+                dataPagamento = boletoDto.dataPagamento,
+                valor = boletoDto.valor,
+                valorPago = boletoDto.valorPago,
+                juros = boletoDto.juros,
+                jurosFixo = boletoDto.jurosFixo,
+                multa = boletoDto.multa,
+                multaFixo = boletoDto.multaFixo,
+                desconto = boletoDto.desconto,
+                tipo = boletoDto.tipo,
+                diasDesconto = boletoDto.diasDesconto,
+                statusBoleto = boletoDto.statusBoleto,
+                historico = boletoDto.historico,
+                subConta = boletoDto.subConta,
+                ativo = boletoDto.ativo,
+                subContaId = boletoDto.subContaId,
+                bancoId = boletoDto.bancoId,
+                centroCustoId = boletoDto.centroCustoId,
+                meioPagamentoId = boletoDto.meioPagamentoId,
+                formaPagamento = boletoDto.formaPagamento,
+                digitosCartao = boletoDto.digitosCartao,
+                ehFornecedor = boletoDto.ehFornecedor,
+                tipoPessoa = boletoDto.tipoPessoa,
+                pessoaId = boletoDto.pessoaId,
+                dataCadastro = boletoDto.dataCadastro,
+                reparcelamentoId = boletoDto.reparcelamentoId,
+                centroCustoUnidadeId = boletoDto.centroCustoUnidadeId,
+                responsavelCadastroId = boletoDto.responsavelCadastroId,
+                infoBoletos = respInfo
+            };
+
+            return boleto;
+        }
+
         [HttpPut]
         [Route("boleto-pagar")]
         public async Task<IActionResult> ReceberBoleto([FromBody] ReceberBoletoCommand command)
         {
 
-            var boleto = await _db.Boletos.FindAsync(command.boletoId);
+            //var fornecedor = await _pessoaQuery.GetFornecedorById(boletoDto.pessoaId);
+
+            //var aluno = new PessoaDto();
+
+            var boletoDto = await _finQueries.GetContaReceber(command.boletoId);// ToBoletoView(boletoDto);
+            var toBoleto = ToBoletoView(boletoDto);
+            var boleto = _mapper.Map<Boleto>(toBoleto);
+
+                //await _debitoRepo.EditBoleto(boleto);
+
+                //var boleto = await _db.Bolet os.FindAsync(command.boletoId);
 
             // VERIFICAR NA API 
             if (!(boleto.StatusBoleto == "Vencido" || boleto.StatusBoleto == "Em aberto"))
@@ -272,17 +354,35 @@ namespace Invictus.Api.Controllers.Financeiro
                 return BadRequest();
             }
 
-            boleto.ReceberBoleto(command.valorRecebido, command.formaRecebimento, command.digitosCartao);
+            var formaPgm = await _db.FormasRecebimento.Where(f => f.Id == command.formaRecebimentoId).SingleOrDefaultAsync();
+
+            if(formaPgm.EhCartao == false)
+            {
+                command.digitosCartao = null;
+            }
+
+            boleto.ReceberBoleto(command.valorRecebido, command.formaRecebimentoId, command.bancoId, command.digitosCartao);
 
             var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
             var usuarioId = _aspNetUser.ObterUsuarioId();
 
-
+            // ver se crédito ou débito
             var caixa = new Caixa(usuarioId, unidade.id, DateTime.Now, command.boletoId);
+            try
+            {
+                await _db.Boletos.SingleUpdateAsync(boleto);
+                await _db.Caixas.SingleUpdateAsync(caixa);
+            }catch(Exception ex)
+            {
 
-            await _db.Boletos.SingleUpdateAsync(boleto);
-            await _db.Caixas.SingleUpdateAsync(caixa);
+            }
+            await _db.SaveChangesAsync();
+
+
+            var logBoleto = LogBoletos.BoletoLog(boleto.Id, EventoBoletoLog.Recebimento, usuarioId);
+
+            await _db.LogBoletos.AddAsync(logBoleto);
 
             await _db.SaveChangesAsync();
 

@@ -17,7 +17,7 @@ namespace Invictus.Dtos.Financeiro
         public int jurosFixo { get; set; }
         public string multa { get; set; }
         public string multaFixo { get; set; }
-        public string desconto { get; set; }
+        public decimal desconto { get; set; }
         public string tipo { get; set; }
         public string diasDesconto { get; set; }
         public string statusBoleto { get; set; }

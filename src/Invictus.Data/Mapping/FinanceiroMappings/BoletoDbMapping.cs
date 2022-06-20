@@ -16,7 +16,10 @@ namespace Invictus.Data.Mapping.FinanceiroMappings
             builder.HasKey(c => c.Id);
 
             builder.Property(d => d.Valor).HasPrecision(11, 2);
+
             builder.Property(d => d.ValorPago).HasPrecision(11, 2);
+
+            builder.Property(d => d.Desconto).HasPrecision(11, 2);
 
             builder.HasIndex(d => d.StatusBoleto);
 

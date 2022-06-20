@@ -103,6 +103,18 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok(new { result = result });
         }
 
+
+        [HttpGet]
+        [Route("forma-recebimento/ativo")]
+        public async Task<IActionResult> GetFormasRecebimentosAtivas()
+        {
+            var result = await _finConfigQuereis.GetAllFormasRecebimentosAtivas();
+
+            return Ok(new { result = result });
+        }
+
+
+
         [HttpGet]
         [Route("forma-recebimento/create")]
         public async Task<IActionResult> GetFormaRecebimentoCreate()

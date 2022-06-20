@@ -17,21 +17,71 @@ namespace Invictus.Api.Controllers
     [ApiController]
     [Route("api/dev")]
     public class DesenvolvimentoController : ControllerBase
-    {
+    {        
         private readonly IUnidadeQueries _unidadeQueries;
         private readonly IFinanceiroQueries _finQueries;
-        private readonly IMapper _mapper;
-        
-        public UserManager<IdentityUser> UserManager { get; set; }
+        private readonly IMapper _mapper;       
+        private UserManager<IdentityUser> UserManager { get; set; }
+        private SignInManager<IdentityUser> SignInManager;
         private readonly InvictusDbContext _db;
-        public DesenvolvimentoController(IMapper mapper, InvictusDbContext db, UserManager<IdentityUser> userMgr, 
+        public DesenvolvimentoController(IMapper mapper, InvictusDbContext db, UserManager<IdentityUser> userMgr,
+            SignInManager<IdentityUser> signInManager,
             IUnidadeQueries unidadeQueries, IFinanceiroQueries finQueries)
         {
             _db = db;
             UserManager = userMgr;
+            SignInManager = signInManager;
             _unidadeQueries = unidadeQueries;
             _finQueries = finQueries;
             _mapper = mapper;
+        }
+
+        [HttpGet]
+        [Route("troca-senha")]
+        public async Task<IActionResult> changePassword()
+        {
+            var email = "felipe.nascimento@cursoinvictus.com.br";
+
+            var user = await UserManager.FindByEmailAsync(email);
+
+            //temp
+            //user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, "Abc*123456");
+            //var resultado123 = await _userManager.UpdateAsync(user);
+            //return Ok();
+            //
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            //var result = await SignInManager.PasswordSignInAsync(user, usermodel.Senha, false, true);
+
+            //if (!result.Succeeded)
+            //{
+            //    AdicionarErroProcessamento("Usuário ou senha incorretos.");
+            //    return CustomResponse();
+            //}
+
+            //var passwordValidator = new PasswordValidator<IdentityUser>();
+            //var validateSenha = await passwordValidator.ValidateAsync(_userManager, user, usermodel.SenhaConfirmacao);
+
+            //if (!validateSenha.Succeeded)
+            //{
+            //    AdicionarErroProcessamento("A senha deve conter letras maiúsculas e minúsculas.");
+            //    return CustomResponse();
+            //}
+
+
+
+
+            user.PasswordHash = UserManager.PasswordHasher.HashPassword(user, "Abc123456");
+
+            var resultado = await UserManager.UpdateAsync(user);
+            if (!resultado.Succeeded)
+            {
+                return BadRequest();
+            }
+            return Ok();
         }
 
         [HttpDelete]
@@ -259,10 +309,16 @@ namespace Invictus.Api.Controllers
         {
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
 
-            //var boletos = await _db.Boletos.Where(b => b.Vencimento < hoje &
+            //var allBoletos = await _db.Boletos.Include(b => b.InfoBoletos).Where(b => b.Vencimento < hoje &
             //                                b.StatusBoleto == "Em aberto").ToListAsync();
+            /* ver se é sábado ou domingo, ou feriado
+                se for nao feriado E terça, quarta, quinta ou sexta  
 
+             */
             var boletosDto = await _finQueries.GetAllBoletosVencidos();
+            var feriados = await _db.ParametrosKeys.Where(f => f.Key == "Feriados").FirstOrDefaultAsync();
+            var feriadosValues = await _db.ParametrosValues.Where(f => f.ParametrosKeyId == feriados.Id).ToListAsync();
+
 
             var boletosView = new List<BoletoViewModel>();
 
@@ -274,12 +330,59 @@ namespace Invictus.Api.Controllers
             //var toBoleto = ToBoletoView(conta);
             var boletos = _mapper.Map<List<Boleto>>(boletosView);
 
+
             //await _debitoRepo.EditBoleto(boleto);
 
             foreach (var boleto in boletos)
-            {
-                boleto.SetBoletoVencido();
+            {   
+                TimeSpan difference = hoje - boleto.Vencimento;
+
+                List<DateTime> days = new List<DateTime>();
+
+                for (int i = 0; i < difference.Days; i++)
+                {
+                    var diaParaAdicionar = boleto.Vencimento.AddDays(i);
+
+                    if(diaParaAdicionar.DayOfWeek != DayOfWeek.Saturday || diaParaAdicionar.DayOfWeek != DayOfWeek.Sunday)
+                    {
+                        days.Add(hoje.AddDays(i));
+                    }                    
+                }
+
+                if (days.Any())
+                {
+                    // foraehc nos feriados e add na lista se achar
+                    // se ao final, a lista original ainda tiver dia, entao significa q está vencido 
+
+                    foreach (var feriado in feriadosValues)
+                    {
+                        var diaMes = feriado.Value.Split("/");
+                        var diParaRemove = days.Where(d => d.Day == Convert.ToInt32(diaMes[0]) & d.Month == Convert.ToInt32(diaMes[1]));
+                        if (diParaRemove.Any())
+                        {
+                            foreach (var diaRemove in diParaRemove)
+                            {
+                                days.Remove(diaRemove);
+                            }
+                            
+                        }
+                        
+
+                    }
+
+                    if (days.Any())
+                    {
+                        boleto.SetBoletoVencido();
+                    }
+
+                    
+                }
+                
+
+               // boleto.SetBoletoVencido();
             }
+
+
 
             _db.Boletos.UpdateRange(boletos);
 

@@ -74,6 +74,26 @@ namespace Invictus.Application.AdmApplication
             var banco = _mapper.Map<Banco>(bancoDto);
 
             await _configRepo.AddBanco(banco);
+
+            var newFormaRecebimento = new FormaRecebimentoDto();
+            newFormaRecebimento.ehCartao = false;
+            newFormaRecebimento.descricao = "DINHEIRO";
+            newFormaRecebimento.ativo = true;
+            newFormaRecebimento.unidadeId = unidade.Id;
+            newFormaRecebimento.taxa = null;
+            newFormaRecebimento.diasParaCompensacao = null;
+            newFormaRecebimento.permiteParcelamento = null;
+            newFormaRecebimento.centroDeCustoTaxaVinculadaId = null;
+            newFormaRecebimento.bancoPermitidoParaCreditoId = null;
+            newFormaRecebimento.compensarAutomaticamenteId = null;
+            newFormaRecebimento.fornecedorTaxaVinculadaId = null;
+            newFormaRecebimento.subcontaTaxaVinculadaId = null;
+
+
+            var forma = _mapper.Map<FormaRecebimento>(newFormaRecebimento);
+
+            await _configRepo.AddFormaRecebimento(forma);
+
             _configRepo.Commit();
         }
 

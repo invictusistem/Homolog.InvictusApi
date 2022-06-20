@@ -15,6 +15,7 @@ namespace Invictus.QueryService.FinanceiroQueries.Interfaces
         Task<IEnumerable<PlanoContaDto>> GetAllPlanos();
         Task<IEnumerable<CentroCustoDto>> GetAllCentroCusto();
         Task<IEnumerable<FormaRecebimentoDto>> GetAllFormasRecebimentos();
+        Task<IEnumerable<FormaRecebimentoDto>> GetAllFormasRecebimentosAtivas();
         Task<IEnumerable<SubContaDto>> GetAllSubContas();
         Task<IEnumerable<SubContaDto>> GetAllSubContasAtivas();
         Task<IEnumerable<SubContaDto>> GetAllSubContasAtivasDebitos();

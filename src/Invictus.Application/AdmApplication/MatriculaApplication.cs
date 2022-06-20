@@ -556,7 +556,7 @@ namespace Invictus.Application.AdmApplication
                 var newBoleto = Boleto.CadastrarBoletoMatriculaFactory(
                     parcela.vencimento,
                     parcela.valor,
-                    _command.plano.bonusPontualidade.ToString(),
+                    _command.plano.bonusPontualidade,
                     TipoLancamento.Credito,
                     "",
                     _newMatriculaId,

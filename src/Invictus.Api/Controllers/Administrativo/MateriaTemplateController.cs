@@ -72,7 +72,7 @@ namespace Invictus.Api.Controllers
             // var cargos = await _db.Cargos.ToListAsync();
             if (materias == null) return NotFound();
 
-            return Ok(new { materias = materias });
+            return Ok(new { materias });
         }
 
         [HttpGet]

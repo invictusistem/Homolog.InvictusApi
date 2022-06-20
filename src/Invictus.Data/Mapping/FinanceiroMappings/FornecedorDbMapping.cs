@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Invictus.Data.Mapping.FinanceiroMappings
 {
-    //public class FornecedorDbMapping : IEntityTypeConfiguration<Fornecedor>
-    //{
-    //    public void Configure(EntityTypeBuilder<Fornecedor> builder)
-    //    {
-    //        builder.HasKey(c => c.Id);           
+    public class FornecedorDbMapping : IEntityTypeConfiguration<Fornecedor>
+    {
+        public void Configure(EntityTypeBuilder<Fornecedor> builder)
+        {
+            builder.HasKey(c => c.Id);
 
-    //        builder.ToTable("Fornecedores");
-    //    }
-    //}
+            builder.ToTable("Fornecedores");
+        }
+    }
 }

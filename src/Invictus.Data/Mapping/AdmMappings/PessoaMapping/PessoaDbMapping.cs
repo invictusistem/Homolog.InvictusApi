@@ -9,9 +9,9 @@ namespace Invictus.Data.Mapping.AdmMappings.FuncionarioMapping
         public void Configure(EntityTypeBuilder<Pessoa> builder)
         {
             builder.HasKey(c => c.Id);
-            //builder.HasIndex(f => f.Id)
-            //    .HasDatabaseName("Id")
-            //    .IsUnique();
+            builder.HasIndex(f => f.Id)
+                .HasDatabaseName("Id")
+                .IsUnique();
 
             builder.HasIndex(c => c.TipoPessoa);
 

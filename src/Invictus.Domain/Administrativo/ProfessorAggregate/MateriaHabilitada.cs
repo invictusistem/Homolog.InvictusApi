@@ -21,7 +21,7 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate
 
         #region EF
         public Guid ProfessorId { get; private set; }
-       // public virtual Professor Professor { get; private set; }
+       public virtual Professor Professor { get; private set; }
         #endregion
     }
 }

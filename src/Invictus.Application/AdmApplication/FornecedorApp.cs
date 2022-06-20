@@ -27,6 +27,8 @@ namespace Invictus.Application.AdmApplication
 
         public async Task CreateFornecedor(PessoaDto newFornecedor)
         {
+            newFornecedor.razaoSocial = newFornecedor.nome;
+
             newFornecedor.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
             newFornecedor.dataCadastro = DateTime.Now;
