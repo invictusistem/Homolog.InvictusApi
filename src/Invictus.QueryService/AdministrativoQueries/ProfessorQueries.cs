@@ -198,7 +198,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<ProfessorCalendarioViewModel>> GetProfessorCalendario(Guid professorId)
         {
-            var query = @"select 
+            var query = @"SELECT 
                         calendarios.Id,
                         calendarios.diaaula,
                         calendarios.diadasemana,
@@ -211,13 +211,13 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Unidades.descricao as unidadeDescricao,
                         Unidadessalas.titulo,
                         materiastemplate.nome as materiaDescricao,
-                        Professores.Nome as professor 
+                        Pessoas.Nome as professor 
                         from calendarios
                         left join Turmas on Calendarios.TurmaId = Turmas.Id
                         left join Unidades on Calendarios.UnidadeId = Unidades.Id
                         left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
                         left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
-                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        left join Pessoas on Calendarios.ProfessorId = Pessoas.Id
                         where calendarios.professorId = @professorId  
                         order by Calendarios.DiaAula asc  ";
 
@@ -587,7 +587,8 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             ProfessorRelatorioViewModel report = new ProfessorRelatorioViewModel();
 
-            var query = @"select 
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT 
                         calendarios.Id,
                         calendarios.diaaula,
                         calendarios.diadasemana,
@@ -602,24 +603,24 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Unidades.descricao as unidadeDescricao,
                         Unidadessalas.titulo,
                         materiastemplate.nome as materiaDescricao,
-                        Professores.Nome as professor 
-                        from calendarios
-                        left join Turmas on Calendarios.TurmaId = Turmas.Id
-                        left join Unidades on Calendarios.UnidadeId = Unidades.Id
-                        left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
-                        left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
-                        left join Professores on Calendarios.ProfessorId = Professores.Id
-                        where calendarios.professorId = @teacherId 
+                        Pessoas.Nome as professor 
+                        FROM calendarios
+                        LEFT JOIN Turmas on Calendarios.TurmaId = Turmas.Id
+                        LEFT JOIN Unidades on Calendarios.UnidadeId = Unidades.Id
+                        LEFT JOIN Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
+                        LEFT JOIN materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
+                        LEFT JOIN Pessoas on Calendarios.ProfessorId = Pessoas.Id
+                        WHERE calendarios.professorId = @teacherId 
                         AND calendarios.DiaAula >= @rangeIni  
                         AND calendarios.DiaAula < @rangeFinal
-                        order by Calendarios.DiaAula asc ";
+                        ORDER BY Calendarios.DiaAula asc ");
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
                 
-                report.calendars = await connection.QueryAsync<ProfessorCalendarioViewModel>(query, new { rangeIni = rangeIni, rangeFinal = rangeFinal, teacherId = teacherId });
+                report.calendars = await connection.QueryAsync<ProfessorCalendarioViewModel>(query.ToString(), new { rangeIni = rangeIni, rangeFinal = rangeFinal, teacherId = teacherId });
 
                 connection.Close();
 

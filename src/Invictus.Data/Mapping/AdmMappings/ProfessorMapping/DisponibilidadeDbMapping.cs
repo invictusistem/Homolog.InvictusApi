@@ -1,4 +1,5 @@
-﻿using Invictus.Domain.Administrativo.ProfessorAggregate;
+﻿using Invictus.Domain.Administrativo.FuncionarioAggregate;
+using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

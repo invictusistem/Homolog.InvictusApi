@@ -51,26 +51,30 @@ namespace Invictus.QueryService.AdministrativoQueries
         {
 
             StringBuilder query = new StringBuilder();
-            query.Append(@"SELECT Colaboradores.id, Colaboradores.nome, Colaboradores.email, 
+            query.Append(@"SELECT 
+             Pessoas.id, 
+             Pessoas.nome, 
+             Pessoas.email, 
              Unidades.sigla as unidadeSigla,      
              AspNetRoles.Name as RoleName,             
              AspNetUserClaims.Id as ClamId, 
              AspNetUserClaims.ClaimType as clamType, 
              AspNetUserClaims.ClaimValue as clamKey 
-             from Colaboradores 
-             inner join Unidades on Colaboradores.UnidadeId = Unidades.Id
-             inner join AspNetUsers on Colaboradores.Email = AspNetUsers.Email  
-             inner join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId 
-             inner join AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId 
-             inner join AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id ");
+             FROM Pessoas 
+             INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id
+             INNER JOIN AspNetUsers on Pessoas.Email = AspNetUsers.Email  
+             INNER JOIN AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId 
+             INNER JOIN AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId 
+             INNER JOIN AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id 
+             AND (Pessoas.tipoPessoa = 'Colaborador' OR Pessoas.tipoPessoa = 'Professor') ");
 
-            if (param.nome != "") query.Append(" AND LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if (param.email != "") query.Append(" AND LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if (param.cpf != "") query.Append(" AND LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if(param.todasUnidades == false) query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
+            if (param.nome != "") query.Append(" AND LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if (param.email != "") query.Append(" AND LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if (param.cpf != "") query.Append(" AND LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if(param.todasUnidades == false) query.Append(" AND Pessoas.UnidadeId = '" + unidade.id + "' ");
             //if (param.ativo == false) query.Append(" AND Professores.Ativo = 'True' ");
-            query.Append(" WHERE AspNetUserClaims.ClaimType = 'IsActive' ");
-            query.Append(" ORDER BY Colaboradores.Nome ");
+            query.Append(" AND AspNetUserClaims.ClaimType = 'IsActive' ");
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
 
@@ -78,12 +82,15 @@ namespace Invictus.QueryService.AdministrativoQueries
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
+                IEnumerable<UsuarioDto> usuarios = new List<UsuarioDto>();
+               
+                    var users = await connection.QueryAsync<UsuarioDto>(query.ToString());
+                    usuarios = users.Where(u => u.clamType == "IsActive");
 
-                var usuarios = await connection.QueryAsync<UsuarioDto>(query.ToString());
-
+              
                 foreach (var user in usuarios)
                 {
-                    user.ativo = user.clamKey;
+                    user.ativo = Convert.ToBoolean(user.clamKey);
                 }
 
                 //var alunoDictionary = new Dictionary<Guid, UsuarioDto>();
@@ -147,18 +154,19 @@ namespace Invictus.QueryService.AdministrativoQueries
         {
             StringBuilder query = new StringBuilder();
             query.Append(@"SELECT Count(*)  
-             from Colaboradores 
-             inner join Unidades on Colaboradores.UnidadeId = Unidades.Id
-             inner join AspNetUsers on Colaboradores.Email = AspNetUsers.Email  
-             inner join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId 
-             inner join AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId 
-             inner join AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id ");
+             FROM Pessoas 
+             INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id
+             INNER JOIN AspNetUsers on Pessoas.Email = AspNetUsers.Email  
+             INNER JOIN AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId 
+             INNER JOIN AspNetUserRoles on AspNetUsers.Id = AspNetUserRoles.UserId 
+             INNER JOIN AspNetRoles on AspNetUserRoles.RoleId = AspNetRoles.Id 
+             AND (Pessoas.tipoPessoa = 'Colaborador' OR Pessoas.tipoPessoa = 'Professor') ");
 
-            if (param.nome != "") query.Append(" AND LOWER(Colaboradores.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if (param.email != "") query.Append(" AND LOWER(Colaboradores.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if (param.cpf != "") query.Append(" AND LOWER(Colaboradores.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
-            if (param.todasUnidades == false) query.Append(" AND Colaboradores.UnidadeId = '" + unidade.id + "' ");
-            query.Append(" WHERE AspNetUserClaims.ClaimType = 'IsActive' ");
+            if (param.nome != "") query.Append(" AND LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if (param.email != "") query.Append(" AND LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if (param.cpf != "") query.Append(" AND LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            if (param.todasUnidades == false) query.Append(" AND Pessoas.UnidadeId = '" + unidade.id + "' ");
+            query.Append(" AND AspNetUserClaims.ClaimType = 'IsActive' ");
             //query.Append(" ORDER BY Colaboradores.Nome ");
             
 

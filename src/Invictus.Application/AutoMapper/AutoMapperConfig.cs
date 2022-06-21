@@ -156,7 +156,7 @@ namespace Invictus.Application.AutoMapper
 
             CreateMap<AlunoDocumentoDto, AlunoDocumento>();
 
-           // CreateMap<DisponibilidadeDto, Disponibilidade>();
+            CreateMap<DisponibilidadeDto, Disponibilidade>();
 
             CreateMap<TurmaProfessoresDto, TurmaProfessor>();
 

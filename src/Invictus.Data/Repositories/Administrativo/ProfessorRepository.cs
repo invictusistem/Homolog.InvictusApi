@@ -1,4 +1,5 @@
 ﻿using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
 using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.ProfessorAggregate.Interfaces;
 using System;
@@ -36,7 +37,7 @@ namespace Invictus.Data.Repositories.Administrativo
             _db.SaveChanges();
         }
 
-        public async Task AddProfessorMateria(MateriaHabilitada profMateria)
+        public async Task AddProfessorMateria(Domain.Administrativo.ProfessorAggregate.MateriaHabilitada profMateria)
         {
             await _db.MateriasHabilitadas.AddAsync(profMateria);
         }

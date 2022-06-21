@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Disponibilidade = Invictus.Domain.Administrativo.ProfessorAggregate.Disponibilidade;
 using MateriaHabilitada = Invictus.Domain.Administrativo.ProfessorAggregate.MateriaHabilitada;
 
 namespace Invictus.Application.AdmApplication
@@ -89,7 +88,9 @@ namespace Invictus.Application.AdmApplication
             }
             else
             {
+
                 var dispo = _mapper.Map<Disponibilidade>(dispoDto);
+
                 await _profRepository.EditDisponibilidade(dispo);
                 await AtualizarAulasProfessor(dispoDto, dispoDto.unidadeId, dispoDto.pessoaId);
             }
@@ -215,7 +216,7 @@ namespace Invictus.Application.AdmApplication
                 {
                     // update se existir
                     var user = await UserManager.FindByEmailAsync(oldEmail);
-                    if(user != null)
+                    if (user != null)
                     {
                         await UserManager.UpdateAsync(user);
 
@@ -239,7 +240,7 @@ namespace Invictus.Application.AdmApplication
                 }
             }
 
-            
+
         }
 
         public async Task RemoveProfessorMateria(Guid profMateriaId)

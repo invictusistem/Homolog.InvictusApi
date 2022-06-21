@@ -751,11 +751,11 @@ order by DiaAula
                                 Calendarios.HoraFinal,
                                 Calendarios.observacoes,
                                 Turmas.id as turmaId,
-                                Professores.Nome as nome,
+                                Pessoas.Nome as nome,
                                 MateriasTemplate.nome as materiaDescricao
                                 FROM Calendarios
                                 inner join Turmas on Calendarios.turmaId = Turmas.id 
-                                left join Professores on Calendarios.ProfessorId = Professores.Id
+                                left join Pessoas on Calendarios.ProfessorId = Pessoas.Id
                                 inner join MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
                                 WHERE Calendarios.Id = @calendarioId ";
 
@@ -765,10 +765,10 @@ order by DiaAula
                                     TurmasPresencas.alunoId,
                                     TurmasPresencas.isPresent,
                                     TurmasPresencas.isPresentToString,
-                                    Alunos.nome,
-                                    Alunos.nomeSocial
+                                    Pessoas.nome,
+                                    Pessoas.nomeSocial
                                     FROM TurmasPresencas 
-                                    INNER JOIN Alunos ON TurmasPresencas.AlunoId = Alunos.Id
+                                    INNER JOIN Pessoas ON TurmasPresencas.AlunoId = Pessoas.Id
                                     WHERE TurmasPresencas.CalendarioId = @calendarioId ";
 
             //string queryTwo = @"SELECT 

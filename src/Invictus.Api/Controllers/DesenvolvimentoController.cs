@@ -376,8 +376,7 @@ namespace Invictus.Api.Controllers
                     }
 
                     
-                }
-                
+                }                
 
                // boleto.SetBoletoVencido();
             }

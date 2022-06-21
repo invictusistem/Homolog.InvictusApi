@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Invictus.Domain.Administrativo.FuncionarioAggregate;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

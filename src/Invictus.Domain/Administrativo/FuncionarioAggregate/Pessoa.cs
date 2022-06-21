@@ -255,8 +255,8 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
         public bool Sexta { get; private set; }
         public bool Sabado { get; private set; }
         public Guid UnidadeId { get; private set; }
-        public Guid FuncionarioId { get; private set; }
-        public DateTime DataCadastro { get; private set; }
+        public Guid PessoaId { get; private set; }
+        public DateTime DataAtualizacao { get; private set; }      
 
         #region EF
         protected Disponibilidade() { }

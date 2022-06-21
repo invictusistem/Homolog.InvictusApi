@@ -45,6 +45,8 @@ namespace Invictus.QueryService.PedagogicoQueries
         Pessoas.telResidencial ,
         Pessoas.telWhatsapp ,
         Pessoas.dataCadastro,
+        Pessoas.tipoPessoa, 
+        Pessoas.pessoaRespCadastroId,
         Pessoas.ativo ,
         Pessoas.unidadeId,
         Enderecos.Id,
@@ -54,7 +56,8 @@ namespace Invictus.QueryService.PedagogicoQueries
         Enderecos.logradouro,
         Enderecos.numero,
         Enderecos.cidade ,
-        Enderecos.uf        
+        Enderecos.uf,
+        Enderecos.PessoaId
         FROM Pessoas 
         LEFT JOIN Enderecos ON Pessoas.Id = enderecos.PessoaId 
         LEFT JOIN matriculas ON Pessoas.id = matriculas.alunoid
@@ -87,7 +90,7 @@ namespace Invictus.QueryService.PedagogicoQueries
                         Pessoas.id,
                         Pessoas.nome
                         FROM Pessoas 
-                        INNER JOIN Matriculas ON Alunos.id = Matriculas.AlunoId 
+                        INNER JOIN Matriculas ON Pessoas.id = Matriculas.AlunoId 
                         WHERE Pessoas.tipoPessoa = 'Aluno' ";
 
             await using (var connection = new SqlConnection(

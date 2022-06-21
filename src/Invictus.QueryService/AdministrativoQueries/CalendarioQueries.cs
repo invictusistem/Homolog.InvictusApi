@@ -35,8 +35,8 @@ namespace Invictus.QueryService.AdministrativoQueries
                         turmas.Descricao,
                         turmas.Identificador,
                         turmas.unidadeId,
-                        Professores.Id as professorId,
-                        Professores.Nome,
+                        Pessoas.Id as professorId,
+                        Pessoas.Nome,
                         UnidadesSalas.Titulo,
                         MateriasTemplate.Nome as materiaDescricao,
                         Calendarios.DiaAula,
@@ -49,7 +49,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Calendarios.Observacoes
                         from Calendarios 
                         left join turmas on Calendarios.TurmaId = Turmas.Id 
-                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        left join Pessoas on Calendarios.ProfessorId = Pessoas.Id
                         left join UnidadesSalas on Calendarios.SalaId = UnidadesSalas.Id
                         left join MateriasTemplate on Calendarios.MateriaId = MateriasTemplate.Id
                         where Calendarios.id = @calendarioId ";
@@ -119,11 +119,11 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Unidadessalas.titulo,
                         materiastemplate.nome,
                         materiastemplate.id as materiaId,
-                        Professores.Nome as professor 
+                        Pessoas.Nome as professor 
                         from calendarios 
                         left join Unidadessalas on Calendarios.SalaId = Unidadessalas.Id
                         left join materiastemplate on Calendarios.MateriaId = materiastemplate.Id 
-                        left join Professores on Calendarios.ProfessorId = Professores.Id
+                        left join Pessoas on Calendarios.ProfessorId = Pessoas.Id
                         where Calendarios.TurmaId = @turmaId 
                         order by Calendarios.DiaAula asc ";
 

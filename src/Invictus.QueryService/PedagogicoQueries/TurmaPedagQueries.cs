@@ -35,9 +35,9 @@ namespace Invictus.QueryService.PedagogicoQueries
                             Pessoas.email, 
                             Pessoas.cpf
                             FROM Pessoas 
-                            INNER JOIN Matriculas ON Alunos.id = Matriculas.alunoId
+                            INNER JOIN Matriculas ON Pessoas.id = Matriculas.alunoId
                             WHERE Matriculas.TurmaId = @turmaId 
-                            AND Pessoas.tipoPessoa = 'Fornecedor' ";
+                            AND Pessoas.tipoPessoa = 'Aluno' ";
 
 
             await using (var connection = new SqlConnection(
@@ -198,9 +198,9 @@ namespace Invictus.QueryService.PedagogicoQueries
                         TurmasNotas.MateriaId = @materiaId ";
 
             var query3 = @"select 
-                        Alunos.Nome
-                        from Alunos
-                        inner join Matriculas on Alunos.Id = Matriculas.AlunoId 
+                        Pessoas.Nome
+                        from Pessoas
+                        inner join Matriculas on Pessoas.Id = Matriculas.AlunoId 
                         where Matriculas.id = @matriculaId
                         AND Matriculas.TurmaId = @turmaId ";
 

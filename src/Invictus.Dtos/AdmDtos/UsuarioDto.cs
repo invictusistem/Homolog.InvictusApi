@@ -17,7 +17,7 @@ namespace Invictus.Dtos.AdmDtos
         public List<Claims> claims { get; set; }// = new List<Claims>();
         public int Clamid { get; set; }
         public string clamType { get; set; }
-        public bool clamKey { get; set; }
+        public string clamKey { get; set; }
     }
 
     public class Claims

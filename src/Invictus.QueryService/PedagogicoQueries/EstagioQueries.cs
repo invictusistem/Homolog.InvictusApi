@@ -81,32 +81,32 @@ namespace Invictus.QueryService.PedagogicoQueries
 
             StringBuilder query = new StringBuilder();
             query.Append(@"SELECT 
-                        alunos.id,  
-                        alunos.cpf, 
-                        alunos.rg, 
-                        alunos.nascimento, 
-                        alunos.dataCadastro, 
-                        alunos.nome, 
-                        alunos.ativo,
+                        Pessoas.id,  
+                        Pessoas.cpf, 
+                        Pessoas.rg, 
+                        Pessoas.nascimento, 
+                        Pessoas.dataCadastro, 
+                        Pessoas.nome, 
+                        Pessoas.ativo,
                         Matriculas.Id as matriculaId,
                         estagiosMatriculas.id as estagioMatriculaId,
                         estagiosMatriculas.status, 
                         turmas.descricao as turmaDescricao,
                         turmas.identificador as turmaIdentificador,
                         unidades.sigla 
-                        FROM alunos 
-                        INNER JOIN Matriculas on Alunos.id = Matriculas.AlunoId
+                        FROM Pessoas 
+                        INNER JOIN Matriculas on Pessoas.id = Matriculas.AlunoId
                         FULL JOIN estagiosMatriculas on Matriculas.id = estagiosMatriculas.matriculaId 
-                        INNER JOIN Unidades on Alunos.UnidadeId = Unidades.Id 
+                        INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id 
                         INNER JOIN Turmas on Matriculas.TurmaId = Turmas.Id  WHERE ");
 
             // query.Append("from alunos full join estagiosMatriculas on alunos.id = estagiosMatriculas.alunoid inner join Unidades on Alunos.UnidadeId = Unidades.Id WHERE ");
-            if (param.todasUnidades == false) query.Append(@" Alunos.UnidadeId = @unidadeId AND ");
-            if (param.nome != "") query.Append(@" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { query.Append(" Alunos.Ativo = 'True' "); } else { query.Append(" (Alunos.Ativo = 'True' OR Alunos.Ativo = 'False') "); }
-            query.Append(" ORDER BY Alunos.Nome ");
+            if (param.todasUnidades == false) query.Append(@" Pessoas.UnidadeId = @unidadeId AND ");
+            if (param.nome != "") query.Append(@" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             await using (var connection = new SqlConnection(
@@ -131,17 +131,17 @@ namespace Invictus.QueryService.PedagogicoQueries
             // estagiosMatriculas
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append(@"SELECT count(*)  
-                                FROM alunos 
-                                INNER JOIN Matriculas on Alunos.id = Matriculas.AlunoId
+                                FROM Pessoas 
+                                INNER JOIN Matriculas on Pessoas.id = Matriculas.AlunoId
                                 FULL JOIN estagiosMatriculas on Matriculas.id = estagiosMatriculas.matriculaId 
-                                INNER JOIN Unidades on Alunos.UnidadeId = Unidades.Id 
+                                INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id 
                                 INNER JOIN Turmas on Matriculas.TurmaId = Turmas.Id  WHERE ");
 
-            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { queryCount.Append(" Alunos.Ativo = 'True' "); } else { queryCount.Append(" (Alunos.Ativo = 'True' OR Alunos.Ativo = 'False') "); }
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
 
 
             await using (var connection = new SqlConnection(

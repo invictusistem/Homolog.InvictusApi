@@ -178,7 +178,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<DateTime> GetIdadeAluno(Guid alunoId)
         {
-            var query = "SELECT Alunos.nascimento from Alunos where Alunos.Id = @alunoId";
+            var query = "SELECT Pessoas.nascimento FROM Pessoas WHERE Pessoas.Id = @alunoId";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -222,7 +222,7 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<PessoaDto> GetAlunoByMatriculaId(Guid matriculaId)
         {
-            var query = @"select* from alunos Where alunos.id = (
+            var query = @"select* from Pessoas Where Pessoas.id = (
                         select matriculas.alunoId from matriculas where matriculas.id = @matriculaId 
                         )";
 
@@ -259,12 +259,12 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             StringBuilder queryCount = new StringBuilder();
             queryCount.Append("select Count(*) ");
-            queryCount.Append("from Matriculas left join alunos on Matriculas.AlunoId = Alunos.Id left join Unidades on alunos.UnidadeId = Unidades.Id where ");
-            if (param.todasUnidades == false) queryCount.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            if (param.nome != "") queryCount.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") queryCount.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") queryCount.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { queryCount.Append(" Alunos.Ativo = 'True' "); } else { queryCount.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
+            queryCount.Append("from Matriculas left join Pessoas on Matriculas.AlunoId = Pessoas.Id left join Unidades on Pessoas.UnidadeId = Unidades.Id where ");
+            if (param.todasUnidades == false) queryCount.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
 
 
             await using (var connection = new SqlConnection(
@@ -286,9 +286,9 @@ namespace Invictus.QueryService.AdministrativoQueries
 
             StringBuilder query = new StringBuilder();
             query.Append(@"select 
-                        alunos.nome, 
-                        alunos.CPF, 
-                        alunos.email,
+                        Pessoas.nome, 
+                        Pessoas.CPF, 
+                        Pessoas.email,
                         matriculas.NumeroMatricula,
                         matriculas.id as matriculaId, 
                         matriculas.status, 
@@ -299,19 +299,19 @@ namespace Invictus.QueryService.AdministrativoQueries
                         AspNetUserClaims.claimValue as acessoSistema ");
 
             query.Append(@"from Matriculas 
-                        left join alunos on Matriculas.AlunoId = Alunos.Id 
+                        left join Pessoas on Matriculas.AlunoId = Pessoas.Id 
                         left join Turmas on Matriculas.turmaId = Turmas.id 
-                        left join Unidades on alunos.UnidadeId = Unidades.Id 
-                        left join AspNetUsers on Alunos.Email = AspNetUsers.Email
+                        left join Unidades on Pessoas.UnidadeId = Unidades.Id 
+                        left join AspNetUsers on Pessoas.Email = AspNetUsers.Email
                         left join AspNetUserClaims on AspNetUsers.Id = AspNetUserClaims.UserId where  ");
 
             query.Append(" AspNetUserClaims.ClaimType = 'IsActive' AND ");
-            if (param.todasUnidades == false) query.Append(" Alunos.UnidadeId = '" + unidadeId + "' AND ");
-            if (param.nome != "") query.Append(" LOWER(Alunos.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.email != "") query.Append(" LOWER(Alunos.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.cpf != "") query.Append(" LOWER(Alunos.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { query.Append(" Alunos.Ativo = 'True' "); } else { query.Append(" Alunos.Ativo = 'True' OR Alunos.Ativo = 'False' "); }
-            query.Append(" ORDER BY Alunos.Nome ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
+            if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
+            query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
             await using (var connection = new SqlConnection(
@@ -444,7 +444,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             if (param.nome != "") queryCount.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.email != "") queryCount.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.cpf != "") queryCount.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            if (param.ativo == false) { queryCount.Append(" Pessoas.Ativo = 'True' "); } else { queryCount.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
 
 
             await using (var connection = new SqlConnection(
@@ -471,7 +471,7 @@ namespace Invictus.QueryService.AdministrativoQueries
             if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
-            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
             query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 
