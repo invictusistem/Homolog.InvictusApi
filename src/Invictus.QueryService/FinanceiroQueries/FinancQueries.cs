@@ -242,10 +242,10 @@ namespace Invictus.QueryService.FinanceiroQueries
         }
 
         public async Task<IEnumerable<BoletoDto>> GetContasReceber(string meioPagamentoId, DateTime start, DateTime end, bool ativo)
-        {   
+        {
             var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
-            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);           
-            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();           
+            var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
             StringBuilder query = new StringBuilder();
             query.Append(@"SELECT
@@ -268,7 +268,7 @@ namespace Invictus.QueryService.FinanceiroQueries
             if (meioPagamentoId != "null") query.Append(@"AND MeioPagamentoId = '" + meioPagamentoId + "'");
 
             query.Append(@" ORDER BY Boletos.Vencimento");
-              
+
             //
             var matriculadoQuery = @"SELECT 
                             Pessoas.Nome 
@@ -282,7 +282,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                 connection.Open();
                 // itemsPerPage currentPage  param   unidadeId
 
-                var boletos = await connection.QueryAsync<BoletoDto>(query.ToString(), new { inicio = inicio, fim = fim, unidadeId = unidadeId});
+                var boletos = await connection.QueryAsync<BoletoDto>(query.ToString(), new { inicio = inicio, fim = fim, unidadeId = unidadeId });
 
                 foreach (var boleto in boletos)
                 {
@@ -342,7 +342,7 @@ namespace Invictus.QueryService.FinanceiroQueries
             //            Boletos.Valor,
             //            Boletos.StatusBoleto,
             //            Boletos.PessoaId,
-                        
+
             //            Bancos.Nome as banco
             //            FROM Boletos 
             //            LEFT JOIN Bancos ON Boletos.BancoId = Bancos.Id
@@ -360,7 +360,7 @@ namespace Invictus.QueryService.FinanceiroQueries
 
             var colaboradorQuery = @"SELECT Colaboradores.nome FROM Colaboradores WHERE Colaboradores.id = @id";
 
-            var professorQuery = @"SELECT Professores.nome FROM Professores WHERE Professores.id = @id";            
+            var professorQuery = @"SELECT Professores.nome FROM Professores WHERE Professores.id = @id";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -378,7 +378,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                     }
                     else
                     {
-                        
+
                         var nomes = await connection.QueryAsync<string>(colaboradorQuery, new { id = boleto.pessoaId });
 
                         if (nomes.Any())
@@ -404,7 +404,7 @@ namespace Invictus.QueryService.FinanceiroQueries
             //StringBuilder query = new StringBuilder();
             //var inicio = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
             //var fim = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
-           //var meioPgmId = Guid.NewGuid();
+            //var meioPgmId = Guid.NewGuid();
             //var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
 
             //if (meioPagamentoId == "null")
@@ -466,7 +466,7 @@ namespace Invictus.QueryService.FinanceiroQueries
 
             var query = @"SELECT * FROM Boletos WHERE Boletos.ativo = 'True' 
                         AND Boletos.statusBoleto = 'Em aberto' 
-                        AND Boletos.Vencimento < @hoje";           
+                        AND Boletos.Vencimento < @hoje";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
@@ -481,9 +481,47 @@ namespace Invictus.QueryService.FinanceiroQueries
             }
         }
 
-        public async Task<IEnumerable<BoletoDto>> GetCaixa(DateTime start, DateTime end)
+        public async Task<IEnumerable<CaixaViewModel>> GetCaixa(bool cartao, DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
+            end = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
+
+            var query = @"SELECT 
+                        Boletos.id,
+                        (ISNULL(Pessoas.Nome, Matriculas.nome)) as nome,
+                        Boletos.Vencimento,
+                        Boletos.DataPagamento,
+                        Boletos.ValorPago,
+                        boletos.PessoaId,
+                        Boletos.DigitosCartao,
+                        FormasRecebimento.descricao,
+                        FormasRecebimento.Taxa,
+                        FormasRecebimento.DiasParaCompensacao
+                        FROM Boletos
+                        INNER JOIN FormasRecebimento ON Boletos.FormaRecebimentoId = FormasRecebimento.Id
+                        LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id
+                        LEFT JOIN Matriculas ON Boletos.pessoaId = Matriculas.id
+                        WHERE Boletos.StatusBoleto = 'Pago'
+                        AND Boletos.FormaRecebimentoId IN 
+                        (
+                        SELECT FormasRecebimento.id FROM FormasRecebimento
+                        WHERE FormasRecebimento.EhCartao = @cartao
+                        AND FormasRecebimento.UnidadeId = @unidadeId
+                        )
+                        AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var boleto = await connection.QueryAsync<CaixaViewModel>(query, new { unidadeId = unidadeId, cartao = cartao.ToString(), start = start, end = end });
+
+                connection.Close();
+
+                return boleto;
+            }
         }
     }
 }

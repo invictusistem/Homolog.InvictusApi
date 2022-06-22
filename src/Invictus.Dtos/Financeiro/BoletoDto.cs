@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace Invictus.Dtos.Financeiro
 {
+    public class CaixaViewModel
+    {
+        public Guid id { get; set; }
+        public string nome { get; set; }
+        public DateTime vencimento { get; set; }
+        public DateTime dataPagamento { get; set; }
+        public decimal valorPago { get; set; }
+        public Guid pessoaId { get; set; }
+        public string digitosCartao { get; set; }
+        public string descricao { get; set; }
+        public decimal taxa { get; set; }
+        public int diasParaCompensacao { get; set; }
+    }
     public class BoletoDto
     {
         public Guid id { get; set; }
@@ -31,7 +44,7 @@ namespace Invictus.Dtos.Financeiro
         public string banco { get; set; }
         public bool ehFornecedor { get; set; }
         public bool ativo { get; set; }
-        
+
         //public BoletoResponseInfo InfoBoletos { get; private set; }
         public string id_unico { get; set; }
         public string id_unico_original { get; set; }

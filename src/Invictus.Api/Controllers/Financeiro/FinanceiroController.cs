@@ -217,8 +217,10 @@ namespace Invictus.Api.Controllers.Financeiro
             var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName & c.ativo == true).Select(c => c.valor).Sum();
 
             var totalreceber = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName & c.ativo == true).Select(c => c.valor).Sum();
-            
-            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalreceber = totalreceber });
+
+            var totalRecebido = contas.Where(c => c.statusBoleto == StatusPagamento.Pago.DisplayName).Select(c => c.valor).Sum();
+
+            return Ok(new { contas = contas, totalAtraso = totalAtraso, totalreceber = totalreceber, totalRecebido = totalRecebido });
         }
 
         [HttpGet]
@@ -259,11 +261,13 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("caixa")]
-        public async Task<IActionResult> GetCaixa([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> GetCaixa([FromQuery] bool cartao, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            await _finQueries.GetCaixa(start, end);
+            var result = await _finQueries.GetCaixa(cartao, start, end);
 
-            return Ok ();
+            var totalRecebido = result.Select(t => t.valorPago).Sum();
+
+            return Ok (new { result = result, totalRecebido = totalRecebido });
         }
 
         [HttpPut]
