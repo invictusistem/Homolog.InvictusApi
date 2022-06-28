@@ -60,7 +60,9 @@ namespace Invictus.Domain.Financeiro
         public string FormaPagamento { get; private set; }
         public string DigitosCartao { get; private set; }
         public bool EhFornecedor { get; private set; }
+        public string tipoVenda { get; private set; }
         public string TipoPessoa { get; private set; }
+        public string Identificador { get; private set; }
         public Guid PessoaId { get; private set; } // colaborador ou matricula
         public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
@@ -221,6 +223,61 @@ namespace Invictus.Domain.Financeiro
                 ResponsavelCadastroId = responsavelCadastroId,
                 DataCadastro = DateTime.Now,
                 Ativo = true
+
+            };
+
+            return boleto;
+        }
+
+        public static Boleto CadastrarBoletoVendaProdutoFactory(
+                   //DateTime vencimento,
+                   decimal valor,
+                   decimal valorPago,
+                   string digitosCartao,
+                   //int juros,
+                   // int jurosFixo,
+                   // string multa,
+                   //string multaFixo,
+                   //decimal desconto,
+                   TipoLancamento tipo,
+                   //string diasDesconto,
+                   //StatusPagamento statusBoleto,
+                   //bool ehFornecedor,
+                   Guid pessoaId,
+                   Guid centroCustoUnidadeId,
+                   Guid responsavelCadastroId,
+                   //string historico,
+                   Guid? subcontaId,
+                   Guid? bancoId,
+                   Guid formaRecebimentoId
+                   )
+        {
+            var boleto = new Boleto()
+            {
+                Vencimento = DateTime.Now,
+                Valor = valor,
+                ValorPago = valorPago,
+                DataPagamento = DateTime.Now,
+                DigitosCartao = digitosCartao,
+                Juros = 0,
+                JurosFixo = 0,
+                Multa = "",
+                MultaFixo = "",
+                //Desconto = desconto,
+                Tipo = tipo.DisplayName,
+                //DiasDesconto = diasDesconto,
+                StatusBoleto = StatusPagamento.Pago.DisplayName,
+                //Historico = historico,
+                SubContaId = subcontaId,
+                BancoId = bancoId,
+                FormaRecebimentoId = formaRecebimentoId,
+                EhFornecedor = false,
+                PessoaId = pessoaId,
+                CentroCustoUnidadeId = centroCustoUnidadeId,
+                ResponsavelCadastroId = responsavelCadastroId,
+                DataCadastro = DateTime.Now,
+                Ativo = true,
+                Identificador = "Produto"
 
             };
 

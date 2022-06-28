@@ -19,6 +19,7 @@ using Invictus.Domain.Administrativo.RequerimentoAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
 using Invictus.Domain.Administrativo.UnidadeAuth;
+using Invictus.Domain.Comercial;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Financeiro.Configuracoes;
@@ -103,6 +104,13 @@ namespace Invictus.Data.Context
 
         #endregion
 
+        #region COMERCIAL
+
+        public DbSet<Lead> Leads { get; set; }
+
+        #endregion
+
+
         #region PEDAGOGICO
         public DbSet<AlunoAnotacao> AlunosAnotacoes { get; set; }
         public DbSet<DocumentoEstagio> DocumentosEstagio { get; set; }
@@ -120,6 +128,7 @@ namespace Invictus.Data.Context
             AdmModelBuilder.RegisterBuilders(modelBuilder);
             PedagModelBuilder.RegisterBuilders(modelBuilder);
             FinancModelBuilder.RegisterBuilders(modelBuilder);
+            ComercialModelBuilder.RegisterBuilders(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

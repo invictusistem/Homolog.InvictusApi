@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Invictus.QueryService.AdministrativoQueries
@@ -19,6 +20,39 @@ namespace Invictus.QueryService.AdministrativoQueries
             _config = config;
             _aspNetUser = aspNetUser;
         }
+
+        public async Task<IEnumerable<ProdutoDto>> BuscaProduto(string nome)
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT 
+                        Produtos.id,
+                        Produtos.nome,
+                        Produtos.descricao,
+                        Produtos.preco,
+                        Produtos.quantidade as estoque
+                        FROM Produtos 
+                        WHERE LOWER(Produtos.nome) like LOWER('%" + nome + "%') collate SQL_Latin1_General_CP1_CI_AI ");
+            query.Append(" AND Produtos.ativo = 'True' AND Produtos.unidadeId = '" + unidadeId + "' ");
+            query.Append(" AND Produtos.quantidade > 0");
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ProdutoDto>(query.ToString());
+
+                connection.Close();
+                
+
+                return result;
+
+            }
+        }
+
         public async Task<ProdutoDto> GetProdutobyId(Guid produtoId)
         {
             var query = "SELECT * from Produtos where Produtos.Id = @produtoId";

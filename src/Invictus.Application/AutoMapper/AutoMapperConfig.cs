@@ -16,6 +16,7 @@ using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.RequerimentoAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Domain.Administrativo.UnidadeAggregate;
+using Invictus.Domain.Comercial;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Financeiro.Configuracoes;
@@ -25,6 +26,7 @@ using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
+using Invictus.Dtos.Comercial;
 using Invictus.Dtos.Financeiro;
 using Invictus.Dtos.Financeiro.Configuracoes;
 using Invictus.Dtos.PedagDto;
@@ -147,6 +149,8 @@ namespace Invictus.Application.AutoMapper
             CreateMap<BoletoResponseViewModel, BoletoResponseInfo>();
 
             CreateMap<BoletoDto, Boleto>();
+
+            CreateMap<LeadDto, Lead>();
 
             CreateMap<SalaDto, Sala>();
 

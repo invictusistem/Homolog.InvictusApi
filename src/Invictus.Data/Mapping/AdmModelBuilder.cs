@@ -17,7 +17,6 @@ using Invictus.Data.Mapping.AdmMappings.RequerimentoMapping;
 using Invictus.Data.Mapping.AdmMappings.ResponsavelMapping;
 using Invictus.Data.Mapping.AdmMappings.TurmaAggregateMapping;
 using Invictus.Data.Mapping.AdmMappings.UnidadeMapping;
-using Invictus.Domain.Administrativo.Logs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Invictus.Data.Mapping

@@ -101,5 +101,14 @@ namespace Invictus.Api.Controllers.Administrativo
 
             return Ok();
         }
+
+
+        [HttpDelete]
+        public async Task<IActionResult> wefAluno([FromBody] PessoaDto aluno)
+        {
+            await _alunoApplication.EditAluno(aluno);
+
+            return Ok();
+        }
     }
 }

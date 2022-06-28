@@ -54,6 +54,17 @@ namespace Invictus.Api.Controllers
             return Ok(new { produto = produto });
         }
 
+        [HttpGet]
+        [Route("busca")]
+        public async Task<IActionResult> BuscaProduto([FromQuery] string nome)
+        {   
+            var produtos = await _produtoQueries.BuscaProduto(nome);// .GetProdutosViewModel();//  _db.Produtos.ToListAsync();
+
+            if (!produtos.Any()) return NotFound();
+
+            return Ok(new { produtos = produtos });
+        }
+
         [HttpPost]
         // [Route("produto")]
         public async Task<IActionResult> Save(ProdutoDto newProduto)

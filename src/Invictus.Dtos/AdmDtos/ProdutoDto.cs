@@ -11,6 +11,7 @@ namespace Invictus.Dtos.AdmDtos
         public decimal preco { get; set; }
         public decimal precoCusto { get; set; }
         public int quantidade { get; set; }
+        public int estoque { get; set; }
         public int nivelMinimo { get; set; }
         public Guid unidadeId { get; set; }
         public DateTime dataCadastro { get; set; }

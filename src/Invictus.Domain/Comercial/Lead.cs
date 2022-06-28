@@ -5,50 +5,52 @@ namespace Invictus.Domain.Comercial
 {
     public class Lead : Entity
     {
-        public Lead(string nome,
-                    string email,
-                    string data,
-                    string telefone,
-                    string bairro,
-                    string cursoPretendido,
-                    string unidade,
-                    DateTime dataInclusaoSistem,
-                    string responsavelLead,
-                    Guid funcionarioId)
-        {   
-            Nome = nome;
-            Email = email;
-            Data = data;
-            Telefone = telefone;
-            Bairro = bairro;
-            CursoPretendido = cursoPretendido;
-            Unidade = unidade;
-            DataInclusaoSistema = dataInclusaoSistem;
-            ResponsavelLead = responsavelLead;
-            FuncionarioId = funcionarioId;
-        }
 
-        public Lead()
-        {
-
-        }
-        
         public string Nome { get; private set; }
         public string Email { get; private set; }
-        public string Data { get; private set; }
+        public DateTime Data { get; private set; }
         public string Telefone { get; private set; }
         public string Bairro { get; private set; }
         public string CursoPretendido { get; private set; }
-        public string Unidade { get; private set; }
+        public Guid UnidadeId { get; private set; }
         public DateTime DataInclusaoSistema { get; private set; }
-        public string ResponsavelLead { get; private set; }
-        public Guid FuncionarioId { get; private set; }
+        public Guid ResponsavelLead { get; private set; }
+        public bool Efetivada { get; private set; }
+        public Guid? MatriculaId { get; private set; }
 
-        public void SetDateAndResponsavelInLead(string nomeResponsavel)
+        public static Lead LeadFactory(string nome,
+                    string email,
+                    //string data,
+                    string telefone,
+                    string bairro,
+                    string cursoPretendido,
+                    Guid unidadeId,
+                    DateTime dataInclusaoSistem,
+                    Guid responsavelLead)
         {
-            ResponsavelLead = nomeResponsavel;
-            DataInclusaoSistema = DateTime.Now;
+
+            var lead = new Lead()
+            {
+                Nome = nome,
+                Email = email,
+                Data = DateTime.Now,
+                Telefone = telefone,
+                Bairro = bairro,
+                CursoPretendido = cursoPretendido,
+                UnidadeId = unidadeId,
+                DataInclusaoSistema = dataInclusaoSistem,
+                ResponsavelLead = responsavelLead,
+                Efetivada = false
+            };
+
+            return lead;
+        }
+
+
+        protected Lead()
+        {
 
         }
+
     }
 }
