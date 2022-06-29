@@ -149,6 +149,36 @@ namespace Invictus.QueryService.PedagogicoQueries
             }
         }
 
+        public async Task<MatriculaViewModel> GetMatriculaByNumeroMatricula(string numeroMatricula)
+        {
+            var query = @"SELECT 
+                        Matriculas.Id as matriculaId,
+                        Matriculas.NumeroMatricula,
+                        Alunos.Nome as alunoNome,
+                        Alunos.Email,
+                        Alunos.CPF,
+                        Turmas.Id as turmaId,
+                        Turmas.Descricao as turma,
+                        Turmas.UnidadeId,
+                        Unidades.Descricao as unidade
+                        FROM Matriculas
+                        INNER JOIN Alunos ON Matriculas.AlunoId = Alunos.Id
+                        INNER JOIN Turmas ON Matriculas.TurmaId = Turmas.Id
+                        INNER JOIN Unidades ON Turmas.UnidadeId = Unidades.Id
+                        WHERE Matriculas.NumeroMatricula = @numeroMatricula ";
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<MatriculaViewModel>(query, new { numeroMatricula  = numeroMatricula });
+
+                return result.FirstOrDefault();
+
+            }
+        }
+
         public async Task<IEnumerable<MatriculaViewModel>> GetMatriculadosFromUnidade()
         {
             var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();           

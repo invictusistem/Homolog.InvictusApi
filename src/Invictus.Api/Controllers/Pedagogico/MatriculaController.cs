@@ -1,4 +1,7 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations;
+using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.RegistroMatricula;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
@@ -7,6 +10,7 @@ using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Invictus.QueryService.Utilitarios.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +27,18 @@ namespace Invictus.Api.Controllers.Pedagogico
         private readonly IMatriculaQueries _matriculaQueries;
         private readonly IMatriculaApplication _matriculaApplication;
         private readonly IPedagMatriculaQueries _pedagMatriculaQueries;
+        private readonly IAspNetUser _aspNetUser;
         private readonly IUtils _utils;
+        private readonly InvictusDbContext _db;
         public MatriculaController(IMatriculaQueries matriculaQueries, IMatriculaApplication matriculaApplication, IPedagMatriculaQueries pedagMatriculaQueries,
-            IUtils utils)
+            IUtils utils, InvictusDbContext db, IAspNetUser aspNetUser)
         {
             _matriculaQueries = matriculaQueries;
             _matriculaApplication = matriculaApplication;
             _pedagMatriculaQueries = pedagMatriculaQueries;
+            _aspNetUser = aspNetUser;
             _utils = utils;
+            _db = db;
         }
 
         [HttpGet]
@@ -76,6 +84,86 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             return Ok(new { alunos = alunos });
         }
+        #region TRANSFERENCIA
+        [HttpGet]
+        [Route("transf-turma/{matricula}")]
+        public async Task<IActionResult> GetMatriculaTransfTurma(string matricula)
+        {
+            // cadastro aluno baseado na matricula
+
+            var aluno = await _pedagMatriculaQueries.GetMatriculaByNumeroMatricula(matricula);
+
+            if (aluno == null) return NotFound();
+
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+
+            if (unidadeId != aluno.unidadeId) return NotFound();
+
+            var turmas = await _db.Turmas.Where(t => t.UnidadeId == unidadeId & t.Id != aluno.turmaId).ToListAsync();
+
+            return Ok(new { aluno = aluno, turmas = turmas });
+        }
+
+        
+
+        [HttpGet]
+        [Route("transf-unidade/{matricula}")]
+        public async Task<IActionResult> GetAlunosIndicacao(string matricula)
+        {
+            var matriculaAluno = await _db.Matriculas.Where(m => m.NumeroMatricula == matricula).SingleOrDefaultAsync();
+
+            if (matriculaAluno == null) return NotFound();
+
+            var validar = await _db.Boletos.Where(b => b.PessoaId == matriculaAluno.Id & b.StatusBoleto == StatusPagamento.Vencido.DisplayName).ToListAsync();
+
+            var podeTransf = true;
+
+            if (validar.Any()) podeTransf = false;
+
+            var aluno = await _pedagMatriculaQueries.GetMatriculaByNumeroMatricula(matricula);
+
+            var unidades = await _db.Unidades.Where(u => u.Id != aluno.unidadeId).ToListAsync();
+
+            if (aluno == null) return NotFound();
+
+            return Ok(new { aluno = aluno, podeTransf= podeTransf, unidades = unidades });
+        }
+
+        [HttpGet]
+        [Route("transf-unidade-turmas/{matriculaId}/{unidadeId}")]
+        public async Task<IActionResult> GetTurmasTransfs(Guid matriculaId, Guid unidadeId)
+        {
+            var matriculaAtual = await _db.Matriculas.Where(m => m.Id == matriculaId).SingleOrDefaultAsync();
+
+            var turmas = await _db.Turmas.Where(t => t.Id != matriculaAtual.TurmaId & t.UnidadeId != unidadeId 
+            & (t.StatusAndamento == StatusTurma.AguardandoInicio.DisplayName || t.StatusAndamento == StatusTurma.EmAndamento.DisplayName)).ToListAsync();
+
+            if (!turmas.Any()) return NotFound();
+
+            return Ok(new { turmas = turmas });
+        }
+
+        [HttpPut]
+        [Route("transf-turma")]
+        public async Task<IActionResult> TransfTurma([FromBody] AnotacaoDto anotacao)
+        {
+            //await _matriculaApplication.SetAnotacao(anotacao);
+
+            return Ok();
+
+        }
+
+        [HttpPut]
+        [Route("transf-unidade")]
+        public async Task<IActionResult> TransfUnidade([FromBody] AnotacaoDto anotacao)
+        {
+            //await _matriculaApplication.SetAnotacao(anotacao);
+
+            return Ok();
+
+        }
+
+        #endregion
 
         [HttpGet]
         [Route("relatorio")]

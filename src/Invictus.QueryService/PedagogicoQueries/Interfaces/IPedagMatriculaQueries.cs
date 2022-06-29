@@ -20,6 +20,7 @@ namespace Invictus.QueryService.PedagogicoQueries.Interfaces
         Task<IEnumerable<PessoaDto>> GetAlunosIndicacao();
         Task<IEnumerable<MatriculaViewModel>> GetRelatorioMatriculas(string param);
         Task<IEnumerable<MatriculaViewModel>> GetMatriculadosFromUnidade();
+        Task<MatriculaViewModel> GetMatriculaByNumeroMatricula(string numeroMatricula);
 
     }
 }
