@@ -12,7 +12,7 @@ namespace Invictus.Application.AdmApplication.Interfaces
     {
        string GenerateRandomPassword(PasswordOptions opts = null);
         Task CriarAcessoInicial(Guid colaboradorId, string siglaUnidade, Guid unidadeId);
-        Task EditarAcesso(List<UsuarioAcessoViewModel> acessos);
+        Task EditarAcesso(List<UsuarioAcessoViewModel> acessos, Guid colabId);
         IEnumerable<string> GetPerfisAutorizados();
     }
 }

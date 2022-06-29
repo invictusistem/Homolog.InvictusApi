@@ -22,7 +22,7 @@ namespace Invictus.Api.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IColaboradorQueries _colaboradorQueries;
-        
+
         private readonly IProfessorQueries _profQueries;
         private readonly IUsuariosQueries _userQueries;
         private readonly IUsuarioApplication _userApplication;
@@ -121,14 +121,14 @@ namespace Invictus.Api.Controllers
         {
 
             var colaborador = await _colaboradorQueries.GetColaboradoresById(colaboradorId);// _context.Colaboradores.Find(id);
-            
-            if(colaborador == null)
+
+            if (colaborador == null)
             {
                 var prof = await _profQueries.GetProfessorById(colaboradorId);
                 colaborador.email = prof.email;
                 colaborador.nome = prof.nome;
             }
-            
+
 
             var primeiroNome = colaborador.nome.Split(" ");
 
@@ -168,7 +168,7 @@ namespace Invictus.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { msg = "O acesso foi concedido mas não foi possível enviar o e-mail para o usuário."});
+                return BadRequest(new { msg = "O acesso foi concedido mas não foi possível enviar o e-mail para o usuário." });
             }
 
             return Ok();
@@ -194,7 +194,7 @@ namespace Invictus.Api.Controllers
         [HttpPut]
         [Route("envio-acesso/{email}")]
         public async Task<IActionResult> ChangePasswordAluno(string email)
-        {  
+        {
 
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -242,9 +242,9 @@ namespace Invictus.Api.Controllers
             {
                 return BadRequest();
             }
-            
+
             var mensagem = "Olá,<br>Segue seu login e senha para acesso ao sistema Invictus:<br> https://www.cursosinvict.com/user/login <br>Login: " + email + "<br>Senha: " + senha + "<br> :)";
-            
+
 
             await _email.SendEmailAsync(user.Email, "Invictus Login", mensagem);
 
@@ -253,10 +253,10 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpPut]
-        [Route("acessos")]
-        public async Task<ActionResult> EditarAcesso(List<UsuarioAcessoViewModel> acessos)
+        [Route("acessos/{colabId}")]
+        public async Task<ActionResult> EditarAcesso(List<UsuarioAcessoViewModel> acessos, Guid colabId)
         {
-            await _userApplication.EditarAcesso(acessos);
+            await _userApplication.EditarAcesso(acessos, colabId);
 
             return Ok();
         }

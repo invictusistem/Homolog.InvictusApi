@@ -97,12 +97,12 @@ namespace Invictus.Application.AdmApplication
             return new string(chars.ToArray());
         }
 
-        public async Task EditarAcesso(List<UsuarioAcessoViewModel> acessos)
+        public async Task EditarAcesso(List<UsuarioAcessoViewModel> acessos, Guid colabId)
         {
             var acessosSemDefault = acessos.Where(a => a.podeAlterar != false & a.acesso == true);
             var acessoDefault = acessos.Where(a => a.podeAlterar == false).FirstOrDefault();
             // remover claims com exceção da default
-            var colab = await _colabQueries.GetColaboradoresById(acessos[0].id);
+            var colab = await _colabQueries.GetColaboradoresById(colabId);
             
             var usuario = await _userManager.FindByEmailAsync(colab.email);
             var claims = await _userManager.GetClaimsAsync(usuario);
