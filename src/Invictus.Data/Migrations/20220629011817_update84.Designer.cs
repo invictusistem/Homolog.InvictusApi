@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220629011817_update84")]
+    partial class update84
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -580,9 +582,6 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Evento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProdutosVenda")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UserId")

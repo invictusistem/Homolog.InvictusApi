@@ -48,6 +48,7 @@ namespace Invictus.Domain.Financeiro
         public decimal Desconto { get; private set; }
         public string Tipo { get; private set; }
         public string DiasDesconto { get; private set; }
+        public DateTime? DataCompensacao { get; private set; }
         public string StatusBoleto { get; private set; }
         public string Historico { get; private set; }
         public string SubConta { get; private set; }
@@ -63,7 +64,7 @@ namespace Invictus.Domain.Financeiro
         public string tipoVenda { get; private set; }
         public string TipoPessoa { get; private set; }
         public string Identificador { get; private set; }
-        public Guid PessoaId { get; private set; } // colaborador ou matricula
+        public Guid? PessoaId { get; private set; } // colaborador ou matricula
         public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
         public Guid CentroCustoUnidadeId { get; private set; }
@@ -243,13 +244,14 @@ namespace Invictus.Domain.Financeiro
                    //string diasDesconto,
                    //StatusPagamento statusBoleto,
                    //bool ehFornecedor,
-                   Guid pessoaId,
+                   //Guid pessoaId,
                    Guid centroCustoUnidadeId,
                    Guid responsavelCadastroId,
-                   //string historico,
-                   Guid? subcontaId,
+                   string historico,
+                   //Guid? subcontaId,
                    Guid? bancoId,
-                   Guid formaRecebimentoId
+                   Guid formaRecebimentoId,
+                   DateTime dataCompensacao
                    )
         {
             var boleto = new Boleto()
@@ -265,14 +267,15 @@ namespace Invictus.Domain.Financeiro
                 MultaFixo = "",
                 //Desconto = desconto,
                 Tipo = tipo.DisplayName,
+                DataCompensacao = dataCompensacao,
                 //DiasDesconto = diasDesconto,
                 StatusBoleto = StatusPagamento.Pago.DisplayName,
-                //Historico = historico,
-                SubContaId = subcontaId,
+                Historico = historico,
+                //SubContaId = subcontaId,
                 BancoId = bancoId,
                 FormaRecebimentoId = formaRecebimentoId,
                 EhFornecedor = false,
-                PessoaId = pessoaId,
+                //PessoaId = pessoaId,
                 CentroCustoUnidadeId = centroCustoUnidadeId,
                 ResponsavelCadastroId = responsavelCadastroId,
                 DataCadastro = DateTime.Now,

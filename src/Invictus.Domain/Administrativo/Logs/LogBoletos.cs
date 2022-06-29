@@ -19,6 +19,7 @@ namespace Invictus.Domain.Administrativo.Logs
         public Guid BoletoId { get; private set; }
         public string BoletoJson { get; private set; }
         public string Evento { get; private set; } // Edição, Pagamento, Recebimento, Exclusão, Criação 
+        public string ProdutosVenda { get; private set; }
         public Guid? UserId { get; private set; } 
         public DateTime DataCriacao { get; private set; }
 
@@ -30,6 +31,21 @@ namespace Invictus.Domain.Administrativo.Logs
                 Evento = evento.DisplayName,
                 UserId = userId,
                 DataCriacao = DateTime.Now
+            };
+
+            return log;
+        }
+
+
+        public static LogBoletos BoletoProdutoVendaLog(Guid boletoId, string produtosJson, EventoBoletoLog evento, Guid userId)
+        {
+            var log = new LogBoletos()
+            {
+                BoletoId = boletoId,
+                Evento = evento.DisplayName,
+                UserId = userId,
+                DataCriacao = DateTime.Now,
+                ProdutosVenda = produtosJson
             };
 
             return log;
