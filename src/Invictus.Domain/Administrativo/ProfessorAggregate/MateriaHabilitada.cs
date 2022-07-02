@@ -1,4 +1,5 @@
 ﻿using Invictus.Core;
+using Invictus.Domain.Administrativo.FuncionarioAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Invictus.Domain.Administrativo.ProfessorAggregate
 
         #region EF
         public Guid ProfessorId { get; private set; }
-       public virtual Professor Professor { get; private set; }
+       public virtual Pessoa Professor { get; private set; }
         #endregion
     }
 }

@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220629221606_update86")]
+    partial class update86
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2142,45 +2144,6 @@ namespace Invictus.Data.Migrations
                     b.ToTable("TurmasNotas");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Padagogico.Requerimento.Categoria", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReqCategorias");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Padagogico.Requerimento.Tipo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("CategoriaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoriaId");
-
-                    b.ToTable("ReqTipos");
-                });
-
             modelBuilder.Entity("Invictus.Domain.Pedagogico.AlunoAggregate.AlunoAnotacao", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2673,17 +2636,6 @@ namespace Invictus.Data.Migrations
                     b.Navigation("MatriculaEstagio");
                 });
 
-            modelBuilder.Entity("Invictus.Domain.Padagogico.Requerimento.Tipo", b =>
-                {
-                    b.HasOne("Invictus.Domain.Padagogico.Requerimento.Categoria", "Categoria")
-                        .WithMany("Tipos")
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
-
             modelBuilder.Entity("Invictus.Domain.Pedagogico.Responsaveis.Responsavel", b =>
                 {
                     b.OwnsOne("Invictus.Domain.Pedagogico.Responsaveis.ResponsavelEndereco", "Endereco", b1 =>
@@ -2779,11 +2731,6 @@ namespace Invictus.Data.Migrations
             modelBuilder.Entity("Invictus.Domain.Padagogico.Estagio.MatriculaEstagio", b =>
                 {
                     b.Navigation("Documentos");
-                });
-
-            modelBuilder.Entity("Invictus.Domain.Padagogico.Requerimento.Categoria", b =>
-                {
-                    b.Navigation("Tipos");
                 });
 #pragma warning restore 612, 618
         }

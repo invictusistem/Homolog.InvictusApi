@@ -196,6 +196,8 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             var matsView = await _turmaQueries.GetMateriasLiberadas(turmaId, professorId);//.AddProfesso resNaTurma(command);
 
+            if (!matsView.Any()) return NotFound();
+
             return Ok(new { matsView = matsView });
         }
 

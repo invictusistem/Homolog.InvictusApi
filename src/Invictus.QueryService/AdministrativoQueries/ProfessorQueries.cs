@@ -62,7 +62,8 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         private async Task<IEnumerable<PessoaDto>> GetProfessoresByFilterV2(int itemsPerPage, int currentPage, ParametrosDTO param)
         {
-            var unidade = await _unidadeQueries.GetUnidadeBySigla(_user.ObterUnidadeDoUsuario());
+
+            var unidadeId = _user.GetUnidadeIdDoUsuario();
 
             StringBuilder query = new StringBuilder();
             query.Append(@"SELECT
@@ -71,13 +72,14 @@ namespace Invictus.QueryService.AdministrativoQueries
                         Pessoas.Email,
                         Pessoas.Ativo,
                         Unidades.sigla as unidadeSigla
-                        FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id WHERE Pessoas.tipoPessoa = 'Professor' AND ");
-            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidade.id + "' AND ");
+                        FROM Pessoas INNER JOIN Unidades on Pessoas.UnidadeId = Unidades.Id AND ");
+            if (param.todasUnidades == false) query.Append(" Pessoas.UnidadeId = '" + unidadeId + "' AND ");
             if (param.nome != "") query.Append(" LOWER(Pessoas.nome) like LOWER('%" + param.nome + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.email != "") query.Append(" LOWER(Pessoas.email) like LOWER('%" + param.email + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             if (param.cpf != "") query.Append(" LOWER(Pessoas.cpf) like LOWER('%" + param.cpf + "%') collate SQL_Latin1_General_CP1_CI_AI AND ");
             //query.Append("Professores.UnidadeId = '" + unidade.id + "'");
-            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False' "); }
+            if (param.ativo == false) { query.Append(" Pessoas.Ativo = 'True' "); } else { query.Append(" (Pessoas.Ativo = 'True' OR Pessoas.Ativo = 'False') "); }
+            query.Append(" AND Pessoas.tipoPessoa = 'Professor' ");
             query.Append(" ORDER BY Pessoas.Nome ");
             query.Append(" OFFSET(" + currentPage + " - 1) * " + itemsPerPage + " ROWS FETCH NEXT " + itemsPerPage + " ROWS ONLY");
 

@@ -23,6 +23,7 @@ using Invictus.Domain.Financeiro.Configuracoes;
 using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
+using Invictus.Domain.Padagogico.Requerimento;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Invictus.Dtos.AdmDtos;
@@ -167,6 +168,9 @@ namespace Invictus.Application.AutoMapper
             CreateMap<TipoRequerimentoDto, TipoRequerimento>();
 
             CreateMap<TurmaNotasDto, TurmaNotas>();
+
+            CreateMap<CategoriaDto, Categoria>();
+            CreateMap<TipoDto, Tipo>();
 
             //CreateMap<FornecedorDto, Fornecedor>();
 

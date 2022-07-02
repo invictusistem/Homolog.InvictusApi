@@ -29,6 +29,7 @@ using Invictus.Domain.Financeiro.Interfaces;
 using Invictus.Domain.Padagogico.AlunoAggregate.Interfaces;
 using Invictus.Domain.Padagogico.Estagio.Interfaces;
 using Invictus.Domain.Padagogico.NotasTurmas.Interface;
+using Invictus.Domain.Padagogico.Requerimento.interfaces;
 using Invictus.Domain.Pedagogico.Responsaveis.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,6 +75,7 @@ namespace Invictus.IoC
             // Pedag
             services.AddScoped<IAlunoPedagRepo, AlunoPedagRepo>();
             services.AddScoped<IEstagioRepo, EstagioRepo>();
+            services.AddScoped<ICategoriaRepo, CategoriaRepo>();
             services.AddScoped<IRespRepo, RespRepo>();
 
 

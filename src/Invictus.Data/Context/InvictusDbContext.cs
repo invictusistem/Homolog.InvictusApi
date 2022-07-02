@@ -1,7 +1,4 @@
 ﻿using Invictus.Data.Mapping;
-using Invictus.Data.Mapping.AdmMappings;
-using Invictus.Data.Mapping.FinanceiroMappings;
-using Invictus.Data.Mapping.PedagMappings;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
@@ -13,7 +10,6 @@ using Invictus.Domain.Administrativo.Logs;
 using Invictus.Domain.Administrativo.Models;
 using Invictus.Domain.Administrativo.PacoteAggregate;
 using Invictus.Domain.Administrativo.Parametros;
-using Invictus.Domain.Administrativo.ProfessorAggregate;
 using Invictus.Domain.Administrativo.RegistroMatricula;
 using Invictus.Domain.Administrativo.RequerimentoAggregate;
 using Invictus.Domain.Administrativo.TurmaAggregate;
@@ -23,9 +19,9 @@ using Invictus.Domain.Comercial;
 using Invictus.Domain.Financeiro;
 using Invictus.Domain.Financeiro.Bolsas;
 using Invictus.Domain.Financeiro.Configuracoes;
-using Invictus.Domain.Financeiro.Fornecedores;
 using Invictus.Domain.Padagogico.Estagio;
 using Invictus.Domain.Padagogico.NotasTurmas;
+using Invictus.Domain.Padagogico.Requerimento;
 using Invictus.Domain.Pedagogico.AlunoAggregate;
 using Invictus.Domain.Pedagogico.Responsaveis;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +109,8 @@ namespace Invictus.Data.Context
 
         #region PEDAGOGICO
         public DbSet<AlunoAnotacao> AlunosAnotacoes { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Tipo> Tipos { get; set; }
         public DbSet<DocumentoEstagio> DocumentosEstagio { get; set; }
         public DbSet<Estagio> Estagios { get; set; }
         public DbSet<MatriculaEstagio> MatriculasEstagios { get; set; }

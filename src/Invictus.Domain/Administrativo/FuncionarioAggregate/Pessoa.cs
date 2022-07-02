@@ -1,6 +1,8 @@
 ﻿using Invictus.Core;
 using Invictus.Core.Interfaces;
+using Invictus.Domain.Administrativo.ProfessorAggregate;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -36,6 +38,7 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
         public DateTime? DataSaida { get; private set; }
         public Guid UnidadeId { get; private set; }
         public Endereco Endereco { get; private set; }
+        public List<MateriaHabilitada> Materias { get; private set; }
 
         public void AtualizarNome()
         {
@@ -266,13 +269,13 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
 
     }
 
-    public class MateriaHabilitada : Entity
-    {
-        protected MateriaHabilitada() { }
+    //public class MateriaHabilitada : Entity
+    //{
+    //    protected MateriaHabilitada() { }
 
-        public Guid PacoteMateriaId { get; private set; }
-        public Guid FuncionarioId { get; private set; }
+    //    public Guid PacoteMateriaId { get; private set; }
+    //    public Guid FuncionarioId { get; private set; }
 
 
-    }
+    //}
 }

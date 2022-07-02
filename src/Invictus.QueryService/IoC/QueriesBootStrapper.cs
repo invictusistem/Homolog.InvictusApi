@@ -49,6 +49,7 @@ namespace Invictus.QueryService.IoC
             services.AddScoped<IEstagioQueries, EstagioQueries>();
             services.AddScoped<IPedagDocsQueries, PedagDocsQueries>();
             services.AddScoped<IPedagMatriculaQueries, PedagMatriculaQueries>();
+            services.AddScoped<IPedagReqQueries, PedagReqQueries>();
             services.AddScoped<ITurmaPedagQueries, TurmaPedagQueries>();
             //Aluno Sia
             services.AddScoped<IAlunoSiaQueries, AlunoSiaQueries > ();

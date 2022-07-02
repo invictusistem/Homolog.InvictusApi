@@ -68,8 +68,13 @@ namespace Invictus.Application.AdmApplication
             var materia = new MateriaHabilitada(materiaId, profId);
 
             await _profRepository.AddProfessorMateria(materia);
+            try
+            {
+                _profRepository.Save();
+            }catch(Exception ex)
+            {
 
-            _profRepository.Save();
+            }
         }
 
         public async Task EditDisponibilidade(DisponibilidadeDto dispoDto)

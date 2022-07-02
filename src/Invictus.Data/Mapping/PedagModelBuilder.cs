@@ -1,6 +1,5 @@
-﻿
-
-using Invictus.Data.Mapping.PedagMappings.AlunoMapping;
+﻿using Invictus.Data.Mapping.PedagMappings.AlunoMapping;
+using Invictus.Data.Mapping.PedagMappings.CategoriaMapping;
 using Invictus.Data.Mapping.PedagMappings.EstagioMappping;
 using Invictus.Data.Mapping.PedagMappings.NotasTurmasMapping;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,8 @@ namespace Invictus.Data.Mapping
         public static void RegisterBuilders(ModelBuilder modelBuilder)
         {   
             modelBuilder.ApplyConfiguration(new AlunoAnotacoesDbMapping());
+            modelBuilder.ApplyConfiguration(new CategoriaDbMapping());
+            modelBuilder.ApplyConfiguration(new TipoDbMapping());
             modelBuilder.ApplyConfiguration(new DocumentoEstagioDbMapping());
             modelBuilder.ApplyConfiguration(new EstagioDbMapping());
             modelBuilder.ApplyConfiguration(new MatriculaEstagioDbMapping());

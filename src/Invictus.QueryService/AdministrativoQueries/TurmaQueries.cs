@@ -302,6 +302,58 @@ namespace Invictus.QueryService.AdministrativoQueries
 
         public async Task<IEnumerable<TurmaInfoCompleta>> GetTurmaInfo(Guid turmaId)
         {
+            //var query = @"SELECT 
+            //            * 
+            //            FROM Turmas 
+            //            INNER JOIN TurmasPrevisoes ON turmas.id = TurmasPrevisoes.turmaid 
+            //            INNER JOIN TurmasHorarios ON Turmas.Id = TurmasHorarios.TurmaId
+            //            WHERE Turmas.id = @turmaId ";
+
+            //var query2 = @"SELECT COUNT(*) FROM Matriculas WHERE Matriculas.TurmaId = @turmaId";
+
+            //var query3 = @" SELECT UnidadesSalas.Capacidade FROM UnidadesSalas WHERE UnidadesSalas.Id = @salaId ";
+
+            //var turmaDictionary = new Dictionary<Guid, TurmaInfoCompleta>();
+
+            //await using (var connection = new SqlConnection(
+            //        _config.GetConnectionString("InvictusConnection")))
+            //{
+            //    connection.Open();
+
+            //    var results = connection.Query<TurmaInfoCompleta, PrevisoesDto, HorarioDto, TurmaInfoCompleta >(
+            //            query,
+            //            (turmaViewModel, privisoesDto, horarioDto) => 
+            //            {
+            //                TurmaInfoCompleta turmaViewEntry;
+
+            //                if(!turmaDictionary.TryGetValue(turmaViewModel.id, out turmaViewEntry)){
+
+            //                    turmaViewEntry = turmaViewModel;
+            //                    turmaViewEntry.previsoes = privisoesDto;
+            //                    turmaViewEntry.horarios = new List<HorarioDto>();
+            //                    turmaDictionary.Add(turmaViewEntry.id, turmaViewEntry);
+            //                }
+
+            //                turmaViewEntry.horarios.Add(horarioDto);
+
+            //                //turmaViewModel.previsoes = privisoesDto;
+            //                return turmaViewModel;
+            //            }, new { turmaId = turmaId },
+
+            //            splitOn: "Id").Distinct().ToList();
+
+            //    connection.Close();
+
+            //    foreach (var turma in results)
+            //    {
+            //        turma.totalAlunos = await connection.QuerySingleAsync<int>(query2, new { turmaId = turma.id });
+            //        turma.vagas = await connection.QuerySingleAsync<int>(query3, new { salaId = turma.salaId });
+            //    }
+
+            //    return results;//.OrderBy(d => d.prevInicio);
+
+            //}
+           
             var query = @"select * from Turmas inner join TurmasPrevisoes on turmas.id = TurmasPrevisoes.turmaid 
                         where Turmas.id = @turmaId ";
 
@@ -334,6 +386,7 @@ namespace Invictus.QueryService.AdministrativoQueries
                 return results;//.OrderBy(d => d.prevInicio);
 
             }
+            
         }
 
         public async Task<TurmaMateriasDto> GetTurmaMateria(Guid turmaMateriaId)

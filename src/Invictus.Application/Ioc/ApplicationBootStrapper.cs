@@ -50,6 +50,7 @@ namespace Invictus.Application.Ioc
             //pedag
             services.AddScoped<IPedagogicoApplication, PedagogicoApplication>();
             services.AddScoped<IEstagioApplication, EstagioApplication>();
+            services.AddScoped<IPedagReqService, PedagReqService > ();
             // report services
             services.AddScoped<IReportServices, ReportServices>();
             services.AddScoped<IPDFDesigns, PDFDesigns>();
