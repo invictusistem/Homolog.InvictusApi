@@ -81,6 +81,19 @@ namespace Invictus.Api.Controllers.Financeiro
         }
 
         [HttpGet]
+        [Route("contas/saldo-bancario")]
+        public async Task<IActionResult> GetSaldo()
+        {
+            var unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            var bancos = await _db.Bancos.Where(b => b.UnidadeId == unidadeId).ToListAsync();
+
+            var total = bancos.Select(b => b.Saldo).Sum();
+
+            return Ok(new { bancos, total });
+
+        }
+
+        [HttpGet]
         [Route("produtos-venda")]
         public async Task<IActionResult> BuscaVendaProdutos([FromQuery] int itemsPerPage, [FromQuery] int currentPage, [FromQuery] string paramsJson)
         {
