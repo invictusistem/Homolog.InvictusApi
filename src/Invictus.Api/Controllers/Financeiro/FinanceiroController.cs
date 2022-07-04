@@ -208,7 +208,7 @@ namespace Invictus.Api.Controllers.Financeiro
 
         [HttpGet]
         [Route("contas/receber")]
-        public async Task<IActionResult> GetContasReceber([FromQuery]string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] bool ativo)
+        public async Task<IActionResult> GetContasReceber([FromQuery] string meioPagamentoId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] bool ativo)
         {
             var contas = await _finQueries.GetContasReceber(meioPagamentoId, start, end, ativo);
 
@@ -231,7 +231,7 @@ namespace Invictus.Api.Controllers.Financeiro
 
             if (!contas.Any()) return NotFound();
             var hoje = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
-            
+
             var totalAtraso = contas.Where(c => c.statusBoleto == StatusPagamento.Vencido.DisplayName & c.ativo == true & c.vencimento < hoje).Select(c => c.valor).Sum();
 
             var totalPagar = contas.Where(c => c.statusBoleto == StatusPagamento.EmAberto.DisplayName & c.ativo == true & c.vencimento > hoje).Select(c => c.valor).Sum();
@@ -267,7 +267,7 @@ namespace Invictus.Api.Controllers.Financeiro
 
             var totalRecebido = result.Select(t => t.valorPago).Sum();
 
-            return Ok (new { result = result, totalRecebido = totalRecebido });
+            return Ok(new { result = result, totalRecebido = totalRecebido });
         }
 
         [HttpPut]
@@ -348,9 +348,9 @@ namespace Invictus.Api.Controllers.Financeiro
             var toBoleto = ToBoletoView(boletoDto);
             var boleto = _mapper.Map<Boleto>(toBoleto);
 
-                //await _debitoRepo.EditBoleto(boleto);
+            //await _debitoRepo.EditBoleto(boleto);
 
-                //var boleto = await _db.Bolet os.FindAsync(command.boletoId);
+            //var boleto = await _db.Bolet os.FindAsync(command.boletoId);
 
             // VERIFICAR NA API 
             if (!(boleto.StatusBoleto == "Vencido" || boleto.StatusBoleto == "Em aberto"))
@@ -360,28 +360,52 @@ namespace Invictus.Api.Controllers.Financeiro
 
             var formaPgm = await _db.FormasRecebimento.Where(f => f.Id == command.formaRecebimentoId).SingleOrDefaultAsync();
 
-            if(formaPgm.EhCartao == false)
+            if (formaPgm.EhCartao == false)
             {
                 command.digitosCartao = null;
             }
 
-            boleto.ReceberBoleto(command.valorRecebido, command.formaRecebimentoId, command.bancoId, command.digitosCartao);
+            var usuarioId = _aspNetUser.ObterUsuarioId();
+
+
+            var statusBoleto = StatusPagamento.Pago;
+            var dataCompensacao = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            dataCompensacao = dataCompensacao.AddDays(Convert.ToDouble(formaPgm.DiasParaCompensacao));
+
+            if (formaPgm.EhCartao == false)
+            {
+                statusBoleto = StatusPagamento.Confirmado;
+
+            }
+
+
+            boleto.ReceberBoleto(command.valorRecebido, command.formaRecebimentoId, command.bancoId, statusBoleto,
+                dataCompensacao, command.digitosCartao);
 
             var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
             var unidade = await _unidadeQueries.GetUnidadeBySigla(unidadeSigla);
-            var usuarioId = _aspNetUser.ObterUsuarioId();
+
 
             // ver se crédito ou débito
-            var caixa = new Caixa(usuarioId, unidade.id, DateTime.Now, command.boletoId);
-            try
+            //var caixa = new Caixa(usuarioId, unidade.id, DateTime.Now, command.boletoId);
+
+            await _db.Boletos.SingleUpdateAsync(boleto);
+            // await _db.Caixas.SingleUpdateAsync(caixa);
+
+            await _db.SaveChangesAsync();
+
+            var banco = await _db.Bancos.FindAsync(command.bancoId);
+
+
+            if (formaPgm.EhCartao == false)
             {
-                await _db.Boletos.SingleUpdateAsync(boleto);
-                await _db.Caixas.SingleUpdateAsync(caixa);
-            }catch(Exception ex)
-            {
+                banco.RegistroEntrada(command.valorRecebido);
+
+                _db.Bancos.Update(banco);
+
+                _db.SaveChanges();
 
             }
-            await _db.SaveChangesAsync();
 
 
             var logBoleto = LogBoletos.BoletoLog(boleto.Id, EventoBoletoLog.Recebimento, usuarioId);
@@ -393,6 +417,49 @@ namespace Invictus.Api.Controllers.Financeiro
             return Ok();
 
         }
+
+
+        [HttpPut]
+        [Route("contas/confirmar/{contaId}")]
+        public async Task<IActionResult> ConfirmarConta(Guid contaId)
+        {
+            var boletoDto = await _finQueries.GetContaReceber(contaId);
+            var toBoleto = ToBoletoView(boletoDto);
+            var boleto = _mapper.Map<Boleto>(toBoleto);
+
+            if (boleto.StatusBoleto != "Pago")
+            {
+                return BadRequest();
+            }
+
+            boleto.ConfirmarCompensacao();
+
+            await _db.Boletos.SingleUpdateAsync(boleto);
+
+            await _db.SaveChangesAsync();
+
+            var banco = await _db.Bancos.FindAsync(boleto.BancoId);
+
+            banco.RegistroEntrada(boleto.ValorPago);
+
+            _db.Bancos.Update(banco);
+
+            _db.SaveChanges();
+
+
+
+            var usuarioId = _aspNetUser.ObterUsuarioId();
+
+            var logBoleto = LogBoletos.BoletoLog(boleto.Id, EventoBoletoLog.Compensacao, usuarioId);
+
+            await _db.LogBoletos.AddAsync(logBoleto);
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+
+        }
+
 
         [HttpPut]
         [Route("boleto-cancelar/{boletoId}")]

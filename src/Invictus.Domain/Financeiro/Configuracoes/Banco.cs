@@ -14,7 +14,10 @@ namespace Invictus.Domain.Financeiro.Configuracoes
                     string contaDigito,
                     bool ativo,
                     DateTime dataCadastro,
-                    bool utilizadoParaImpressao
+                    bool utilizadoParaImpressao,
+                    decimal saldo
+
+                    
                     )
         {
             Nome = nome;
@@ -26,6 +29,7 @@ namespace Invictus.Domain.Financeiro.Configuracoes
             Ativo = ativo;
             DataCadastro = dataCadastro;
             UtilizadoParaImpressao = utilizadoParaImpressao;
+            Saldo = saldo;
 
         }
         public string Nome { get; private set; }
@@ -38,7 +42,12 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         public DateTime DataCadastro { get; private set; }
         public bool UtilizadoParaImpressao { get; private set; }
         public Guid UnidadeId { get; private set; }
+        public decimal Saldo { get; private set; }
 
+        public void RegistroEntrada(decimal valor)
+        {
+            Saldo += valor;
+        }
         protected Banco()
         {
 

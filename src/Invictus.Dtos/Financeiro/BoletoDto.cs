@@ -10,11 +10,16 @@ namespace Invictus.Dtos.Financeiro
     {
         public Guid id { get; set; }
         public string nome { get; set; }
+        public string historico { get; set; }
         public DateTime vencimento { get; set; }
         public DateTime dataPagamento { get; set; }
+        public DateTime dataCompensacao { get; set; }
         public decimal valorPago { get; set; }
         public Guid pessoaId { get; set; }
         public string digitosCartao { get; set; }
+        public string usuario { get; set; }
+        public string statusBoleto { get; set; }
+        public string tipo { get; set; }
         public string descricao { get; set; }
         public decimal taxa { get; set; }
         public int diasParaCompensacao { get; set; }

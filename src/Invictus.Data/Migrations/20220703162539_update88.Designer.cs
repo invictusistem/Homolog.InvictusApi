@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220703162539_update88")]
+    partial class update88
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1201,6 +1203,7 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Tipo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1540,9 +1543,6 @@ namespace Invictus.Data.Migrations
                     b.Property<Guid>("CentroCustoUnidadeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Compensado")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("datetime2");
 
@@ -1614,9 +1614,6 @@ namespace Invictus.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TipoPessoa")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoTransacao")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Valor")
@@ -1732,10 +1729,6 @@ namespace Invictus.Data.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Saldo")
-                        .HasPrecision(11, 2)
-                        .HasColumnType("decimal(11,2)");
-
                     b.Property<Guid>("UnidadeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1784,9 +1777,6 @@ namespace Invictus.Data.Migrations
 
                     b.Property<Guid?>("CentroDeCustoTaxaVinculadaId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("CompensacaoAutomatica")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("CompensarAutomaticamenteId")
                         .HasColumnType("uniqueidentifier");

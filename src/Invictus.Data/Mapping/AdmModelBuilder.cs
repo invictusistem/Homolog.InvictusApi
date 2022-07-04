@@ -1,4 +1,5 @@
-﻿using Invictus.Data.Mapping.AdmMappings.AgendaTrimestreMapping;
+﻿using Invictus.Data.Mapping.AdmMappings;
+using Invictus.Data.Mapping.AdmMappings.AgendaTrimestreMapping;
 using Invictus.Data.Mapping.AdmMappings.AlunoMapping;
 using Invictus.Data.Mapping.AdmMappings.AutorizacaoMapping;
 using Invictus.Data.Mapping.AdmMappings.CalendarioMapping;
@@ -68,6 +69,8 @@ namespace Invictus.Data.Mapping
             modelBuilder.ApplyConfiguration(new TypePacoteDbMapping());
             modelBuilder.ApplyConfiguration(new SalaDbMapping());
             modelBuilder.ApplyConfiguration(new UnidadeDbMapping());
+
+            modelBuilder.ApplyConfiguration(new TransacaoDbMapping());
         }
     }
 }

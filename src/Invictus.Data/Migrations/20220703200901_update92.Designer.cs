@@ -4,14 +4,16 @@ using Invictus.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Invictus.Data.Migrations
 {
     [DbContext(typeof(InvictusDbContext))]
-    partial class InvictusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220703200901_update92")]
+    partial class update92
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1784,9 +1786,6 @@ namespace Invictus.Data.Migrations
 
                     b.Property<Guid?>("CentroDeCustoTaxaVinculadaId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("CompensacaoAutomatica")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("CompensarAutomaticamenteId")
                         .HasColumnType("uniqueidentifier");

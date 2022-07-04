@@ -1,4 +1,5 @@
 ﻿using Invictus.Data.Mapping;
+using Invictus.Domain.Administrativo;
 using Invictus.Domain.Administrativo.AlunoAggregate;
 using Invictus.Domain.Administrativo.Calendarios;
 using Invictus.Domain.Administrativo.ColaboradorAggregate;
@@ -80,6 +81,9 @@ namespace Invictus.Data.Context
         public DbSet<TypePacote> TypePacotes { get; set; }
         public DbSet<Sala> Salas { get; set; }
         public DbSet<Unidade> Unidades { get; set; }
+
+        public DbSet<Transacao> Transacoes { get; set; }
+
         #endregion
 
         #region FINANC

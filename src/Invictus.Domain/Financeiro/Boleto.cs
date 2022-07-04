@@ -64,11 +64,12 @@ namespace Invictus.Domain.Financeiro
         public string tipoVenda { get; private set; }
         public string TipoPessoa { get; private set; }
         public string Identificador { get; private set; }
+        public string TipoTransacao { get; private set; }
+        public bool Compensado { get; private set; }
         public Guid? PessoaId { get; private set; } // colaborador ou matricula
         public DateTime DataCadastro { get; private set; }
         public Guid ReparcelamentoId { get; private set; }
-        public Guid CentroCustoUnidadeId { get; private set; }
-        //public Guid InformacaoDebitoId { get; private set; }
+        public Guid CentroCustoUnidadeId { get; private set; }       
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
@@ -312,13 +313,14 @@ namespace Invictus.Domain.Financeiro
             ResponsavelCadastroId = new Guid("e94d7dd8-8fef-4c14-8907-88ed8dc934c8");
         }
 
-        public void ReceberBoleto(decimal valorPago, Guid formaRecebimentoId, Guid bancoId, string digitosCartao = null)
+        public void ReceberBoleto(decimal valorPago, Guid formaRecebimentoId, Guid bancoId, StatusPagamento status,DateTime dataCompensacao, string digitosCartao = null)
         {
             DataPagamento = DateTime.Now;
             ValorPago = valorPago;
-            StatusBoleto = StatusPagamento.Pago.DisplayName;
+            StatusBoleto = status.DisplayName;
             //FormaPagamento = formaPagamento;
-            SubConta = "Caixa da escola";
+            //SubConta = "Caixa da escola";
+            DataCompensacao = dataCompensacao;
             FormaRecebimentoId = formaRecebimentoId;
             BancoId = bancoId;
             if (digitosCartao != null)
@@ -326,6 +328,11 @@ namespace Invictus.Domain.Financeiro
                 DigitosCartao = digitosCartao;
             }
 
+        }
+
+        public void ConfirmarCompensacao()
+        {
+            StatusBoleto = StatusPagamento.Confirmado.DisplayName;
         }
         public void SetBoletoVencido()
         {

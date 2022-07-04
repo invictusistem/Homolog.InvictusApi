@@ -10,9 +10,10 @@ namespace Invictus.Core.Enumerations
     {
         public static EventoBoletoLog Edicao = new(1, "Edição");
         public static EventoBoletoLog Pagamento = new(2, "Pagamento");
-        public static EventoBoletoLog Recebimento = new(3, "Recebimento");
-        public static EventoBoletoLog Exclusao = new(4, "Exclusão");
-        public static EventoBoletoLog Criacao = new(5, "Criação");
+        public static EventoBoletoLog Compensacao = new(3, "Compensação");
+        public static EventoBoletoLog Recebimento = new(4, "Recebimento");
+        public static EventoBoletoLog Exclusao = new(5, "Exclusão");
+        public static EventoBoletoLog Criacao = new(6, "Criação");
 
         public EventoBoletoLog() { }
         public EventoBoletoLog(int id, string name) : base(id, name) { }

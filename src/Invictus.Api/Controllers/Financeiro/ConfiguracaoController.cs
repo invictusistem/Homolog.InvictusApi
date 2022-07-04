@@ -4,6 +4,7 @@ using Invictus.QueryService.FinanceiroQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invictus.Api.Controllers.Financeiro
@@ -134,7 +135,13 @@ namespace Invictus.Api.Controllers.Financeiro
 
             var forncedores = await _finConfigQuereis.GetFornecedoresForCreateFormaRecebimento();
 
-            return Ok(new { bancos = bancos, centroCustos = centroCustos, subContas = subContas, forncedores = forncedores });
+            return Ok(new
+            {
+                bancos = bancos.OrderBy(c => c.nome),
+                centroCustos = centroCustos.OrderBy(c => c.descricao),
+                subContas = subContas.OrderBy(c => c.descricao),
+                forncedores = forncedores.OrderBy(c => c.nome)
+            });
         }
 
         // Get By Id

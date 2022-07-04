@@ -92,14 +92,15 @@ namespace Invictus.Application.FinancApplication
         {
             if (!editedFormaRecebimento.ehCartao)
             {   
-                editedFormaRecebimento.taxa = null;
-                editedFormaRecebimento.diasParaCompensacao = null;
-                editedFormaRecebimento.permiteParcelamento = null;
+                editedFormaRecebimento.taxa = 0;
+                editedFormaRecebimento.diasParaCompensacao = 0;
+                editedFormaRecebimento.permiteParcelamento = false;
                 editedFormaRecebimento.centroDeCustoTaxaVinculadaId = null;
                 editedFormaRecebimento.bancoPermitidoParaCreditoId = null;
-                editedFormaRecebimento.compensarAutomaticamenteId = null;
+                editedFormaRecebimento.compensacaoAutomatica = true;
                 editedFormaRecebimento.fornecedorTaxaVinculadaId = null;
                 editedFormaRecebimento.subcontaTaxaVinculadaId = null;
+                //editedFormaRecebimento.diasParaCompensacao = 0;
             }
 
             var forma = _mapper.Map<FormaRecebimento>(editedFormaRecebimento);
@@ -139,6 +140,7 @@ namespace Invictus.Application.FinancApplication
         public async Task SaveBanco(BancoDto bancoDto)
         {
             bancoDto.unidadeId = _aspNetUser.GetUnidadeIdDoUsuario();
+            bancoDto.saldo = 0;
 
             bancoDto.dataCadastro = DateTime.Now;
 

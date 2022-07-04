@@ -19,6 +19,7 @@ namespace Invictus.Dtos.Financeiro.Configuracoes
         public DateTime dataCadastro { get; set; }
         public bool utilizadoParaImpressao { get; set; }
         public Guid unidadeId { get; set; }
+        public decimal saldo { get; set; }
     }
 
 

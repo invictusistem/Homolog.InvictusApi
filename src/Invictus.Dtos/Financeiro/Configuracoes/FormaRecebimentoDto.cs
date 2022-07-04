@@ -13,6 +13,7 @@ namespace Invictus.Dtos.Financeiro.Configuracoes
         public bool ativo { get; set; }
         public bool ehCartao { get; set; }
         public int? diasParaCompensacao { get; set; }
+        public bool compensacaoAutomatica { get; set; }
         public decimal? taxa { get; set; }
         public bool? permiteParcelamento { get; set; }
         public Guid? bancoPermitidoParaCreditoId { get; set; }
@@ -21,5 +22,6 @@ namespace Invictus.Dtos.Financeiro.Configuracoes
         public Guid? centroDeCustoTaxaVinculadaId { get; set; }
         public Guid? compensarAutomaticamenteId { get; set; }
         public Guid unidadeId { get; set; }
+        public bool dinheiro { get; set; }
     }
 }

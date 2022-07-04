@@ -50,6 +50,7 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         public int? DiasParaCompensacao { get; private set; }
         public decimal? Taxa { get; private set; }
         public bool? PermiteParcelamento { get; private set; }
+        public bool CompensacaoAutomatica { get; private set; }
         public Guid? BancoPermitidoParaCreditoId { get; private set; }
         public Guid? SubcontaTaxaVinculadaId { get; private set; }
         public Guid? FornecedorTaxaVinculadaId { get; private set; }

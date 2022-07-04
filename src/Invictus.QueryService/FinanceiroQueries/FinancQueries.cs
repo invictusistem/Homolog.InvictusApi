@@ -260,7 +260,8 @@ namespace Invictus.QueryService.FinanceiroQueries
                         Boletos.ativo
                         FROM Boletos 
                         LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id  
-                        WHERE Vencimento >= @inicio AND Vencimento <= @fim  ");
+                        WHERE (Boletos.statusBoleto = 'Vencido' OR Boletos.statusBoleto = 'Em aberto' OR Boletos.statusBoleto = 'Cancelado')  
+                        AND Vencimento >= @inicio AND Vencimento <= @fim  ");
             if (ativo == false) query.Append(" AND Boletos.ativo = 'True' ");
             query.Append(@" AND Tipo = 'Crédito' 
                             AND Boletos.CentroCustoUnidadeId = @unidadeId  ");
@@ -487,13 +488,18 @@ namespace Invictus.QueryService.FinanceiroQueries
             start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
             end = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
 
-            var query = @"SELECT 
+            StringBuilder query = new StringBuilder();
+
+            query.Append(@"SELECT 
                         Boletos.id,
                         (ISNULL(Pessoas.Nome, Matriculas.nome)) as nome,
                         Boletos.Vencimento,
                         Boletos.DataPagamento,
+                        Boletos.historico,
                         Boletos.ValorPago,
+                        Boletos.statusBoleto,
                         boletos.PessoaId,
+                        boletos.tipo,
                         Boletos.DigitosCartao,
                         FormasRecebimento.descricao,
                         FormasRecebimento.Taxa,
@@ -501,26 +507,72 @@ namespace Invictus.QueryService.FinanceiroQueries
                         FROM Boletos
                         INNER JOIN FormasRecebimento ON Boletos.FormaRecebimentoId = FormasRecebimento.Id
                         LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id
-                        LEFT JOIN Matriculas ON Boletos.pessoaId = Matriculas.id
-                        WHERE Boletos.StatusBoleto = 'Pago'
-                        AND Boletos.FormaRecebimentoId IN 
-                        (
-                        SELECT FormasRecebimento.id FROM FormasRecebimento
-                        WHERE FormasRecebimento.EhCartao = @cartao
-                        AND FormasRecebimento.UnidadeId = @unidadeId
-                        )
-                        AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ";
+                        LEFT JOIN Matriculas ON Boletos.pessoaId = Matriculas.id");
+
+            if (cartao)
+            {
+                query.Append(@" WHERE (Boletos.StatusBoleto = 'Confirmado' OR Boletos.StatusBoleto = 'Pago') 
+                                AND Boletos.FormaRecebimentoId IN (
+                                SELECT FormasRecebimento.id FROM FormasRecebimento 
+                                WHERE FormasRecebimento.EhCartao = @cartao
+                                AND FormasRecebimento.UnidadeId = @unidadeId)
+                                AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ");
+            }
+            else
+            {
+                query.Append(@" WHERE Boletos.StatusBoleto = 'Confirmado' 
+                                AND Boletos.FormaRecebimentoId IN (
+                                SELECT FormasRecebimento.id FROM FormasRecebimento 
+                                WHERE FormasRecebimento.EhCartao = @cartao
+                                AND FormasRecebimento.UnidadeId = @unidadeId)
+                                AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ");
+            }
+            
+
+            //var query = @"SELECT 
+            //            Boletos.id,
+            //            (ISNULL(Pessoas.Nome, Matriculas.nome)) as nome,
+            //            Boletos.Vencimento,
+            //            Boletos.DataPagamento,
+            //            Boletos.historico,
+            //            Boletos.ValorPago,
+            //            boletos.PessoaId,
+            //            boletos.tipo,
+            //            Boletos.DigitosCartao,
+            //            FormasRecebimento.descricao,
+            //            FormasRecebimento.Taxa,
+            //            FormasRecebimento.DiasParaCompensacao
+            //            FROM Boletos
+            //            INNER JOIN FormasRecebimento ON Boletos.FormaRecebimentoId = FormasRecebimento.Id
+            //            LEFT JOIN Pessoas ON Boletos.PessoaId = Pessoas.Id
+            //            LEFT JOIN Matriculas ON Boletos.pessoaId = Matriculas.id
+            //            WHERE Boletos.StatusBoleto = 'Confirmado'
+            //            AND Boletos.FormaRecebimentoId IN 
+            //            (
+            //            SELECT FormasRecebimento.id FROM FormasRecebimento
+            //            WHERE FormasRecebimento.EhCartao = @cartao
+            //            AND FormasRecebimento.UnidadeId = @unidadeId
+            //            )
+            //            AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ";
 
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
                 connection.Open();
 
-                var boleto = await connection.QueryAsync<CaixaViewModel>(query, new { unidadeId = unidadeId, cartao = cartao.ToString(), start = start, end = end });
+                var boletos = await connection.QueryAsync<CaixaViewModel>(query.ToString(), new { unidadeId = unidadeId, cartao = cartao.ToString(), start = start, end = end });
+
+                if (cartao)
+                {
+                    foreach (var item in boletos)
+                    {
+                        item.dataCompensacao = item.dataPagamento.AddDays(item.diasParaCompensacao);
+                    }
+                }
 
                 connection.Close();
 
-                return boleto;
+                return boletos;
             }
         }
     }

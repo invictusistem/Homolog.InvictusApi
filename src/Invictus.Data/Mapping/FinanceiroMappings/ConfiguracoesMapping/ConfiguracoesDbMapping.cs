@@ -14,7 +14,9 @@ namespace Invictus.Data.Mapping.FinanceiroMappings.ConfiguracoesMapping
         public void Configure(EntityTypeBuilder<Banco> builder)
         {
             builder.HasKey(c => c.Id);
-                      
+
+            builder.Property(d => d.Saldo).HasPrecision(11, 2);
+
             //builder.HasOne(c => c.b)
             //    .WithMany(c => c.Boletos)
             //    .HasForeignKey(m => m.InformacaoDebitoId);

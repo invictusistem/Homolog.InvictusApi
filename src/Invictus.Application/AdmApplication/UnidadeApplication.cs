@@ -70,6 +70,7 @@ namespace Invictus.Application.AdmApplication
             bancoDto.ehCaixaEscola = true;
             bancoDto.unidadeId = unidade.Id;
             bancoDto.nome = "CAIXA DA ESCOLA";
+            bancoDto.saldo = 0;
 
             var banco = _mapper.Map<Banco>(bancoDto);
 

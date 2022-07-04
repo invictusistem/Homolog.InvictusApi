@@ -1,3 +1,4 @@
+using Dapper;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using Invictus.Api.Configurations;
@@ -9,6 +10,7 @@ using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.AutoMapper;
 using Invictus.Application.Ioc;
 using Invictus.BackgroundTasks;
+using Invictus.Core.Enumerations;
 using Invictus.Data.Context;
 using Invictus.Dtos;
 using Invictus.IoC;
@@ -80,7 +82,8 @@ namespace Invictus.Api
             //services.AddDbContext<InvictusDbContext>(options => options.UseSqlServer(Configuration
             //    .GetConnectionString("InvictusConnection", providerOptions => providerOptions.EnableRetryOnFailure())));
             // options.EnableRetryOnFailure())
-
+            //SqlMapper.AddTypeMap(typeof(TipoTransacao), new TransacaoHandler());
+            
             services.AddDefaultIdentity<IdentityUser>(opts =>
             {
                 opts.Password.RequiredLength = 8;
