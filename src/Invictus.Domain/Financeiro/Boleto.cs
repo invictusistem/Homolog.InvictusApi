@@ -73,6 +73,10 @@ namespace Invictus.Domain.Financeiro
         public Guid ResponsavelCadastroId { get; private set; }
         public BoletoResponseInfo InfoBoletos { get; private set; }
 
+        public void TransfTurma(Guid newUnidadeId)
+        {
+            CentroCustoUnidadeId = newUnidadeId;
+        }
         public void InativarConta()
         {
             Ativo = false;
@@ -330,6 +334,10 @@ namespace Invictus.Domain.Financeiro
 
         }
 
+        public void Estornar()
+        {
+            StatusBoleto = StatusPagamento.Estornado.DisplayName;
+        }
         public void ConfirmarCompensacao()
         {
             StatusBoleto = StatusPagamento.Confirmado.DisplayName;

@@ -3,6 +3,7 @@ using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.RegistroMatricula;
+using Invictus.Domain.Administrativo.TurmaAggregate;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -58,7 +59,7 @@ namespace Invictus.Api.Controllers.Pedagogico
         {
 
             var anotacoes = await _pedagMatriculaQueries.GetAnotacoesMatricula(matriculaId);
-          
+
 
             return Ok(new { anotacoes = anotacoes });
         }
@@ -104,7 +105,7 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { aluno = aluno, turmas = turmas });
         }
 
-        
+
 
         [HttpGet]
         [Route("transf-unidade/{matricula}")]
@@ -126,7 +127,7 @@ namespace Invictus.Api.Controllers.Pedagogico
 
             if (aluno == null) return NotFound();
 
-            return Ok(new { aluno = aluno, podeTransf= podeTransf, unidades = unidades });
+            return Ok(new { aluno = aluno, podeTransf = podeTransf, unidades = unidades });
         }
 
         [HttpGet]
@@ -135,7 +136,7 @@ namespace Invictus.Api.Controllers.Pedagogico
         {
             var matriculaAtual = await _db.Matriculas.Where(m => m.Id == matriculaId).SingleOrDefaultAsync();
 
-            var turmas = await _db.Turmas.Where(t => t.Id != matriculaAtual.TurmaId & t.UnidadeId != unidadeId 
+            var turmas = await _db.Turmas.Where(t => t.Id != matriculaAtual.TurmaId & t.UnidadeId != unidadeId
             & (t.StatusAndamento == StatusTurma.AguardandoInicio.DisplayName || t.StatusAndamento == StatusTurma.EmAndamento.DisplayName)).ToListAsync();
 
             if (!turmas.Any()) return NotFound();
@@ -144,10 +145,63 @@ namespace Invictus.Api.Controllers.Pedagogico
         }
 
         [HttpPut]
-        [Route("transf-turma")]
-        public async Task<IActionResult> TransfTurma([FromBody] AnotacaoDto anotacao)
+        [Route("transf-turma/{matriculaId}/{newTurmaId}")]
+        public async Task<IActionResult> TransfTurma(Guid matriculaId, Guid newTurmaId)
         {
-            //await _matriculaApplication.SetAnotacao(anotacao);
+
+            var alunosDocumentos = await _db.AlunosDocs.Where(a => a.MatriculaId == matriculaId).ToListAsync();
+            foreach (var doc in alunosDocumentos)
+            {
+                doc.TransfTurma(newTurmaId);
+            }
+            //Boletos
+            var matricula = await _db.Matriculas.FindAsync(matriculaId);
+
+            matricula.TransfTurma(newTurmaId);
+
+            var turmasNotas = await _db.TurmasNotas.Where(t => t.MatriculaId == matriculaId).ToListAsync();
+
+            foreach (var nota in turmasNotas)
+            {
+                nota.TransfTurma(newTurmaId);
+            }
+
+            // ver materias q nao estao na turma DE destino e CRIAR na nova
+
+            // TurmasPresencas?? 
+            var start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+
+            start = start.AddDays(1);
+
+            var calendariosFutorsNovaTurma = await _db.Calendarios.Where(c => c.TurmaId == newTurmaId & c.DiaAula > start).ToListAsync();
+
+
+            // remover lista Presença antiga
+
+            //var presencasAntigas = await _db.Presencas.Where(p => p.MatriculaId == matriculaId &)
+                
+
+            //var presencas = new List<Presenca>();
+
+            //foreach (var calendario in calendarios)
+            //{
+            //    var presenca = new Presenca(calendario.id, null, _alunoId, _newMatriculaId, null);
+
+            //    presencas.Add(presenca);
+
+            //}
+
+            //await _turmaRepo.SaveListPresencas(presencas);
+
+            /*
+             TABELA PARA MUDAR:
+            Pessoas = unidadeId
+            AlunosDocumentos = TurmaId
+             Boletos = CentrocustoUnidadeId (só os q ainda irao vencer)
+            Matriculas = TurmaId
+            TurmasNotas = TurmaId
+            TurmasPresencas = MUDAR JUNTO COM CALENDARIO PRA FRENTE????????? ANALISAR
+             */
 
             return Ok();
 
@@ -168,7 +222,7 @@ namespace Invictus.Api.Controllers.Pedagogico
         [HttpGet]
         [Route("relatorio")]
         public async Task<IActionResult> GetRelatorio([FromQuery] string paramJson)
-        {            
+        {
             var matriculas = await _pedagMatriculaQueries.GetRelatorioMatriculas(paramJson);
 
             if (!matriculas.Any()) return NotFound();
@@ -180,19 +234,19 @@ namespace Invictus.Api.Controllers.Pedagogico
         [Route("{turmaId}/{alunoId}")]
         public async Task<IActionResult> Matricular(Guid turmaId, Guid alunoId, [FromBody] MatriculaCommand command)
         {
-           
+
             _matriculaApplication.AddParams(turmaId, alunoId, command);
-            var matriculaId = await _matriculaApplication.Matricular();            
+            var matriculaId = await _matriculaApplication.Matricular();
 
             return Ok(new { matriculaId = matriculaId });
-           
-          //  return Ok();
+
+            //  return Ok();
         }
 
         [HttpPost]
         [Route("anotacao")]
         public async Task<IActionResult> SetAnotacao([FromBody] AnotacaoDto anotacao)
-        {   
+        {
             await _matriculaApplication.SetAnotacao(anotacao);
 
             return Ok();
@@ -202,5 +256,5 @@ namespace Invictus.Api.Controllers.Pedagogico
 
     }
 
-    
+
 }

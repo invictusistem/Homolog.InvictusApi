@@ -67,6 +67,11 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
         //{
         //    TurmaId = turmaId;
         //}
+
+        public void TransfTurma(Guid turmaId)
+        {
+            TurmaId = turmaId;
+        }
         public static TurmaNotas CreateNota(Guid id,
                                 string avaliacaoUm,
                                 string segundaChamadaAvaliacaoUm,

@@ -49,6 +49,11 @@ namespace Invictus.Domain.Administrativo.FuncionarioAggregate
             Email = RemoveDiacritics(email);
         }
 
+        public void TransfTurma(Guid newUnidadeId)
+        {
+            UnidadeId = newUnidadeId;
+        }
+
         public void SetTipoPessoa(Invictus.Core.Enumerations.TipoPessoa tipoPessoa)
         {
             TipoPessoa = tipoPessoa.DisplayName;

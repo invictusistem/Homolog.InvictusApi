@@ -48,6 +48,11 @@ namespace Invictus.Domain.Financeiro.Configuracoes
         {
             Saldo += valor;
         }
+
+        public void EstornarEntrada(decimal valor)
+        {
+            Saldo -= valor;
+        }
         protected Banco()
         {
 

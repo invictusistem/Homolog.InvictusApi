@@ -42,6 +42,11 @@ namespace Invictus.Domain.Administrativo.RegistroMatricula
         public Guid CienciaAlunodId { get; private set; }
         public bool MatriculaConfirmada { get; private set; }
 
+        public void TransfTurma(Guid turmaId)
+        {
+            TurmaId = turmaId;
+        }
+
         public void SetConfirmacaoMatricula(bool confirmada)
         {
             MatriculaConfirmada = confirmada;

@@ -16,6 +16,7 @@ namespace Invictus.Core.Enumerations
         public static StatusPagamento Vencido = new(6, "Vencido");
         public static StatusPagamento Quitado = new(7, "Quitado");
         public static StatusPagamento Confirmado = new(8, "Confirmado"); // Confirmado pagamento
+        public static StatusPagamento Estornado = new(9, "Estornado");
         public StatusPagamento()
         {
 

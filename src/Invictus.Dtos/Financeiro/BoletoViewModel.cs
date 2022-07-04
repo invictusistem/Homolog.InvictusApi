@@ -28,7 +28,8 @@ namespace Invictus.Dtos.Financeiro
         public Guid? bancoId { get; set; }
         public Guid? centroCustoId { get; set; }
         public Guid? meioPagamentoId { get; set; }
-        public string formaPagamento { get; set; }
+        public Guid? formaRecebimentoId { get; set; }
+    public string formaPagamento { get; set; }
         public string digitosCartao { get; set; }
         public bool ehFornecedor { get; set; }
         public string tipoPessoa { get; set; }

@@ -63,6 +63,11 @@ namespace Invictus.Domain.Administrativo.AlunoAggregate
 
         //public int EstagioMatriculaId { get; private set; }
         //public virtual EstagioMatricula EstagioMatricula { get; private set; }
+
+        public void TransfTurma(Guid newTurmaId)
+        {
+            TurmaId = newTurmaId;
+        }
         public void SetDocClassificacao(ClassificacaoDoc docClass)
         {
             ClassificacaoDoc = docClass.DisplayName;

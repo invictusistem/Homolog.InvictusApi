@@ -511,7 +511,7 @@ namespace Invictus.QueryService.FinanceiroQueries
 
             if (cartao)
             {
-                query.Append(@" WHERE (Boletos.StatusBoleto = 'Confirmado' OR Boletos.StatusBoleto = 'Pago') 
+                query.Append(@" WHERE (Boletos.StatusBoleto = 'Confirmado' OR Boletos.StatusBoleto = 'Pago' OR Boletos.StatusBoleto = 'Estornado' ) 
                                 AND Boletos.FormaRecebimentoId IN (
                                 SELECT FormasRecebimento.id FROM FormasRecebimento 
                                 WHERE FormasRecebimento.EhCartao = @cartao
@@ -527,7 +527,7 @@ namespace Invictus.QueryService.FinanceiroQueries
                                 AND FormasRecebimento.UnidadeId = @unidadeId)
                                 AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ");
             }
-            
+
 
             //var query = @"SELECT 
             //            Boletos.id,
@@ -555,6 +555,9 @@ namespace Invictus.QueryService.FinanceiroQueries
             //            )
             //            AND Boletos.DataPagamento >= @start AND Boletos.DataPagamento <= @end ";
 
+            var queryFuncionario = @"SELECT Pessoas.nome FROM Pessoas INNER JOIN LogBoletos ON Pessoas.id = LogBoletos.UserId 
+                                    AND LogBoletos.BoletoId = @id";
+
             await using (var connection = new SqlConnection(
                     _config.GetConnectionString("InvictusConnection")))
             {
@@ -568,6 +571,12 @@ namespace Invictus.QueryService.FinanceiroQueries
                     {
                         item.dataCompensacao = item.dataPagamento.AddDays(item.diasParaCompensacao);
                     }
+                }
+
+                foreach (var item in boletos)
+                {
+                    var nome = await connection.QueryAsync<string>(queryFuncionario, new { id = item.id });
+                    item.usuario = nome.LastOrDefault();
                 }
 
                 connection.Close();

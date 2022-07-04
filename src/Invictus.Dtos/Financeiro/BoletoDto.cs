@@ -34,28 +34,41 @@ namespace Invictus.Dtos.Financeiro
         public int juros { get; set; }
         public int jurosFixo { get; set; }
         public string multa { get; set; }
-        public string nome { get; set; }
-        public string tipoPessoa { get; set; }
         public string multaFixo { get; set; }
-        public decimal desconto { get; set; }
         public string diasDesconto { get; set; }
         public string statusBoleto { get; set; }
         public Guid reparcelamentoId { get; set; }
         public Guid centroCustoUnidadeId { get; set; }
-        public Guid informacaoDebitoId { get; set; }
-        public Guid pessoaId { get; set; }
+        public string status { get; set; }
+        public string msg { get; set; }
+        public string digitosCartao { get; set; }
+        public Guid responsavelCadastroId { get; set; }
+        public string tipo { get; set; }
+        public DateTime dataCadastro { get; set; }
         public Guid bancoId { get; set; }
+        public Guid centroCustoId { get; set; }
+        public Guid meioPagamentoId { get; set; }
         public Guid subContaId { get; set; }
-        public string banco { get; set; }
         public bool ehFornecedor { get; set; }
+        public Guid pessoaId { get; set; }
         public bool ativo { get; set; }
+        public Guid formaRecebimentoId { get; set; }
+        public decimal desconto { get; set; }
+        public string identificador { get; set; }
+        public string tipoVenda { get; set; }
+        public DateTime dataCompensacao { get; set; }
+        public bool compensado { get; set; }
+        public string tipoTransacao { get; set; }
+        public string nossonumero { get; set; }
+        public string nome { get; set; }
+        public string tipoPessoa { get; set; }
+        public string banco { get; set; }
 
         //public BoletoResponseInfo InfoBoletos { get; private set; }
         public string id_unico { get; set; }
         public string id_unico_original { get; set; }
-        public string status { get; set; }
-        public string msg { get; set; }
-        public string nossonumero { get; set; }
+        
+        
         public string linkBoleto { get; set; }
         public string linkGrupo { get; set; }
         public string linhaDigitavel { get; set; }
@@ -66,13 +79,12 @@ namespace Invictus.Dtos.Financeiro
         public string historico { get; set; }
         public string subConta { get; set; }
         public string formaPagamento { get; set; }
-        public string digitosCartao { get; set; }
-        public Guid centroCustoId { get; set; }
-        public Guid meioPagamentoId { get; set; }
-        public Guid responsavelCadastroId { get; set; }
+        
+        
+        
         public Guid boletoId { get; set; }
-        public string tipo { get; set; }
-        public DateTime dataCadastro { get; set; }
+        
+        
 
     }
 }

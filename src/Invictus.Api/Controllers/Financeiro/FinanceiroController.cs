@@ -331,6 +331,7 @@ namespace Invictus.Api.Controllers.Financeiro
                 ativo = boletoDto.ativo,
                 subContaId = boletoDto.subContaId,
                 bancoId = boletoDto.bancoId,
+                formaRecebimentoId = boletoDto.formaRecebimentoId,
                 centroCustoId = boletoDto.centroCustoId,
                 meioPagamentoId = boletoDto.meioPagamentoId,
                 formaPagamento = boletoDto.formaPagamento,
@@ -464,6 +465,48 @@ namespace Invictus.Api.Controllers.Financeiro
             var usuarioId = _aspNetUser.ObterUsuarioId();
 
             var logBoleto = LogBoletos.BoletoLog(boleto.Id, EventoBoletoLog.Compensacao, usuarioId);
+
+            await _db.LogBoletos.AddAsync(logBoleto);
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+
+        }
+
+
+        [HttpPut]
+        [Route("contas/estornar/{contaId}")]
+        public async Task<IActionResult> EstornarConta(Guid contaId, [FromQuery] string motivo)
+        {
+            var boletoDto = await _finQueries.GetContaReceber(contaId);
+            var toBoleto = ToBoletoView(boletoDto);
+            var boleto = _mapper.Map<Boleto>(toBoleto);
+
+            if (boleto.StatusBoleto != "Confirmado")
+            {
+                return BadRequest();
+            }
+
+            boleto.Estornar();
+
+            await _db.Boletos.SingleUpdateAsync(boleto);
+
+            await _db.SaveChangesAsync();
+
+            var banco = await _db.Bancos.FindAsync(boleto.BancoId);
+
+            banco.EstornarEntrada(boleto.ValorPago);
+
+            _db.Bancos.Update(banco);
+
+            _db.SaveChanges();
+
+
+
+            var usuarioId = _aspNetUser.ObterUsuarioId();
+
+            var logBoleto = LogBoletos.BoletoLog(boleto.Id, EventoBoletoLog.Estorno, usuarioId);
 
             await _db.LogBoletos.AddAsync(logBoleto);
 

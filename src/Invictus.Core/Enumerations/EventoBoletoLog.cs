@@ -14,6 +14,7 @@ namespace Invictus.Core.Enumerations
         public static EventoBoletoLog Recebimento = new(4, "Recebimento");
         public static EventoBoletoLog Exclusao = new(5, "Exclusão");
         public static EventoBoletoLog Criacao = new(6, "Criação");
+        public static EventoBoletoLog Estorno = new(7, "Estorno");
 
         public EventoBoletoLog() { }
         public EventoBoletoLog(int id, string name) : base(id, name) { }
