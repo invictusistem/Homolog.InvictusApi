@@ -57,6 +57,17 @@ namespace Invictus.Api.Controllers
         }
 
         [HttpGet]
+        [Route("acessos/{rangeini}/{rangefinal}")]
+        public async Task<IActionResult> GetAcessos(DateTime rangeini, DateTime rangefinal)
+        {
+            var result = await _unidadeQueries.Acessos(rangeini, rangefinal);
+
+            if (!result.Any()) return NotFound();
+
+            return Ok(new { result = result });           
+        }
+
+        [HttpGet]
         [Route("{colaboradorId}")]
         public async Task<IActionResult> GetUsuario(Guid colaboradorId)
         {

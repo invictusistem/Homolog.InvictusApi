@@ -51,6 +51,11 @@ namespace Invictus.Domain.Administrativo.TurmaAggregate
         public List<Horario> Horarios { get; private set; }
         public List<TurmaMaterias> Materias { get; private set; }
 
+        public void CancelarTurma()
+        {
+            StatusAndamento = StatusTurma.Cancelada.DisplayName;
+        }
+
         public void CreateIdentificador(int turmasExistentes, string siglaUnidade)
         {
             int totalCaracteres = 6;

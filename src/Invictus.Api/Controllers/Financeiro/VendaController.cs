@@ -66,25 +66,27 @@ namespace Invictus.Api.Controllers.Financeiro
                 connection.Close();
             }
 
-            foreach (var item in results)
-            {
-                var htmlMessage = "";
-                var infos = await _db.LogBoletos.Where(l => l.BoletoId == item.id).SingleOrDefaultAsync();
 
-                var logCommand = JsonConvert.DeserializeObject<VendaProdutoCommand>(infos.ProdutosVenda);
-                item.parcelas = logCommand.parcelas;
-                item.qntItems = logCommand.produtos.Select(p => p.quantidade).Sum();
-                foreach (var prods in logCommand.produtos)
-                {
-                    htmlMessage += "<h6>. " + prods.quantidade.ToString() + " " + prods.nome + "</h6>";
-                    item.infoItems = htmlMessage;
+            //info dos logs
+            //foreach (var item in results)
+            //{
+            //    var htmlMessage = "";
+            //    var infos = await _db.LogBoletos.Where(l => l.BoletoId == item.id).ToListAsync();//.SingleOrDefaultAsync();
+
+            //    var logCommand = JsonConvert.DeserializeObject<VendaProdutoCommand>(infos.LastOrDefault().ProdutosVenda);
+            //    item.parcelas = logCommand.parcelas;
+            //    item.qntItems = logCommand.produtos.Select(p => p.quantidade).Sum();
+            //    foreach (var prods in logCommand.produtos)
+            //    {
+            //        htmlMessage += "<h6>. " + prods.quantidade.ToString() + " " + prods.nome + "</h6>";
+            //        item.infoItems = htmlMessage;
                     
                     
-                }
-                // '<h6>. 1 blusa invitus</h6>'
+            //    }
+                
 
 
-            }
+            //}
             /*
              SELECT 
 Boletos.id,
@@ -160,7 +162,7 @@ AND Boletos.DataPagamento < '2022-06-30T23:59:59'
 
                     var historico = "PARCELA " + (i+1).ToString() + "/" + command.parcelas.ToString() + " VENDA PRODUTOS";
                     boletos.Add(Boleto.CadastrarBoletoVendaProdutoFactory(valorParcela, valorParcela, command.digitosCartao, Core.Enumerations.TipoLancamento.Credito,
-                    unidadeId, userId, historico, command.bancoId, command.formaRecebimentoId, data));
+                    unidadeId, userId, historico, command.bancoId, command.formaRecebimentoId, data, command.matriculaId));
                 }
                
             }
@@ -168,7 +170,7 @@ AND Boletos.DataPagamento < '2022-06-30T23:59:59'
             {
                 var data = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
                 boletos.Add(Boleto.CadastrarBoletoVendaProdutoFactory(command.valorReceber, command.valorRecebido, command.digitosCartao, Core.Enumerations.TipoLancamento.Credito,
-                    unidadeId, userId,"VENDA PRODUTOS À VISTA", command.bancoId, command.formaRecebimentoId, data));
+                    unidadeId, userId,"VENDA PRODUTOS À VISTA", command.bancoId, command.formaRecebimentoId, data, command.matriculaId));
             }
 
             await _db.Boletos.AddRangeAsync(boletos);

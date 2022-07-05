@@ -30,6 +30,7 @@ namespace Invictus.Dtos.AdmDtos
     {
         public Guid id { get; set; }
         public string nome { get; set; }
+        public Guid materiaId { get; set; }
         public Guid matriculaId { get; set; }
         public Guid calendarioId { get; set; }
         public bool isPresent { get; set; }

@@ -1,9 +1,11 @@
-﻿using Invictus.Application.AdmApplication.Interfaces;
+﻿using Dapper;
+using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Core.Enumerations;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
 using Invictus.Domain.Administrativo.RegistroMatricula;
 using Invictus.Domain.Administrativo.TurmaAggregate;
+using Invictus.Domain.Padagogico.NotasTurmas;
 using Invictus.Dtos.AdmDtos;
 using Invictus.Dtos.PedagDto;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
@@ -12,8 +14,11 @@ using Invictus.QueryService.Utilitarios.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,13 +31,15 @@ namespace Invictus.Api.Controllers.Pedagogico
     {
 
         private readonly IMatriculaQueries _matriculaQueries;
+        private readonly ITurmaQueries _turmaQueries;
         private readonly IMatriculaApplication _matriculaApplication;
         private readonly IPedagMatriculaQueries _pedagMatriculaQueries;
         private readonly IAspNetUser _aspNetUser;
+        private readonly IConfiguration _config;
         private readonly IUtils _utils;
         private readonly InvictusDbContext _db;
         public MatriculaController(IMatriculaQueries matriculaQueries, IMatriculaApplication matriculaApplication, IPedagMatriculaQueries pedagMatriculaQueries,
-            IUtils utils, InvictusDbContext db, IAspNetUser aspNetUser)
+            IUtils utils, InvictusDbContext db, IAspNetUser aspNetUser, IConfiguration config, ITurmaQueries turmaQueries)
         {
             _matriculaQueries = matriculaQueries;
             _matriculaApplication = matriculaApplication;
@@ -40,7 +47,11 @@ namespace Invictus.Api.Controllers.Pedagogico
             _aspNetUser = aspNetUser;
             _utils = utils;
             _db = db;
+            _config = config;
+            _turmaQueries = turmaQueries;
         }
+
+
 
         [HttpGet]
         [Route("{alunoId}")]
@@ -144,54 +155,140 @@ namespace Invictus.Api.Controllers.Pedagogico
             return Ok(new { turmas = turmas });
         }
 
+        private async Task<List<ListaPresencaDto>>  GetPresencaAntiga(Guid matriculaId)
+        {
+            var query = @"Select 
+                        Calendarios.MateriaId,
+                        TurmasPresencas.IsPresent
+                        from Calendarios
+                        inner join TurmasPresencas on Calendarios.Id = TurmasPresencas.CalendarioId
+                        WHERE TurmasPresencas.MatriculaId = @matriculaId ";
+
+
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var result = await connection.QueryAsync<ListaPresencaDto>(query, new { matriculaId = matriculaId });
+
+                connection.Close();
+
+                return result.ToList();
+            }
+        }
+
+
         [HttpPut]
         [Route("transf-turma/{matriculaId}/{newTurmaId}")]
         public async Task<IActionResult> TransfTurma(Guid matriculaId, Guid newTurmaId)
         {
+            // VerificarSeTemVagaNaTurmaDestino()
 
+            
+
+            // EfeticarTransfeRenciaDocumentosAluno()
             var alunosDocumentos = await _db.AlunosDocs.Where(a => a.MatriculaId == matriculaId).ToListAsync();
             foreach (var doc in alunosDocumentos)
             {
                 doc.TransfTurma(newTurmaId);
             }
-            //Boletos
+            
+            _db.AlunosDocs.UpdateRange(alunosDocumentos);
+
+            // EfetivarTransferenciaTurmaMatricuia()
             var matricula = await _db.Matriculas.FindAsync(matriculaId);
 
             matricula.TransfTurma(newTurmaId);
 
-            var turmasNotas = await _db.TurmasNotas.Where(t => t.MatriculaId == matriculaId).ToListAsync();
+            _db.Matriculas.Update(matricula);
 
-            foreach (var nota in turmasNotas)
+
+            // TransferiarTurmaNotas()
+            /*
+             NOTAS:
+                CRIAR NOVA NOTAS DO ALUNO
+                loop nas antigas, uma por uma ve se na nova tem com msm matérias e copiar notas
+                salvar novas
+                apagar antigas
+             */
+
+            var turmasMaterias = await _turmaQueries.GetMateriasDaTurma(newTurmaId);
+            var newTurmaNotas = new List<TurmaNotas>();
+            foreach (var materia in turmasMaterias)
             {
-                nota.TransfTurma(newTurmaId);
+                var nota = new TurmaNotas();
+                newTurmaNotas.Add(nota.CreateNotaDisciplinas(materia.nome, materia.id, matriculaId, newTurmaId));
             }
 
-            // ver materias q nao estao na turma DE destino e CRIAR na nova
 
-            // TurmasPresencas?? 
-            var start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            var turmasNotasAtuais = await _db.TurmasNotas.Where(t => t.MatriculaId == matriculaId).ToListAsync();
 
-            start = start.AddDays(1);
+            foreach (var nota in newTurmaNotas)
+            {
+                var correspondente = turmasNotasAtuais.Where(t => t.MateriaId == nota.MateriaId).SingleOrDefault();
 
-            var calendariosFutorsNovaTurma = await _db.Calendarios.Where(c => c.TurmaId == newTurmaId & c.DiaAula > start).ToListAsync();
+                if(correspondente != null)
+                {
+                    nota.CopiarNotas(correspondente);
+                }
+            }
+
+            _db.TurmasNotas.RemoveRange(turmasNotasAtuais);
+
+            await _db.TurmasNotas.AddRangeAsync(newTurmaNotas);
 
 
-            // remover lista Presença antiga
 
-            //var presencasAntigas = await _db.Presencas.Where(p => p.MatriculaId == matriculaId &)
-                
 
-            //var presencas = new List<Presenca>();
+            // TransferirPresenca()
+            /*
+             pega o calendario da turma de destiano
+            pega a lista de presenca atual por materiaId e presenca
+            dou um loop no calendario vejo se tem na lista de presena item com a msm materia Id
+                se tiver, pego o item, crio uma nova presenca com esse valor da presenca velha
+                pego a lsita da presençca velha e tiro o item da lista
 
-            //foreach (var calendario in calendarios)
-            //{
-            //    var presenca = new Presenca(calendario.id, null, _alunoId, _newMatriculaId, null);
+             */
+            var calendarios = await _db.Calendarios.Where(c => c.TurmaId == newTurmaId).ToListAsync();
+            var calendarioOrder = calendarios.OrderBy(c => c.DiaAula);
 
-            //    presencas.Add(presenca);
+            var presencas = new List<Presenca>();
 
-            //}
+            var presencaAntigas = await GetPresencaAntiga(matriculaId);
 
-            //await _turmaRepo.SaveListPresencas(presencas);
+            foreach (var calendario in calendarioOrder)
+            {
+                var oldNota = presencaAntigas.Where(p => p.materiaId == calendario.MateriaId).FirstOrDefault();
+
+                bool? prese = null;
+                if(oldNota != null)
+                {
+                    prese = oldNota.isPresent;
+
+                    presencaAntigas.Remove(oldNota);
+                }
+                var presenca = new Presenca(calendario.Id, prese, matricula.AlunoId, matriculaId, null);
+
+                presencas.Add(presenca);
+
+            }
+            // primeiro pagar as antes p depois salvar as novas
+            var oldPresenca = await _db.Presencas.Where(p => p.MatriculaId == matriculaId).ToListAsync();
+
+            _db.Presencas.RemoveRange(oldPresenca);
+
+            await _db.Presencas.AddRangeAsync(presencas);
+
+
+
+
+
+
+            _db.SaveChanges();
+
+         
 
             /*
              TABELA PARA MUDAR:
@@ -201,6 +298,23 @@ namespace Invictus.Api.Controllers.Pedagogico
             Matriculas = TurmaId
             TurmasNotas = TurmaId
             TurmasPresencas = MUDAR JUNTO COM CALENDARIO PRA FRENTE????????? ANALISAR
+             */
+
+            /* REFACT
+             NOTAS:
+             CRIAR NOVA NOTAS DO ALUNO
+                loop nas antigas, uma por uma ve se na nova tem com msm matérias e copiar notas
+                salvar novas
+                apagar antigas
+
+            PRESENCA
+            CRIAR NOVA PRESENCA ALUNO
+                dar um loopr no calendario nova 
+                    para cada, criar presenca nova
+                    em cada ver se tem P ou F
+                    
+                 
+             
              */
 
             return Ok();

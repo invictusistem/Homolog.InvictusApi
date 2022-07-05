@@ -3,6 +3,7 @@ using Invictus.Application.AdmApplication.Interfaces;
 using Invictus.Application.Extensions;
 using Invictus.Core;
 using Invictus.Core.Enumerations;
+using Invictus.Core.Enumerations.Logs;
 using Invictus.Core.Extensions;
 using Invictus.Core.Interfaces;
 using Invictus.Data.Context;
@@ -225,7 +226,7 @@ namespace Invictus.Application.AdmApplication
 
             var colab = _aspNetUser.ObterUsuarioId();
             var commandJson = JsonConvert.SerializeObject(command);
-            var log = new LogTurmas(turma.Id, colab, DateTime.Now, unidade.id, commandJson);
+            var log = new LogTurmas(turma.Id,LogTurmaAcao.Criacao, colab, DateTime.Now, unidade.id, commandJson);
 
             _db.LogTurmas.Add(log);
             _db.SaveChanges();

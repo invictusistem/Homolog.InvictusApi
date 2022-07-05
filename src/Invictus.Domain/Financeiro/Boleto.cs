@@ -256,7 +256,8 @@ namespace Invictus.Domain.Financeiro
                    //Guid? subcontaId,
                    Guid? bancoId,
                    Guid formaRecebimentoId,
-                   DateTime dataCompensacao
+                   DateTime dataCompensacao,
+                   Guid pessoaId
                    )
         {
             var boleto = new Boleto()
@@ -285,8 +286,8 @@ namespace Invictus.Domain.Financeiro
                 ResponsavelCadastroId = responsavelCadastroId,
                 DataCadastro = DateTime.Now,
                 Ativo = true,
-                Identificador = "Produto"
-
+                Identificador = "Produto",
+                PessoaId = pessoaId
             };
 
             return boleto;

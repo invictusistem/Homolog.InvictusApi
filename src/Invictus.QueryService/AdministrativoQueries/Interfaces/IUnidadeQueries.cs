@@ -18,6 +18,7 @@ namespace Invictus.QueryService.AdministrativoQueries.Interfaces
         Task<UnidadeDto> GetUnidadeById(Guid id);
         Task<IEnumerable<UnidadeDto>> GetUnidadesDonatarias(string unidadeSigla);
         Task<int> CountSalaUnidade(Guid unidadeId);
+        Task<IEnumerable<Acesso>> Acessos(DateTime inicio, DateTime fim);
 
     }
 }

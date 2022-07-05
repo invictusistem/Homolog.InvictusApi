@@ -1,9 +1,14 @@
 ﻿using Invictus.Application.AdmApplication.Interfaces;
+using Invictus.Core.Enumerations.Logs;
+using Invictus.Core.Interfaces;
+using Invictus.Data.Context;
+using Invictus.Domain.Administrativo.Logs;
 using Invictus.Dtos.AdmDtos;
 using Invictus.QueryService.AdministrativoQueries.Interfaces;
 using Invictus.QueryService.PedagogicoQueries.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +28,11 @@ namespace Invictus.Api.Controllers
         private readonly ITurmaQueries _turmaQueries;
         private readonly IPlanoPagamentoQueries _planosQueries;
         private readonly ITurmaPedagQueries _turmaPedagQueries;
+        private readonly IAspNetUser _netUser;
+        private readonly InvictusDbContext _db;
         public TurmaController(IUnidadeQueries unidadeQueries, ITypePacoteQueries typeQueries, ITurmaApplication turmaApplication,
-            ITurmaQueries turmaQueries, IPlanoPagamentoQueries planosQueries, IAlunoQueries alunoQueries, ITurmaPedagQueries turmaPedagQueries)
+            ITurmaQueries turmaQueries, IPlanoPagamentoQueries planosQueries, IAlunoQueries alunoQueries, ITurmaPedagQueries turmaPedagQueries,
+            InvictusDbContext db, IAspNetUser netUser)
         {
             _unidadeQueries = unidadeQueries;
             _typeQueries = typeQueries;
@@ -33,6 +41,8 @@ namespace Invictus.Api.Controllers
             _planosQueries = planosQueries;
             _alunoQueries = alunoQueries;
             _turmaPedagQueries = turmaPedagQueries;
+            _db = db;
+            _netUser = netUser;
         }
 
 
@@ -172,6 +182,51 @@ namespace Invictus.Api.Controllers
         {
             await _turmaApplication.AdiarInicio(turmaId);
 
+            return Ok();
+
+        }
+
+        [HttpPut]
+        [Route("cancelar/{turmaId}")]
+        public async Task<IActionResult> Cancelar(Guid turmaId)
+        {
+            var turma = await _db.Matriculas.Where(t => t.TurmaId == turmaId).ToListAsync();
+
+            if (turma.Any()) return Conflict();
+
+            var userId = _netUser.ObterUsuarioId();
+            var unidadeId = _netUser.GetUnidadeIdDoUsuario();
+            var logTurma = new LogTurmas(turmaId, LogTurmaAcao.Cancelamento, userId, DateTime.Now, unidadeId, "");
+
+            await _db.LogTurmas.AddAsync(logTurma);
+
+            var calendariosDaTurma = await _db.Calendarios.Where(c => c.TurmaId == turmaId).ToListAsync();
+
+            var turmaHorarios = await _db.Horarios.Where(c => c.TurmaId == turmaId).ToListAsync();
+            _db.Horarios.RemoveRange(turmaHorarios);
+            var turmaMaterias = await _db.TurmasMaterias.Where(c => c.TurmaId == turmaId).ToListAsync();
+            _db.TurmasMaterias.RemoveRange(turmaMaterias);
+            var turmaNotas = await _db.TurmasNotas.Where(c => c.TurmaId == turmaId).ToListAsync();
+            _db.TurmasNotas.RemoveRange(turmaNotas);
+            //var turmaPresencas = await _db.Presencas.Where(c => c..TurmaId == turmaId).ToListAsync();
+            var turmaPrevisoes = await _db.Previsoes.Where(c => c.TurmaId == turmaId).ToListAsync();
+            _db.Previsoes.RemoveRange(turmaPrevisoes);
+            var turmaProfessores = await _db.TurmasProfessores.Where(c => c.TurmaId == turmaId).ToListAsync();
+            _db.TurmasProfessores.RemoveRange(turmaProfessores);
+            // var turma //UPDATE
+
+            var turmaCancelar = await _db.Turmas.FindAsync(turmaId);
+
+            turmaCancelar.CancelarTurma();
+
+            _db.Turmas.Update(turmaCancelar);
+            try
+            {
+                _db.SaveChanges();
+            }catch(Exception ex)
+            {
+
+            }
             return Ok();
 
         }

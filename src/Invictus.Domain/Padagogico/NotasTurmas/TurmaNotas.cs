@@ -15,8 +15,8 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
 
         }
         public TurmaNotas(//int id,
-                               // int trimestre,
-                                //Avaliacao avaliacao,
+                          // int trimestre,
+                          //Avaliacao avaliacao,
                                 string avaliacaoUm,
                                 string segundaChamadaAvaliacaoUm,
                                 string avaliacaoDois,
@@ -30,8 +30,8 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
 
                                 ResultadoNotas resultado)
         {
-           // Id = id;
-           // Trimestre = trimestre;
+            // Id = id;
+            // Trimestre = trimestre;
             //Avaliacao = avaliacao;
             AvaliacaoUm = avaliacaoUm;
             SegundaChamadaAvaliacaoUm = segundaChamadaAvaliacaoUm;
@@ -47,7 +47,7 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
             Resultado = resultado.DisplayName;
 
         }
-       // public int Id { get; private set; }
+        // public int Id { get; private set; }
         //public int Trimestre { get; private set; }
         public string AvaliacaoUm { get; private set; }
         public string SegundaChamadaAvaliacaoUm { get; private set; }
@@ -67,6 +67,18 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
         //{
         //    TurmaId = turmaId;
         //}
+
+        public void CopiarNotas(TurmaNotas turma)
+        {
+            AvaliacaoUm = turma.AvaliacaoUm;
+            SegundaChamadaAvaliacaoUm = turma.SegundaChamadaAvaliacaoUm;
+            AvaliacaoDois = turma.AvaliacaoDois;
+            SegundaChamadaAvaliacaoDois = turma.SegundaChamadaAvaliacaoDois;
+            AvaliacaoTres = turma.AvaliacaoTres;
+            SegundaChamadaAvaliacaoTres = turma.SegundaChamadaAvaliacaoTres;
+            Resultado = turma.Resultado;
+
+        }
 
         public void TransfTurma(Guid turmaId)
         {
@@ -152,7 +164,7 @@ namespace Invictus.Domain.Padagogico.NotasTurmas
         {
             var notaDisciplina = new TurmaNotas(null, null, null, null, null, null,
                     materiaTurmaId, materiaDescricao, matriculaId, turmaId, ResultadoNotas.Aguardo);
-            
+
 
             return notaDisciplina;
 

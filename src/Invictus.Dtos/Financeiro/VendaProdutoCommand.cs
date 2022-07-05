@@ -17,5 +17,6 @@ namespace Invictus.Dtos.Financeiro
         public List<ProdutoDto> produtos { get; set; }
         public decimal valorReceber { get; set; }
         public decimal valorRecebido { get; set; }
+        public Guid matriculaId { get; set; }
     }
 }

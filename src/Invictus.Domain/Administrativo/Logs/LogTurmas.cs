@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Invictus.Core.Enumerations.Logs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Invictus.Domain.Administrativo.Logs
     {
         public LogTurmas(
                             Guid turmaId,
+                            LogTurmaAcao acao,
                             Guid guidColaborador,
                             DateTime dataCriacao,
                             Guid unidadeId,
@@ -17,6 +19,7 @@ namespace Invictus.Domain.Administrativo.Logs
         {
 
             TurmaId = turmaId;
+            Acao = acao.DisplayName;
             GuidColaborador = guidColaborador;
             DataCriacao = dataCriacao;
             UnidadeId = unidadeId;
@@ -25,6 +28,7 @@ namespace Invictus.Domain.Administrativo.Logs
         }
 
         public Guid Id { get; private set; }
+        public string Acao { get; set; }
         public Guid TurmaId { get; private set; }
         public Guid GuidColaborador { get; private set; }
         public DateTime DataCriacao { get; private set; }

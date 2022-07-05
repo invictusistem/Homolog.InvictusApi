@@ -180,5 +180,35 @@ namespace Invictus.QueryService.AdministrativoQueries
             }
         }
 
+        public async Task<IEnumerable<Acesso>> Acessos(DateTime inicio, DateTime fim)
+        {
+            var start = new DateTime(inicio.Year, inicio.Month, inicio.Day, 0, 0, 0);
+            var end = new DateTime(fim.Year, fim.Month, fim.Day, 23, 59, 59);
+            var unidadeSigla = _aspNetUser.ObterUnidadeDoUsuario();
+
+            StringBuilder query = new StringBuilder();
+            query.Append(@"SELECT 
+                        Pessoas.Nome,
+                        LogLogins.Data,
+                        LogLogins.Email
+                        FROM LogLogins
+                        LEFT JOIN Pessoas on LogLogins.UserId = Pessoas.Id                        
+                        WHERE LogLogins.Unidade = @unidadeSigla
+                        AND LogLogins.data >= @start  
+                        AND LogLogins.data <= @end
+                        ORDER BY LogLogins.data asc ");
+
+            await using (var connection = new SqlConnection(
+                    _config.GetConnectionString("InvictusConnection")))
+            {
+                connection.Open();
+
+                var acessos = await connection.QueryAsync<Acesso>(query.ToString(), new { unidadeSigla = unidadeSigla, start = start, end = end });
+
+                connection.Close();
+
+                return acessos;
+            }
+        }
     }
 }
